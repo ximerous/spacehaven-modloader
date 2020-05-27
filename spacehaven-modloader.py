@@ -107,7 +107,19 @@ class Window(Frame):
         self.gamePath = None
         self.jarPath = None
         self.modPath = None
-
+        
+        try:
+            cache_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "previous_spacehaven_path.txt")
+            with open(cache_file, 'r') as f:
+                location = f.read()
+                if os.path.exists(location):
+                    self.locateSpacehaven(location)
+                    return
+        except:
+            import traceback
+            traceback.print_exc()
+            pass
+        
         for location in POSSIBLE_SPACEHAVEN_LOCATIONS:
             location = os.path.abspath(location)
             if os.path.exists(location):
@@ -141,7 +153,12 @@ class Window(Frame):
         ui.log.log("  gamePath: {}".format(self.gamePath))
         ui.log.log("  modPath: {}".format(self.modPath))
         ui.log.log("  jarPath: {}".format(self.jarPath))
-
+        
+        
+        cache_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "previous_spacehaven_path.txt")
+        with open(cache_file, 'w') as f:
+            f.write(path)
+        
         self.checkForLoadedMods()
 
         self.gameInfo = ui.gameinfo.GameInfo(self.jarPath)
