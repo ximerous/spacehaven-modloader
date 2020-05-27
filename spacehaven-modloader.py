@@ -109,8 +109,7 @@ class Window(Frame):
         self.modPath = None
         
         try:
-            cache_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "previous_spacehaven_path.txt")
-            with open(cache_file, 'r') as f:
+            with open("previous_spacehaven_path.txt", 'r') as f:
                 location = f.read()
                 if os.path.exists(location):
                     self.locateSpacehaven(location)
@@ -155,8 +154,7 @@ class Window(Frame):
         ui.log.log("  jarPath: {}".format(self.jarPath))
         
         
-        cache_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "previous_spacehaven_path.txt")
-        with open(cache_file, 'w') as f:
+        with open("previous_spacehaven_path.txt", 'w') as f:
             f.write(path)
         
         self.checkForLoadedMods()

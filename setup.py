@@ -27,6 +27,7 @@ setup(
     setup_requires=[],
     install_requires=[
         'lxml',
+        'cx_Freeze'
         'click',
         'pypng',
         'six',
