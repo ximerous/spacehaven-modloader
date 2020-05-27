@@ -25,7 +25,6 @@ class ModDatabase:
             if modFolder == 'spacehaven':
                 continue  # don't need to load core game definitions
             
-            # FIXME this test seems buggy ??
             if os.path.isfile(os.path.join(self.path, modFolder)):
                 continue  # don't load logs, prefs, etc
             if not os.path.isfile(os.path.join(os.path.join(self.path, modFolder), "info")):
