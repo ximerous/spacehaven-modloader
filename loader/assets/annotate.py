@@ -49,11 +49,11 @@ def annotate(corePath):
         elementNames[element.get("eid")] = name
     
     for item in haven.find("Item"):
-        name = nameOf(element) or element.get("elementType") or ""
+        name = nameOf(item) or item.get("elementType") or ""
         
         if name:
-            element.set("_annotated_name", name)
-        elementNames[element.get("mid")] = name
+            item.set("_annotated_name", name)
+        elementNames[item.get("mid")] = name
     
     # small helped to annotate a node
     def _annotate_elt(element, attr = None):

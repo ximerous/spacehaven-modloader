@@ -5,3 +5,4 @@ dist/
 .eggs/
 spacehaven-modloader.spec
 logs.txt
+previous_spacehaven_path.txt
