@@ -246,6 +246,8 @@ class Window(Frame):
             ui.launcher.launchAndWait(self.gamePath)
             loader.load.unload(self.jarPath)
         except Exception as ex:
+            import traceback
+            traceback.print_exc()
             messagebox.showerror("Error loading mods", str(ex))
 
 

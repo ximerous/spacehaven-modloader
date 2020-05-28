@@ -83,6 +83,8 @@ class Mod:
         ui.log.log("    Minimum Loader Version: {}".format(self.minimumLoaderVersion))
 
     def verifyGameVersion(self, mod, gameInfo):
+        # FIXME disabled ATM as this check doesn't work
+        return
         self.gameVersions = []
 
         gameVersionsTag = mod.find("gameVersions")

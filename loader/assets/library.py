@@ -7,12 +7,13 @@ from zipfile import ZipFile
 
 import ui.log
 
-PATCHABLE_FILES = [
+PATCHABLE_XML_FILES = [
     'library/haven',
     'library/texts',
     'library/animations'
 ]
 
+PATCHABLE_CIM_FILES = ["library/%d.cim" % i for i in range(24)]
 
 def extract(jarPath, corePath):
     """Extract library files from spacehaven.jar"""
@@ -24,7 +25,7 @@ def extract(jarPath, corePath):
     with ZipFile(jarPath, "r") as spacehaven:
         for file in set(spacehaven.namelist()):
             if file.startswith("library/") and not file.endswith("/"):
-                ui.log.log("    {}".format(file))
+#                ui.log.log("    {}".format(file))
                 spacehaven.extract(file, corePath)
 
 
@@ -33,12 +34,16 @@ def patch(jarPath, corePath, resultPath):
 
     original = ZipFile(jarPath, "r")
     patched = ZipFile(resultPath, "w")
-
+    
+    patchable_files = PATCHABLE_XML_FILES + PATCHABLE_CIM_FILES
     for file in set(original.namelist()):
-        if not file.endswith("/") and not file in PATCHABLE_FILES:
+        if not file.endswith("/") and not file in patchable_files:
             patched.writestr(file, original.read(file))
-
-    for file in PATCHABLE_FILES:
+    
+    original.close()
+    
+    for file in patchable_files:
+        ui.log.log("  Merging modded {}...".format(file))
         patched.write(os.path.join(corePath, file.replace('/', os.sep)), file)
 
     patched.close()
