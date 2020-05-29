@@ -67,7 +67,7 @@ class Window(Frame):
         
         # left side mods list
         self.modListFrame = Frame(self.modBrowser)
-        self.modList = Listbox(self.modListFrame, height=0, selectmode=SINGLE)
+        self.modList = Listbox(self.modListFrame, height=0, selectmode=SINGLE, activestyle = NONE)
         self.modList.bind('<<ListboxSelect>>', self.showCurrentMod)
         self.modList.pack(fill=BOTH, expand=1, padx=4, pady=4)
 
@@ -75,9 +75,14 @@ class Window(Frame):
         
         # right side mod info
         self.modDetailsFrame = Frame(self.modBrowser)
-        self.modDetailsName = Label(self.modDetailsFrame, font="TkDefaultFont 14 bold", anchor=W)
-        self.modDetailsName.pack(fill=X, padx=4, pady=4)
-
+        frame = Frame(self.modDetailsFrame)
+        self.modEnableDisable = Button(frame, text="Enable", command=self.toggle_current_mod)
+        self.modEnableDisable.pack(side = RIGHT, padx=4, pady=4)
+        
+        self.modDetailsName = Label(frame, font="TkDefaultFont 14 bold", anchor=W)
+        self.modDetailsName.pack(fill = X, padx=4, pady=4)
+        frame.pack(fill = X, padx=4, pady=4)
+        
         self.modDetailsDescription = Text(self.modDetailsFrame, wrap=WORD, font="TkDefaultFont", height=0)
         self.modDetailsDescription.pack(fill=BOTH, expand=1, padx=4, pady=4)
 
@@ -229,38 +234,72 @@ class Window(Frame):
         self.modList.delete(0, END)
 
         if self.modPath is None:
-            self.showMod("Spacehaven not found", "Please use the Browse button above to locate Spacehaven.")
+            self.showModError("Spacehaven not found", "Please use the 'Find game' button below to locate Spacehaven.")
             return
 
         self.modDatabase = ui.database.ModDatabase(self.modPath, self.gameInfo)
-
+        
+        mod_idx = 0
         for mod in self.modDatabase.mods:
             self.modList.insert(END, mod.name)
-
-        self.showCurrentMod()
-
-    def showCurrentMod(self, _arg=None):
-        if len(self.modDatabase.mods) == 0:
-            self.showMod("No mods found", "Please install some mods into your mods folder.")
-            return
-
-        if len(self.modList.curselection()) == 0:
-            mod = self.modDatabase.mods[0]
-            self.modList.selection_set(0)
-        else:
-            mod = self.modDatabase.mods[self.modList.curselection()[0]]
+            # TODO reimplement later (must also do it when enabling/disabling via the UI)
+            #if not mod.enabled:
+            #    self.modList.itemconfig(mod_idx, fg = 'grey')
+            mod_idx += 1
         
-        self.showMod(mod.title(), mod.description)
-
-    def showMod(self, name, description):
-        self.modDetailsName.config(text=name)
-
+        self.showCurrentMod()
+    
+    def selected_mod(self):
+        if not len(self.modDatabase.mods):
+            return None
+        if len(self.modList.curselection()) == 0:
+            self.modList.selection_set(0)
+            selected = 0
+        else:
+            selected = self.modList.curselection()[0]
+        
+        return self.modDatabase.mods[self.modList.curselection()[0]]
+            
+    def showCurrentMod(self, _arg=None):
+        self.showMod(self.selected_mod())
+    
+    def toggle_current_mod(self):
+        mod = self.selected_mod()
+        if not mod:
+            return
+        
+        if mod.enabled:
+            mod.disable()
+        else:
+            mod.enable()
+        # FIXME update style in listbox
+        self.showMod(mod)
+    
+    def update_description(self, description):
         self.modDetailsDescription.config(state="normal")
         self.modDetailsDescription.delete(1.0, END)
         self.modDetailsDescription.insert(END, description)
         self.modDetailsDescription.config(state="disabled")
-
-
+        
+    def showMod(self, mod):
+        if not mod:
+            return self.showModError("No mods found", "Please install some mods into your mods folder.")
+        
+        title = mod.title()
+        if mod.enabled:
+            command_label = "Disable"
+        else:
+            command_label = "Enable"
+            title += " [DISABLED]"
+        
+        self.modDetailsName.config(text = title)
+        self.modEnableDisable.config(text = command_label)
+        self.update_description(mod.description)
+    
+    def showModError(self, title, error):
+        self.modDetailsName.config(text = title)
+        self.update_description(error)
+        
     def openModFolder(self):
         ui.launcher.open(self.modPath)
     

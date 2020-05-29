@@ -39,7 +39,7 @@ class ModDatabase:
         
         self.mods.sort(key=lambda mod: mod.name)
 
-
+DISABLED_MARKER = "disabled.txt"
 class Mod:
     """Details about a specific mod (name, description)"""
 
@@ -50,7 +50,9 @@ class Mod:
         self.name = os.path.basename(self.path)
 
         self.gameInfo = gameInfo
-
+        
+        self.enabled = not os.path.isfile(os.path.join(self.path, DISABLED_MARKER))
+               
         self.loadInfo(info_file)
 
     def loadInfo(self, infoFile):
@@ -83,6 +85,18 @@ class Mod:
             ui.log.log("    Failed to parse info file")
 
         ui.log.log("    Finished loading {}".format(self.name))
+    
+    def enable(self):
+        try:
+            os.unlink(os.path.join(self.path, DISABLED_MARKER))
+            self.enabled = True
+        except:
+            pass
+    
+    def disable(self):
+        with open(os.path.join(self.path, DISABLED_MARKER), "w") as marker:
+            marker.write("this mod is disabled, remove this file to enable it again (or toggle it via the modloader UI)")
+        self.enabled = False
     
     def title(self):
         title = self.name
