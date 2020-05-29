@@ -3,9 +3,11 @@ import os
 import sys
 import subprocess
 
+import ui.log
 
 def launchAndWait(path):
     """Launch the game and wait for it to exit"""
+    ui.log.updateBackgroundState("Running")
 
     if sys.platform == 'win32':
         subprocess.call(path)

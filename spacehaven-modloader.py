@@ -95,7 +95,7 @@ class Window(Frame):
         
         # launcher
         self.launchButton_default_text = "LAUNCH!"
-        self.launchButton = Button(self, text=self.launchButton_default_text, command=self.patchAndLaunch_wrapper, height = 5)
+        self.launchButton = Button(self, text=self.launchButton_default_text, command=self.launch_wrapper, height = 5)
         self.launchButton.pack(fill=X, padx=4, pady=4)
         
 
@@ -132,7 +132,10 @@ class Window(Frame):
         self.modListRefresh = Button(self, text="Refresh Mods", command=self.refreshModList)
         self.modListRefresh.pack(side = RIGHT, expand = False, padx=8, pady=4)
         #self.modListOpenFolder.grid(column = 1, padx=4, pady=4)
-
+        
+        self.quickLaunchClear = Button(self, text="Clear Quicklaunch file", command=self.clear_quick_launch)
+        self.quickLaunchClear.pack(side = RIGHT, expand = False, padx=8, pady=4)
+        #self.modListOpenFolder.grid(column = 1, padx=4, pady=4)
         
         self.autolocateSpacehaven()
 
@@ -148,10 +151,12 @@ class Window(Frame):
                     self.locateSpacehaven(location)
                     return
         except:
+            import traceback
+            traceback.print_exc()
             pass
         
         for location in POSSIBLE_SPACEHAVEN_LOCATIONS:
-            try:
+            try: 
                 location = os.path.abspath(location)
                 if os.path.exists(location):
                     self.locateSpacehaven(location)
@@ -247,6 +252,7 @@ class Window(Frame):
             #    self.modList.itemconfig(mod_idx, fg = 'grey')
             mod_idx += 1
         
+        self.check_quick_launch()
         self.showCurrentMod()
     
     def selected_mod(self):
@@ -272,7 +278,9 @@ class Window(Frame):
             mod.disable()
         else:
             mod.enable()
-        # FIXME update style in listbox
+        # TODO update style in listbox
+                
+        self.check_quick_launch()
         self.showMod(mod)
     
     def update_description(self, description):
@@ -346,6 +354,7 @@ class Window(Frame):
             self.background_thread.join()
             self.background_thread = None
             self.enable_UI(self.launchButton_default_text)
+            self.check_quick_launch()
         else:
             self.after(self.background_refresh_delay, self.update_background_state)
     
@@ -359,19 +368,70 @@ class Window(Frame):
         ui.launcher.open(corePath)
         self.background_finished = True
     
-    def patchAndLaunch_wrapper(self):
-        self.start_background_task(self.patchAndLaunch, "Launching")
+    def current_mods_signature(self):
+        import hashlib
+        
+        mods_signature = []
+        for mod in self.modDatabase.mods:
+            if not mod.enabled:
+                continue
+            mods_signature.append(mod.name)
+            mods_signature.append(mod.version or "NO_VERSION_INFO")
+        
+        text_sig = "__".join(mods_signature)
+        md5 = hashlib.md5(text_sig.encode('utf-8')).hexdigest()
+        return md5
+    
+    def quick_launch_available(self):
+        mods_sig = self.current_mods_signature()
+        return os.path.isfile(loader.load.quick_launch_filename(mods_sig))
+    
+    def check_quick_launch(self):
+        if self.quick_launch_available():
+            self.launchButton_default_text = "QUICKLAUNCH!"
+            self.quickLaunchClear.config(state = NORMAL)
+        else:
+            self.launchButton_default_text = "LAUNCH!"
+            self.quickLaunchClear.config(state = DISABLED)
+        self.launchButton.config(text = self.launchButton_default_text)
+    
+    def clear_quick_launch(self):
+        try:
+            os.unlink(loader.load.quick_launch_filename(self.current_mods_signature()))
+        except:
+            pass
+        self.check_quick_launch()
+    
+    def launch_wrapper(self):
+        if self.quick_launch_available():
+            task = self.quick_launch
+            message = "Quicklaunching"
+        else:
+            task = self.patchAndLaunch
+            message = "Launching"
+        self.start_background_task(task, message)
+    
+    def quick_launch(self):
+        try:
+            loader.load.quickload(self.jarPath, self.current_mods_signature())
+            ui.launcher.launchAndWait(self.gamePath)
+            loader.load.unload(self.jarPath)
+        except Exception as ex:
+            import traceback
+            traceback.print_exc()
+            messagebox.showerror("Error during quick launch", traceback.format_exc(3))
+        
+        self.background_finished = True
     
     def patchAndLaunch(self):
         activeModPaths = []
         for mod in self.modDatabase.mods:
             if not mod.enabled:
                 continue
-            
             activeModPaths.append(mod.path)
         
         try:
-            loader.load.load(self.jarPath, activeModPaths)
+            loader.load.load(self.jarPath, activeModPaths, self.current_mods_signature())
             ui.launcher.launchAndWait(self.gamePath)
             loader.load.unload(self.jarPath)
         except Exception as ex:
