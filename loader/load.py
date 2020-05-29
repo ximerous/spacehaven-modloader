@@ -23,10 +23,10 @@ def load(jarPath, modPaths):
     ui.log.log("  modPaths:\n  {}".format("\n  ".join(modPaths)))
 
     loader.assets.library.extract(jarPath, corePath)
-    loader.assets.merge.mods(corePath, modPaths)
+    extra_assets = loader.assets.merge.mods(corePath, modPaths)
 
     os.rename(jarPath, jarPath + '.vanilla')
-    loader.assets.library.patch(jarPath + '.vanilla', corePath, jarPath)
+    loader.assets.library.patch(jarPath + '.vanilla', corePath, jarPath, extra_assets = extra_assets)
 
     coreDirectory.cleanup()
 

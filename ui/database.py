@@ -112,4 +112,4 @@ class Mod:
     def warn(self, message):
         ui.log.log("    Warning: {}".format(message))
         self.name += " [!]"
-        self.description += "\nWarning: {}".format(message)
+        self.description += "\nWARNING: {}!".format(message)

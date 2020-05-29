@@ -27,9 +27,11 @@ class Logger:
     def log(self, message=""):
         print("[LOG] {}".format(message))
         self.localLog.write(message + "\n")
-
+        self.localLog.flush()
+        
         if self.gameLog:
             self.gameLog.write(message + "\n")
+            self.gameLog.flush()
 
 
 logger = Logger()

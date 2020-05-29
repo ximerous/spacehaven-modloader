@@ -31,7 +31,24 @@ alt code for png
         else:
 """
 class Texture:
-    def __init__(self, path, width = None, height = None):
+    def __init__(self, path, create = False, width = None, height = None):
+        if create:
+            return self._init_cim(width, height)
+        else:
+            return self._import_cim(path)
+    
+    def _init_cim(self, width, height):
+        self.width = int(width)
+        self.height = int(height)
+        
+        self.header = bytearray(HEADER_SIZE)
+        struct.pack_into('>i', self.header, 0, self.width)
+        struct.pack_into('>i', self.header, 4, self.height)
+        struct.pack_into('>i', self.header, 8, RGBA_FORMAT)
+        
+        self.data = bytearray(self.width * self.height * PIXEL_SIZE)
+    
+    def _import_cim(self, path):
         data = io.BytesIO(zlib.decompress(open(path, "rb").read()))
         md5 = hashlib.md5(data.getbuffer()).hexdigest()
         ui.log.log("  %s vanilla md5 %s %d bytes" % (os.path.split(path)[1], md5, data.getbuffer().nbytes))

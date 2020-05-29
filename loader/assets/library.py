@@ -10,7 +10,8 @@ import ui.log
 PATCHABLE_XML_FILES = [
     'library/haven',
     'library/texts',
-    'library/animations'
+    'library/animations',
+    'library/textures',
 ]
 
 PATCHABLE_CIM_FILES = ["library/%d.cim" % i for i in range(24)]
@@ -29,20 +30,22 @@ def extract(jarPath, corePath):
                 spacehaven.extract(file, corePath)
 
 
-def patch(jarPath, corePath, resultPath):
+def patch(jarPath, corePath, resultPath, extra_assets = None):
     """Patch spacehaven.jar with custom library files"""
 
     original = ZipFile(jarPath, "r")
     patched = ZipFile(resultPath, "w")
     
-    patchable_files = PATCHABLE_XML_FILES + PATCHABLE_CIM_FILES
+    update_files = PATCHABLE_XML_FILES + PATCHABLE_CIM_FILES
     for file in set(original.namelist()):
-        if not file.endswith("/") and not file in patchable_files:
+        if not file.endswith("/") and not file in update_files:
             patched.writestr(file, original.read(file))
     
     original.close()
     
-    for file in patchable_files:
+    if extra_assets:
+        update_files += extra_assets
+    for file in update_files:
         ui.log.log("  Merging modded {}...".format(file))
         patched.write(os.path.join(corePath, file.replace('/', os.sep)), file)
 
