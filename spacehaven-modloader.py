@@ -365,6 +365,9 @@ class Window(Frame):
     def patchAndLaunch(self):
         activeModPaths = []
         for mod in self.modDatabase.mods:
+            if not mod.enabled:
+                continue
+            
             activeModPaths.append(mod.path)
         
         try:
