@@ -7,7 +7,7 @@ It is **not associated with Bugbyte or Space Haven in any way** other than that 
 
 ## Getting Started
 
-Download the latest release from [the releases page](https://github.com/anatarist/spacehaven-modloader/releases) and fire it up.
+Download the latest release from [the releases page](https://github.com/PhiR42/spacehaven-modloader/releases) and fire it up.
 
 ![Screenshot](/tools/screenshot.png?raw=true)
 
@@ -22,12 +22,14 @@ spacehaven.jar
 savegames/
   ...
 mods/
-  artificial-plant/
-    info
+  BetterToilets/
+    info.xml
     library/
-  exterior-air-vent/
-    info
-    library/
+      haven.xml
+      animations.xml
+      textures.xml
+    textures/
+      2283.png
   ...
 ```
 
@@ -42,13 +44,14 @@ Mods are stored as a series of XML files in roughly the same format as the game'
 
 You can take a look at the library by clicking the "Extract & annotate game assets" button. That will extract the game library from `spacehaven.jar` into `mods/spacehaven/` and open the folder.
 
-The main file of interest is `library/haven.annotated`, which is an annotated copy of `library/haven`, which is the main game library. It contains definitions for most of the things in the game (buildings, items, ships, characters, objectives, generation parameters, etc). Also of interest are `library/texts`, `library/animations`, and `library/textures`.
+The main file of interest is `library/haven.annotated.xml`, which is an annotated copy of `library/haven`, which is the main game library. It contains definitions for most of the things in the game (buildings, items, ships, characters, objectives, generation parameters, etc). Also of interest are `library/texts`, `library/animations`, and `library/textures`.
 
 Mods follow the same folder structure and file format and should be reasonably obvious from the included sample mods.
 
 Note that because mods are loaded by doing an id-wise merge with the base game library, only the following files and tags are currently supported:
 - All definitions in `library/haven`
 - `animations` in `library/animations`
+- `t`s and `re`s in `library/textures`
 - `t`s in `library/texts`
 
 
@@ -109,12 +112,18 @@ and looking up the `<name tid="869" />` we see the category is named:
     </lifesupport>
 ```
 
-To make life easier, the mod loader does these name lookups automatically in a few places and stores the results in `_name=""` attributes. This annotated version of the library is saved to `library/haven.annotated` and is (accordingly) a bit easier to navigate.
+To make life easier, the mod loader does these name lookups automatically in a few places and stores the results in `_annotated_name=""` attributes. This annotated version of the library is saved to `library/haven.annotated.xml` and is (accordingly) a bit easier to navigate.
 
 
 ### Textures and Animations
 
 Extracting and annotating game assets also decodes and explodes the game's textures into `library/textures.exploded`. The game's original packed textures are written to `library/textures.exploded/*.png` and the texture regions are written to `library/textures.exploded/*/*.png`, where the folder name is the texture ID and the filename is the region ID.
 
-Regions definitions can be found in `library/textures` in `<re n="..." />` tags and are used in `library/animations` by the `<assetPos a="..." />` tags.
+Regions definitions can be found in `library/textures.xml` in `<re n="..." />` tags and are used in `library/animations.xml` by the `<assetPos a="..." />` tags.
+
+The loader can overwrite existing textures from the base game and add new ones. To overwrite a texture, simply place a file called `123.png` in a directory called `textures` (where 123 is the id of the texture you want to replace). 
+
+To add a new texture, you need to add a `<re n="..." t="..." />` entry in `library/textures.xml`. Textures are packed together in `.cim` files, which are defined in `<t i="..." />` entries. The `re` entry references the `t` entry through it's index `i`. Take care of choosing reasonably unique indexes to avoid conflicts. Once this is done, you can add the `123456.png` file to the `textures` directory. 
+
+When loading your mod, the modloader will output the png version of the packed texture file for debugging purposes. This will allow you to check proper placement for new textures, or correct merging for existing ones.
 
