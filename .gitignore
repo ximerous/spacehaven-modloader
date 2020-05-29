@@ -6,3 +6,6 @@ dist/
 spacehaven-modloader.spec
 logs.txt
 previous_spacehaven_path.txt
+*.patch
+*.orig
+*.rej
