@@ -25,14 +25,20 @@ POSSIBLE_SPACEHAVEN_LOCATIONS = [
     "/Applications/Games/Space Haven/spacehaven.app",
     "./spacehaven.app",
     "../spacehaven.app",
+    # could add default steam library location here for mac, unless mac installs steam games in the previous locations?
 
     # Windows
     "../spacehaven/spacehaven.exe",
     "../../spacehaven/spacehaven.exe",
     "../spacehaven.exe",
     "../../spacehaven.exe",
+    "C:/Program Files (x86)/Steam/steamapps/common/SpaceHaven/spacehaven.exe",
 
-    # Linux?
+    # Linux
+    "../SpaceHaven/spacehaven",
+    "../../SpaceHaven/spacehaven",
+    "~/Games/SpaceHaven/spacehaven",
+    ".local/share/Steam/steamapps/common/SpaceHaven/spacehaven",
 ]
 
 class Window(Frame):
@@ -115,16 +121,17 @@ class Window(Frame):
                     self.locateSpacehaven(location)
                     return
         except:
-            import traceback
-            traceback.print_exc()
             pass
         
         for location in POSSIBLE_SPACEHAVEN_LOCATIONS:
-            location = os.path.abspath(location)
-            if os.path.exists(location):
-                self.locateSpacehaven(location)
-                return
-
+            try:
+                location = os.path.abspath(location)
+                if os.path.exists(location):
+                    self.locateSpacehaven(location)
+                    return
+            except:
+                pass
+    
     def locateSpacehaven(self, path):
         if path is None:
             return
@@ -139,7 +146,7 @@ class Window(Frame):
             self.jarPath = path
             self.modPath = os.path.join(os.path.dirname(path), "mods")
 
-        elif path.endswith('.exe'):
+        else:
             self.gamePath = path
             self.jarPath = os.path.join(os.path.dirname(path), "spacehaven.jar")
             self.modPath = os.path.join(os.path.dirname(path), "mods")
@@ -173,18 +180,24 @@ class Window(Frame):
         loader.load.unload(self.jarPath)
 
     def browseForSpacehaven(self):
+        import platform
+        
+        filetypes = [('spacehaven.jar', '*.jar'), ]
+        if platform.system() == "Windows":
+            filetypes.append(('spacehaven.exe', '*.exe'))
+        elif platform.system() == "Darwin":
+            filetypes.append(('spacehaven.app', '*.app'))
+        elif platform.system() == "Linux":
+            filetypes.append(('all files', '*'))
+        
         self.locateSpacehaven(
             filedialog.askopenfilename(
                 parent=self.master,
                 title="Locate spacehaven",
-                filetypes=[
-                    ('spacehaven.exe', '*.exe'),
-                    ('spacehaven.app', '*.app'),
-                    ('spacehaven.jar', '*.jar'),
-                ]
+                filetypes=filetypes,
             )
         )
-
+    
     def focus(self, _arg=None):
         self.refreshModList()
 
