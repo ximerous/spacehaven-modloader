@@ -36,12 +36,16 @@ def patch(jarPath, corePath, resultPath, extra_assets = None):
     original = ZipFile(jarPath, "r")
     patched = ZipFile(resultPath, "w")
     
+    ui.log.updateLaunchState("Packing vanilla files")
+    
     update_files = PATCHABLE_XML_FILES + PATCHABLE_CIM_FILES
     for file in set(original.namelist()):
         if not file.endswith("/") and not file in update_files:
             patched.writestr(file, original.read(file))
     
     original.close()
+    
+    ui.log.updateLaunchState("Packing modded files")
     
     if extra_assets:
         update_files += extra_assets

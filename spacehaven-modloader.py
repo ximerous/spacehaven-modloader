@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import threading
 import traceback
 
 from tkinter import filedialog
@@ -54,37 +55,25 @@ class Window(Frame):
         self.header.pack(fill=X, padx=0, pady=0)
 
         self.pack(fill=BOTH, expand=1, padx=4, pady=4)
-
-        self.spacehavenGameLabel = Label(self, text="Game Location", anchor=NW)
-        self.spacehavenGameLabel.pack(fill=X, padx=4, pady=4)
-
-        self.spacehavenPicker = Frame(self)
-        self.spacehavenBrowse = Button(self.spacehavenPicker, text="Browse...", command=self.browseForSpacehaven)
-        self.spacehavenBrowse.pack(side=RIGHT, padx=4, pady=4)
-
-        self.spacehavenText = Entry(self.spacehavenPicker)
-        self.spacehavenText.pack(fill=X, padx=4, pady=4)
-
-        self.spacehavenPicker.pack(fill=X, padx=0, pady=0)
-
-        Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
+        
+        # separator
+        #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
 
 
-        self.modLabel = Label(self, text="Installed mods", anchor=NW)
-        self.modLabel.pack(fill=X, padx=4, pady=4)
+#        self.modLabel = Label(self, text="Installed mods", anchor=NW)
+#        self.modLabel.pack(fill=X, padx=4, pady=4)
 
         self.modBrowser = Frame(self)
-
+        
+        # left side mods list
         self.modListFrame = Frame(self.modBrowser)
-        self.modList = Listbox(self.modListFrame, height=0)
+        self.modList = Listbox(self.modListFrame, height=0, selectmode=SINGLE)
         self.modList.bind('<<ListboxSelect>>', self.showCurrentMod)
         self.modList.pack(fill=BOTH, expand=1, padx=4, pady=4)
 
-        self.modListOpenFolder = Button(self.modListFrame, text="Open Mods Folder", command=self.openModFolder)
-        self.modListOpenFolder.pack(fill=X, padx=4, pady=4)
-
         self.modListFrame.pack(side=LEFT, fill=Y, padx=4, pady=4)
-
+        
+        # right side mod info
         self.modDetailsFrame = Frame(self.modBrowser)
         self.modDetailsName = Label(self.modDetailsFrame, font="TkDefaultFont 14 bold", anchor=W)
         self.modDetailsName.pack(fill=X, padx=4, pady=4)
@@ -95,18 +84,51 @@ class Window(Frame):
         self.modDetailsFrame.pack(fill=BOTH, expand=1, padx=4, pady=4)
 
         self.modBrowser.pack(fill=BOTH, expand=1, padx=0, pady=0)
+        
+        # separator
+        Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
+        
+        # launcher
+        self.launchButton_default_text = "LAUNCH!"
+        self.launchButton = Button(self, text=self.launchButton_default_text, command=self.patchAndLaunch_wrapper, height = 5)
+        self.launchButton.pack(fill=X, padx=4, pady=4)
+        
 
+        #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
+        self.spacehavenPicker = Frame(self)#.pack(fill=X, padx=4, pady=4)
+        self.spacehavenBrowse = Button(self.spacehavenPicker, text="Find game...", command=self.browseForSpacehaven)
+        self.spacehavenBrowse.pack(side = LEFT, padx=8, pady=4)
+
+        #self.spacehavenGameLabel = Label(self, text="Game Location :", anchor=NE)
+        #self.spacehavenGameLabel.pack(side = LEFT, padx=4, pady=4)
+        # game path
+        self.spacehavenText = Entry(self.spacehavenPicker)
+        # damn cant align properly with the "find game" button...
+        self.spacehavenText.pack(fill = X, padx=4, pady=4, anchor = S)
+
+        self.spacehavenPicker.pack(fill=X, padx=0, pady=0)
         Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
 
-        self.launchButton = Button(self, text="Launch Space Haven!", command=self.patchAndLaunch)
-        self.launchButton.pack(fill=X, padx=4, pady=4)
 
-        self.extractButton = Button(self, text="Extract & annotate game assets", command=self.extractAndAnnotate)
-        self.extractButton.pack(fill=X, padx=4, pady=4)
-
+        # buttons at the bottom
+        #buttonFrame = Frame(self).pack(fill = X, padx = 4, pady = 8)
         self.quitButton = Button(self, text="Quit", command=self.quit)
-        self.quitButton.pack(fill=X, padx=4, pady=4)
+        self.quitButton.pack(side=RIGHT, expand = False, padx=8, pady=4)
+        #self.quitButton.grid(column = 2, padx=4, pady=4)
+        
+        self.extractButton = Button(self, text="Extract game assets", command=self.extractAndAnnotate)
+        self.extractButton.pack(side=RIGHT, expand = False, padx=8, pady=4)
+        #self.extractButton.grid(column = 0, padx=4, pady=4)
+        
+        self.modListOpenFolder = Button(self, text="Open Mods Folder", command=self.openModFolder)
+        self.modListOpenFolder.pack(side = RIGHT, expand = False, padx=8, pady=4)
+        #self.modListOpenFolder.grid(column = 1, padx=4, pady=4)
 
+        self.modListRefresh = Button(self, text="Refresh Mods", command=self.refreshModList)
+        self.modListRefresh.pack(side = RIGHT, expand = False, padx=8, pady=4)
+        #self.modListOpenFolder.grid(column = 1, padx=4, pady=4)
+
+        
         self.autolocateSpacehaven()
 
     def autolocateSpacehaven(self):
@@ -199,7 +221,9 @@ class Window(Frame):
         )
     
     def focus(self, _arg=None):
-        self.refreshModList()
+        # disabled, refreshes too much and resets the selection
+        #self.refreshModList()
+        pass
 
     def refreshModList(self):
         self.modList.delete(0, END)
@@ -222,11 +246,11 @@ class Window(Frame):
 
         if len(self.modList.curselection()) == 0:
             mod = self.modDatabase.mods[0]
-
+            self.modList.selection_set(0)
         else:
             mod = self.modDatabase.mods[self.modList.curselection()[0]]
-
-        self.showMod(mod.name, mod.description)
+        
+        self.showMod(mod.title(), mod.description)
 
     def showMod(self, name, description):
         self.modDetailsName.config(text=name)
@@ -248,23 +272,66 @@ class Window(Frame):
 
         loader.extract.extract(self.jarPath, corePath)
         ui.launcher.open(corePath)
+    
+    LaunchRefreshDelay = 1000
+    launch_thread = None
+    def patchAndLaunch_wrapper(self):
+        self.launchButton.config(state = DISABLED)
+        self.spacehavenBrowse.config(state = DISABLED)
+        self.modListRefresh.config(state = DISABLED)
+        self.modListOpenFolder.config(state = DISABLED)
+        self.extractButton.config(state = DISABLED)
+        self.quitButton.config(state = DISABLED)
+        
+        ui.log.logger.launchState = "Launching"
+        ui.log.logger.launchFinished = False
 
+        self.launchCounter = 0
+        self.launch_thread = threading.Thread(target = self.patchAndLaunch)
+        self.launch_thread.start()
+        self.after(self.LaunchRefreshDelay, self.updateLaunchState)
+    
+    def updateLaunchState(self):
+        extra_label = "." * (self.launchCounter % 5)
+        self.launchCounter += 1
+        
+        self.launchButton.config(text = extra_label + " " + ui.log.logger.launchState + " " + extra_label)
+        if ui.log.logger.launchFinished:
+            self.launchButton.config(state = NORMAL, text = self.launchButton_default_text)
+            self.spacehavenBrowse.config(state = NORMAL)
+            self.modListRefresh.config(state = NORMAL)
+            self.modListOpenFolder.config(state = NORMAL)
+            self.extractButton.config(state = NORMAL)
+            self.quitButton.config(state = NORMAL)
+
+            # FIXME unlock interface
+            self.launch_thread.join()
+            self.launch_thread = None
+        else:
+            self.after(self.LaunchRefreshDelay, self.updateLaunchState)
+    
     def patchAndLaunch(self):
         activeModPaths = []
         for mod in self.modDatabase.mods:
             activeModPaths.append(mod.path)
-
+        
         try:
+            blah
             loader.load.load(self.jarPath, activeModPaths)
             ui.launcher.launchAndWait(self.gamePath)
             loader.load.unload(self.jarPath)
         except Exception as ex:
             import traceback
             traceback.print_exc()
-            messagebox.showerror("Error loading mods", str(ex))
-
-
+            #FIXME will it work from a thread ?
+            messagebox.showerror("Error loading mods", traceback.format_exc(3))
+        
+        ui.log.logger.launchFinished = True
+    
     def quit(self):
+        if self.launch_thread:
+            messagebox.showerror("Cannot quit while the game is running!")
+            return
         self.master.destroy()
 
 
@@ -291,4 +358,5 @@ if __name__ == "__main__":
     root.update()
     root.update_idletasks()
     root.after(0, fixNoButtonLabelsBug)
+    root.protocol("WM_DELETE_WINDOW", app.quit)
     root.mainloop()

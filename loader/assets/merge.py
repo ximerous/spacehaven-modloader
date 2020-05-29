@@ -20,6 +20,9 @@ def _detect_textures(coreLibrary, modLibrary, mod):
     
     def _add_texture(region_id):
         filename = region_id + '.png'
+        if filename in seen_textures:
+            return
+        
         path = os.path.join(textures_path, filename)
         if not os.path.isfile(path):
             ui.log.log("  ERROR MISSING {}...".format(filename))
@@ -30,9 +33,9 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         ui.log.log("  Found {}...".format(filename))
         if int(region_id) > coreLibrary['_last_core_region_id']:
             # adding a new texture, this gets tricky as they have to have consecutive numbers. 
-            core_region_id = str(coreLibrary['_next_texture_id'])
+            core_region_id = str(coreLibrary['_next_region_id'])
             mapping_n_region[region_id] = core_region_id
-            coreLibrary['_next_texture_id'] += 1
+            coreLibrary['_next_region_id'] += 1
         else:
             core_region_id = region_id
         
@@ -43,15 +46,9 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             'path' : path, 
             }
     
-    for region in modLibrary['library/textures'].xpath("//re[@n]"):
-        region_id = region.get('n')
-        _add_texture(region_id)
-    
     for filename in os.listdir(textures_path):
         # also scan the directory for overwriting existing core textures
         if not filename.endswith('.png'):
-            continue
-        if filename in seen_textures:
             continue
         try:
             int(filename.split('.')[0])
@@ -60,8 +57,16 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             continue
         _add_texture(filename.split('.')[0])
     
+    if 'library/textures' not in modLibrary:
+        # no textures.xml file, we're done
+        return modded_textures
+    
+    for region in modLibrary['library/textures'].xpath("//re[@n]"):
+        region_id = region.get('n')
+        _add_texture(region_id)
+    
     if not mapping_n_region:
-        # no added textures, no need to remap ids 
+        # no custom mod textures, no need to remap ids 
         return modded_textures
     
     for asset in modLibrary['library/animations'].xpath("//assetPos[@a]"):
@@ -83,31 +88,42 @@ def _detect_textures(coreLibrary, modLibrary, mod):
     return modded_textures
 
 
-
 def mods(corePath, modPaths):
     # Load the core library files
     coreLibrary = {}
+    def _core_path(filename):
+        return os.path.join(corePath, filename.replace('/', os.sep))
+    
     for filename in PATCHABLE_XML_FILES:
-        # FIXME add support for xml extension
-        with open(os.path.join(corePath, filename), 'rb') as f:
+        with open(_core_path(filename), 'rb') as f:
             coreLibrary[filename] = lxml.etree.parse(f, parser=lxml.etree.XMLParser(recover=True))
     
     all_modded_textures = {}
+    # find the last region in the texture file and remember its index
+    # we will need this to add mod textures with consecutive indexes...
     coreLibrary['_last_core_region_id'] = int(coreLibrary['library/textures'].find("//re[@n][last()]").get('n'))
-    coreLibrary['_next_texture_id'] = coreLibrary['_last_core_region_id'] + 1
+    coreLibrary['_next_region_id'] = coreLibrary['_last_core_region_id'] + 1
     
     # Merge in modded files
     for mod in modPaths:
+        ui.log.updateLaunchState("Installing {}".format(mod))
+
         ui.log.log("  Loading mod {}...".format(mod))
         
         # Load the mod's library
         modLibrary = {}
+        def _mod_path(filename):
+            return os.path.join(mod, filename.replace('/', os.sep))
+        
         for filename in PATCHABLE_XML_FILES:
-        # FIXME add support for xml extension
-            modLibraryFilePath = os.path.join(mod, filename.replace('/', os.sep))
-            if os.path.exists(modLibraryFilePath):
-                with open(modLibraryFilePath) as f:
-                    modLibrary[filename] = lxml.etree.parse(f, parser=lxml.etree.XMLParser(remove_comments=True))
+            mod_file = _mod_path(filename)
+            if not os.path.exists(mod_file):
+                # try again with the extension ?
+                mod_file += '.xml'
+                if not os.path.exists(mod_file):
+                    continue
+            with open(mod_file) as f:
+                modLibrary[filename] = lxml.etree.parse(f, parser=lxml.etree.XMLParser(remove_comments=True))
 
         # Do an element-wise merge (replacing conflicts)
         mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Randomizer", idAttribute="id")
@@ -148,7 +164,7 @@ def mods(corePath, modPaths):
 
         mergeDefinitions(coreLibrary, modLibrary, file="library/texts", xpath="/t", idAttribute="id")
         
-        # do that before merging animations and textures because ids might have to be remapped
+        # do that before merging animations and textures because references might have to be remapped!
         all_modded_textures.update(_detect_textures(coreLibrary, modLibrary, mod))
         
         # this way the last mod loaded will overwrite previous textures
@@ -164,12 +180,14 @@ def mods(corePath, modPaths):
         mergeDefinitions(coreLibrary, modLibrary, file="library/textures", xpath="/AllTexturesAndRegions/regions", idAttribute="n")
         
 
-
+    ui.log.updateLaunchState("Writing XML")
+    
     # Write out the new base library
     for filename in PATCHABLE_XML_FILES:        
-        with open(os.path.join(corePath, filename.replace('/', os.sep)), "wb") as f:
+        with open(_core_path(filename), "wb") as f:
             f.write(lxml.etree.tostring(coreLibrary[filename], pretty_print=True, encoding="UTF-8"))
     
+    ui.log.updateLaunchState("Writing textures".format(mod))
     # add or overwrite textures from mods. This is done after all the XML has been merged into the core "textures" file
     cims = {}
     reexport_cims = {}
@@ -201,12 +219,11 @@ def mods(corePath, modPaths):
         
         x = int(region.get("x"))
         y = int(region.get("y"))
-        
-        ui.log.log("  Patching {}.cim...".format(page))
-        cims[page].pack_png(png_file, x, y)
-        # FIXME check w/h vs png file!
         w = int(region.get("w"))
         h = int(region.get("h"))
+        
+        ui.log.log("  Patching {}.cim...".format(page))
+        cims[page].pack_png(png_file, x, y, w, h)
     
     # cims contains only the textures files that have actually been modified
     for page in cims:

@@ -24,33 +24,37 @@ class ModDatabase:
         for modFolder in os.listdir(self.path):
             if modFolder == 'spacehaven':
                 continue  # don't need to load core game definitions
-            
-            if os.path.isfile(os.path.join(self.path, modFolder)):
+            modPath = os.path.join(self.path, modFolder)
+            if os.path.isfile(modPath):
+                # TODO add support for zip files ? unzip them on the fly ?
                 continue  # don't load logs, prefs, etc
-            if not os.path.isfile(os.path.join(os.path.join(self.path, modFolder), "info")):
-                continue  # don't empty directories
-
-            self.mods.append(Mod(os.path.join(self.path, modFolder), self.gameInfo))
-
+            
+            info_file = os.path.join(modPath, "info")
+            if os.path.isfile(info_file):
+                self.mods.append(Mod(info_file, self.gameInfo))
+            else:
+                info_file += '.xml'
+                if os.path.isfile(info_file):
+                    self.mods.append(Mod(info_file, self.gameInfo))
+        
         self.mods.sort(key=lambda mod: mod.name)
 
 
 class Mod:
     """Details about a specific mod (name, description)"""
 
-    def __init__(self, path, gameInfo):
-        ui.log.log("  Loading mod at {}...".format(path))
-
-        self.path = path
+    def __init__(self, info_file, gameInfo):
+        self.path = os.path.dirname(info_file)
+        ui.log.log("  Loading mod at {}...".format(self.path))
+        
         self.name = os.path.basename(self.path)
 
         self.gameInfo = gameInfo
 
-        self.loadInfo()
+        self.loadInfo(info_file)
 
-    def loadInfo(self):
-        infoFile = os.path.join(self.path, "info")
-
+    def loadInfo(self, infoFile):
+        
         if not os.path.exists(infoFile):
             ui.log.log("    No info file present")
             self.name += " [!]"
@@ -63,7 +67,12 @@ class Mod:
 
             self.name = mod.find("name").text.strip()
             self.description = mod.find("description").text.strip() + "\n\n"
-
+            self.version = ""
+            try:
+                self.version = mod.find("modVersion").text.strip()
+            except:
+                pass
+            
             self.verifyLoaderVersion(mod)
             self.verifyGameVersion(mod, self.gameInfo)
 
@@ -74,7 +83,13 @@ class Mod:
             ui.log.log("    Failed to parse info file")
 
         ui.log.log("    Finished loading {}".format(self.name))
-
+    
+    def title(self):
+        title = self.name
+        if self.version:
+            title += " (%s)" % self.version
+        return title
+    
     def verifyLoaderVersion(self, mod):
         self.minimumLoaderVersion = mod.find("minimumLoaderVersion").text
         if distutils.version.StrictVersion(self.minimumLoaderVersion) > distutils.version.StrictVersion(version.version):

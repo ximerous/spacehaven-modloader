@@ -69,9 +69,16 @@ class Texture:
         if len(self.data) != expected_size:
             ui.log.log("ERROR: Wrong size %s: %d vs %d" % (path, len(self.data), expected_size))
     
-    def pack_png(self, path, x=0, y=0):
+    def pack_png(self, path, x=0, y=0, w=0, h=0):
         reader = png.Reader(filename = path)
         (width, height, rows, info) = reader.asRGBA()
+        if w and w != width:
+            ui.log.log("ERROR: Wrong width in %s: %d vs %d" % (path, width, w))
+            return
+        if h and h != height:
+            ui.log.log("ERROR: Wrong width in %s: %d vs %d" % (path, height, h))
+            return
+        
         row_idx = 0
         for row in rows:
             start = (x + ((row_idx + y) * self.width)) * PIXEL_SIZE
@@ -79,8 +86,6 @@ class Texture:
             
             self.data[start:end] = row
             row_idx += 1
-        if row_idx != height:
-            ui.log.log("ERROR: Wrong height in %s: %d vs %d" % (path, row_idx, height))
         ui.log.log("  Repacked {}...".format(os.path.split(path)[1]))
     
     def export_cim(self, path):

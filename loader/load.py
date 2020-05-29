@@ -21,13 +21,16 @@ def load(jarPath, modPaths):
     ui.log.log("  jarPath: {}".format(jarPath))
     ui.log.log("  corePath: {}".format(corePath))
     ui.log.log("  modPaths:\n  {}".format("\n  ".join(modPaths)))
-
+    
+    ui.log.updateLaunchState("Extracting game assets")
     loader.assets.library.extract(jarPath, corePath)
+    ui.log.updateLaunchState("Installing Mods")
     extra_assets = loader.assets.merge.mods(corePath, modPaths)
 
     os.rename(jarPath, jarPath + '.vanilla')
     loader.assets.library.patch(jarPath + '.vanilla', corePath, jarPath, extra_assets = extra_assets)
-
+    
+    ui.log.updateLaunchState("Running")
     coreDirectory.cleanup()
 
 
@@ -36,7 +39,7 @@ def unload(jarPath):
 
     vanillaPath = jarPath + '.vanilla'
 
-    ui.log.log("Unloading mods...")
+    ui.log.updateLaunchState("Unloading mods")
     if not os.path.exists(vanillaPath):
         ui.log.log("  No active mods")
         return
