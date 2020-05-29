@@ -99,7 +99,7 @@ def annotate(corePath):
             processName.append(name)
 
         processName = " ".join(processName)
-        # FIXME different attribute now
+        # FIXME double check this test ? different attribute now
         if len(processName) > 2 and not element.get("_annotated_name"):
             elementNames[element.get("eid")] = processName
             element.set("_annotated_process", processName)
@@ -128,7 +128,6 @@ def annotate(corePath):
             print(trade.tag)
             print(trade.attrib)
     
-    #FIXME log all tids as well
     annotatedHavenPath = os.path.join(corePath, "library", "haven.annotated.xml")
     haven.write(annotatedHavenPath)
     ui.log.log("    Wrote annotated spacehaven library to {}".format(annotatedHavenPath))

@@ -33,11 +33,11 @@ class Logger:
             self.gameLog.write(message + "\n")
             self.gameLog.flush()
     
-    def updateLaunchState(self, message):
-        self.launchState = message
+    def updateBackgroundState(self, message):
+        self.backgroundState = message
     
 
 logger = Logger()
 log = logger.log
-updateLaunchState = logger.updateLaunchState
+updateBackgroundState = updateLaunchState = logger.updateBackgroundState
 setGameModPath = logger.setGameModPath

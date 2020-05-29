@@ -116,7 +116,7 @@ class Window(Frame):
         self.quitButton.pack(side=RIGHT, expand = False, padx=8, pady=4)
         #self.quitButton.grid(column = 2, padx=4, pady=4)
         
-        self.extractButton = Button(self, text="Extract game assets", command=self.extractAndAnnotate)
+        self.extractButton = Button(self, text="Extract game assets", command=self.extractAndAnnotate_wrapper)
         self.extractButton.pack(side=RIGHT, expand = False, padx=8, pady=4)
         #self.extractButton.grid(column = 0, padx=4, pady=4)
         
@@ -263,52 +263,65 @@ class Window(Frame):
 
     def openModFolder(self):
         ui.launcher.open(self.modPath)
+    
+    def set_ui_state(self, state, message):
+        self.launchButton.config(state = state, text = message)
+        self.spacehavenBrowse.config(state = state)
+        self.modListRefresh.config(state = state)
+        self.modListOpenFolder.config(state = state)
+        self.extractButton.config(state = state)
+        self.quitButton.config(state = state)
+    
+    can_quit = True
+    def disable_UI(self, message):
+        self.set_ui_state(DISABLED, message)
+        self.can_quit = False
+    
+    def enable_UI(self, message):
+        self.set_ui_state(NORMAL, message)
+        self.can_quit = True
+    
+    background_refresh_delay = 1000
+    background_thread = None
+    background_finished = True
+    
+    def start_background_task(self, task, message):
+        self.disable_UI(message)
+        
+        ui.log.logger.backgroundState = message
+        
+        self.background_finished = False
 
+        self.background_counter = 0
+        self.background_thread = threading.Thread(target = task)
+        self.background_thread.start()
+        # first run asap to update the UI
+        self.after(1, self.update_background_state)
+        
+    def update_background_state(self):
+        extra_label = "." * (self.background_counter % 5)
+        self.background_counter += 1
+        
+        self.launchButton.config(text = extra_label + " " + ui.log.logger.backgroundState + " " + extra_label)
+        if self.background_finished:
+            self.background_thread.join()
+            self.background_thread = None
+            self.enable_UI(self.launchButton_default_text)
+        else:
+            self.after(self.background_refresh_delay, self.update_background_state)
+    
+    def extractAndAnnotate_wrapper(self):
+        self.start_background_task(self.extractAndAnnotate, "Extracting")
+    
     def extractAndAnnotate(self):
-        if not messagebox.askokcancel("Extract & Annotate", "Extracting and annotating game assets will take a minute or two.\n\nWould you like to proceed?"):
-            return
-
         corePath = os.path.join(self.modPath, "spacehaven")
-
+        
         loader.extract.extract(self.jarPath, corePath)
         ui.launcher.open(corePath)
+        self.background_finished = True
     
-    LaunchRefreshDelay = 1000
-    launch_thread = None
     def patchAndLaunch_wrapper(self):
-        self.launchButton.config(state = DISABLED)
-        self.spacehavenBrowse.config(state = DISABLED)
-        self.modListRefresh.config(state = DISABLED)
-        self.modListOpenFolder.config(state = DISABLED)
-        self.extractButton.config(state = DISABLED)
-        self.quitButton.config(state = DISABLED)
-        
-        ui.log.logger.launchState = "Launching"
-        ui.log.logger.launchFinished = False
-
-        self.launchCounter = 0
-        self.launch_thread = threading.Thread(target = self.patchAndLaunch)
-        self.launch_thread.start()
-        self.after(self.LaunchRefreshDelay, self.updateLaunchState)
-    
-    def updateLaunchState(self):
-        extra_label = "." * (self.launchCounter % 5)
-        self.launchCounter += 1
-        
-        self.launchButton.config(text = extra_label + " " + ui.log.logger.launchState + " " + extra_label)
-        if ui.log.logger.launchFinished:
-            self.launchButton.config(state = NORMAL, text = self.launchButton_default_text)
-            self.spacehavenBrowse.config(state = NORMAL)
-            self.modListRefresh.config(state = NORMAL)
-            self.modListOpenFolder.config(state = NORMAL)
-            self.extractButton.config(state = NORMAL)
-            self.quitButton.config(state = NORMAL)
-
-            # FIXME unlock interface
-            self.launch_thread.join()
-            self.launch_thread = None
-        else:
-            self.after(self.LaunchRefreshDelay, self.updateLaunchState)
+        self.start_background_task(self.patchAndLaunch, "Launching")
     
     def patchAndLaunch(self):
         activeModPaths = []
@@ -316,23 +329,22 @@ class Window(Frame):
             activeModPaths.append(mod.path)
         
         try:
-            blah
             loader.load.load(self.jarPath, activeModPaths)
             ui.launcher.launchAndWait(self.gamePath)
             loader.load.unload(self.jarPath)
         except Exception as ex:
             import traceback
             traceback.print_exc()
-            #FIXME will it work from a thread ?
             messagebox.showerror("Error loading mods", traceback.format_exc(3))
         
-        ui.log.logger.launchFinished = True
+        self.background_finished = True
     
     def quit(self):
-        if self.launch_thread:
-            messagebox.showerror("Cannot quit while the game is running!")
+        if self.can_quit:
+            self.master.destroy()
             return
-        self.master.destroy()
+        
+        messagebox.showerror("Error", "Cannot quit while a task is running!")
 
 
 def handleException(type, value, trace):

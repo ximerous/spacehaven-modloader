@@ -12,7 +12,7 @@ import ui.log
 def load(jarPath, modPaths):
     """Load mods into spacehaven.jar"""
 
-    unload(jarPath)
+    unload(jarPath, message = False)
 
     coreDirectory = tempfile.TemporaryDirectory()
     corePath = coreDirectory.name
@@ -22,24 +22,24 @@ def load(jarPath, modPaths):
     ui.log.log("  corePath: {}".format(corePath))
     ui.log.log("  modPaths:\n  {}".format("\n  ".join(modPaths)))
     
-    ui.log.updateLaunchState("Extracting game assets")
     loader.assets.library.extract(jarPath, corePath)
-    ui.log.updateLaunchState("Installing Mods")
+    ui.log.updateBackgroundState("Installing Mods")
     extra_assets = loader.assets.merge.mods(corePath, modPaths)
 
     os.rename(jarPath, jarPath + '.vanilla')
     loader.assets.library.patch(jarPath + '.vanilla', corePath, jarPath, extra_assets = extra_assets)
     
-    ui.log.updateLaunchState("Running")
+    ui.log.updateBackgroundState("Running")
     coreDirectory.cleanup()
 
 
-def unload(jarPath):
+def unload(jarPath, message = True):
     """Unload mods from spacehaven.jar"""
-
+    
+    if message:
+        ui.log.updateBackgroundState("Unloading mods")
+        
     vanillaPath = jarPath + '.vanilla'
-
-    ui.log.updateLaunchState("Unloading mods")
     if not os.path.exists(vanillaPath):
         ui.log.log("  No active mods")
         return

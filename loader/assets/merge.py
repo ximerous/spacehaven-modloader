@@ -106,8 +106,8 @@ def mods(corePath, modPaths):
     
     # Merge in modded files
     for mod in modPaths:
-        ui.log.updateLaunchState("Installing {}".format(mod))
-
+        ui.log.updateLaunchState("Installing {}".format(os.path.basename(mod)))
+        
         ui.log.log("  Loading mod {}...".format(mod))
         
         # Load the mod's library
@@ -180,14 +180,14 @@ def mods(corePath, modPaths):
         mergeDefinitions(coreLibrary, modLibrary, file="library/textures", xpath="/AllTexturesAndRegions/regions", idAttribute="n")
         
 
-    ui.log.updateLaunchState("Writing XML")
+    ui.log.updateLaunchState("Updating XML")
     
     # Write out the new base library
     for filename in PATCHABLE_XML_FILES:        
         with open(_core_path(filename), "wb") as f:
             f.write(lxml.etree.tostring(coreLibrary[filename], pretty_print=True, encoding="UTF-8"))
     
-    ui.log.updateLaunchState("Writing textures".format(mod))
+    ui.log.updateLaunchState("Packing textures".format(mod))
     # add or overwrite textures from mods. This is done after all the XML has been merged into the core "textures" file
     cims = {}
     reexport_cims = {}

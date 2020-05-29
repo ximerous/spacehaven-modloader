@@ -12,7 +12,11 @@ def extract(jarPath, corePath):
 
     ui.log.log("Running extract & annotate")
 
+    ui.log.updateBackgroundState("Extracting game files")
     loader.assets.library.extract(jarPath, corePath)
 
+    ui.log.updateBackgroundState("Unpacking textures")
     loader.assets.explode.explode(corePath)
+    
+    ui.log.updateBackgroundState("Annotating XML")
     loader.assets.annotate.annotate(corePath)

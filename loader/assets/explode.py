@@ -135,7 +135,9 @@ def explode(corePath):
         page = region.get("t")
 
         if not page in cims:
-            cims[page] = Texture(os.path.join(corePath, 'library', '{}.cim'.format(page)))
+            cim_filename = '{}.cim'.format(page)
+            ui.log.updateBackgroundState("Unpacking textures ({})".format(cim_filename))
+            cims[page] = Texture(os.path.join(corePath, 'library', cim_filename))
         
         try:
             os.makedirs(os.path.join(corePath, 'library', 'textures.exploded', page))
