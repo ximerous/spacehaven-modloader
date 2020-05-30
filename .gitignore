@@ -9,3 +9,4 @@ previous_spacehaven_path.txt
 *.patch
 *.orig
 *.rej
+quicklaunch_*.jar
