@@ -313,6 +313,7 @@ class Window(Frame):
     
     def set_ui_state(self, state, message):
         self.launchButton.config(state = state, text = message)
+        self.modEnableDisable.config(state = state)
         self.spacehavenBrowse.config(state = state)
         self.modListRefresh.config(state = state)
         self.modListOpenFolder.config(state = state)
