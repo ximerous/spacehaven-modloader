@@ -1,0 +1,24 @@
+<AllTexturesAndRegions>
+	<textures>
+	    <!-- texture files -->
+		<t i="5042" />
+	</textures>
+	<regions>
+	    <!-- 
+	    	Individual textures
+		-->
+		<re _annotated_name="Pump element R" n="267" t="0" x="489" y="1019" w="62" h="66"/>
+		<re _annotated_name="Pump element L" n="278" t="0" x="488" y="1229" w="64" h="62"/>
+		<re _annotated_name="Cabinet w/ sink R" n="398" t="0" x="721" y="697" w="50" h="70"/>
+		<re _annotated_name="Blue drum element" n="400" t="0" x="942" y="491" w="56" h="62"/>
+		<re _annotated_name="Cabinet w/ sink L" n="445" t="0" x="1987" y="626" w="50" h="64"/>
+		<re _annotated_name="Toilet seat R" n="652" t="0" x="1048" y="1029" w="52" h="42"/>
+		<re _annotated_name="gray tile" n="685" t="0" x="1810" y="1028" w="64" h="32"/>
+		<re _annotated_name="Toilet seat L" n="779" t="0" x="1333" y="1147" w="46" h="38"/>
+		<re _annotated_name="In/Out slot (open)" n="1123" t="0" x="1288" y="1739" w="20" h="30"/>
+		<re _annotated_name="Small pipe" n="1217" t="0" x="612" y="346" w="24" h="16"/>
+		<re _annotated_name="Small bin L" n="1228" t="0" x="1867" y="1490" w="18" h="20"/>
+		<re _annotated_name="Small bin R" n="1229" t="0" x="1889" y="1490" w="18" h="20"/>
+		<re _annotated_name="X1 Toilet menu icon" n="2283" t="5042" x="0" y="0" w="100" h="100"/>
+	</regions>
+</AllTexturesAndRegions>

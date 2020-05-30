@@ -363,11 +363,13 @@ class Window(Frame):
         self.start_background_task(self.extractAndAnnotate, "Extracting")
     
     def extractAndAnnotate(self):
-        corePath = os.path.join(self.modPath, "spacehaven")
-        
-        loader.extract.extract(self.jarPath, corePath)
-        ui.launcher.open(corePath)
-        self.background_finished = True
+        try:
+            corePath = os.path.join(self.modPath, "spacehaven")
+            
+            loader.extract.extract(self.jarPath, corePath)
+            ui.launcher.open(corePath)
+        finally:
+            self.background_finished = True
     
     def current_mods_signature(self):
         import hashlib

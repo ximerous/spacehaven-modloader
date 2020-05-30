@@ -17,6 +17,6 @@ def extract(jarPath, corePath):
 
     ui.log.updateBackgroundState("Unpacking textures")
     loader.assets.explode.explode(corePath)
-    
+    #FIXME split this into 2 functions
     ui.log.updateBackgroundState("Annotating XML")
     loader.assets.annotate.annotate(corePath)

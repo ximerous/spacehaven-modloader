@@ -5,13 +5,28 @@ from lxml.etree import XMLParser
 
 import ui.log
 
-
 def annotate(corePath):
     """Generate an annotated Space Haven library"""
 
+    texture_names = {}
+    local_texture_names = ElementTree.parse("textures_annotations.xml", parser=XMLParser(recover=True))
+    for region in local_texture_names.findall(".//re[@n]"):
+        texture_names[region.get('n')] = region.get("_annotated_name")
+    
+    animations = ElementTree.parse(os.path.join(corePath, "library", "animations"), parser=XMLParser(recover=True))
+    for assetPos in animations.findall('.//assetPos[@a]'):
+        asset_id = assetPos.get('a')
+        if not asset_id in texture_names:
+            continue
+        assetPos.set('_annotated_name', texture_names[asset_id])
+    
+    annotatedPath = os.path.join(corePath, "library", "animations_annotated.xml")
+    animations.write(annotatedPath)
+    ui.log.log("    Wrote annotated annimations to {}".format(annotatedPath))
+    
     haven = ElementTree.parse(os.path.join(corePath, "library", "haven"), parser=XMLParser(recover=True))
     texts = ElementTree.parse(os.path.join(corePath, "library", "texts"), parser=XMLParser(recover=True))
-    
+        
     tids = {}
     # Load texts
     for text in texts.getroot():
@@ -128,6 +143,6 @@ def annotate(corePath):
             print(trade.tag)
             print(trade.attrib)
     
-    annotatedHavenPath = os.path.join(corePath, "library", "haven.annotated.xml")
+    annotatedHavenPath = os.path.join(corePath, "library", "haven_annotated.xml")
     haven.write(annotatedHavenPath)
     ui.log.log("    Wrote annotated spacehaven library to {}".format(annotatedHavenPath))
