@@ -368,7 +368,7 @@ class Window(Frame):
             corePath = os.path.join(self.modPath, "spacehaven")
             
             loader.extract.extract(self.jarPath, corePath)
-            ui.launcher.open(corePath)
+            ui.launcher.open(os.path.join(corePath, 'library'))
         finally:
             self.background_finished = True
     
@@ -378,7 +378,7 @@ class Window(Frame):
             
             loader.assets.annotate.annotate(corePath)
             
-            ui.launcher.open(corePath)
+            ui.launcher.open(os.path.join(corePath, 'library'))
         finally:
             self.background_finished = True
     
