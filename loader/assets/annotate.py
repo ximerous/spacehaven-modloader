@@ -11,14 +11,16 @@ def annotate(corePath):
     texture_names = {}
     local_texture_names = ElementTree.parse("textures_annotations.xml", parser=XMLParser(recover=True))
     for region in local_texture_names.findall(".//re[@n]"):
-        texture_names[region.get('n')] = region.get("_annotated_name")
+        if not region.get("_annotation"):
+            continue
+        texture_names[region.get('n')] = region.get("_annotation")
     
     animations = ElementTree.parse(os.path.join(corePath, "library", "animations"), parser=XMLParser(recover=True))
     for assetPos in animations.findall('.//assetPos[@a]'):
         asset_id = assetPos.get('a')
         if not asset_id in texture_names:
             continue
-        assetPos.set('_annotated_name', texture_names[asset_id])
+        assetPos.set('_annotation', texture_names[asset_id])
     
     annotatedPath = os.path.join(corePath, "library", "animations_annotated.xml")
     animations.write(annotatedPath)
@@ -50,7 +52,7 @@ def annotate(corePath):
 
         objectInfo = element.find("objectInfo")
         if objectInfo is not None:
-            element.set("_element_name_0", nameOf(objectInfo))
+            element.set("_annotation", nameOf(objectInfo))
     
     # Annotate basic products
     # first pass also builds the names cache
@@ -60,14 +62,14 @@ def annotate(corePath):
         name = nameOf(element) or element.get("elementType") or ""
         
         if name:
-            element.set("_annotated_name", name)
+            element.set("_annotation", name)
         elementNames[element.get("eid")] = name
     
     for item in haven.find("Item"):
         name = nameOf(item) or item.get("elementType") or ""
         
         if name:
-            item.set("_annotated_name", name)
+            item.set("_annotation", name)
         elementNames[item.get("mid")] = name
     
     # small helped to annotate a node
@@ -77,7 +79,7 @@ def annotate(corePath):
         else:
             name = elementNames[element.get("element", element.get("elementId"))]
         if name:
-            element.set("_annotated_name", name)
+            element.set("_annotation", name)
         return name
     
     # construction blocks for the build menu
@@ -114,10 +116,9 @@ def annotate(corePath):
             processName.append(name)
 
         processName = " ".join(processName)
-        # FIXME double check this test ? different attribute now
-        if len(processName) > 2 and not element.get("_annotated_name"):
+        if len(processName) > 2 and not element.get("_annotation"):
             elementNames[element.get("eid")] = processName
-            element.set("_annotated_process", processName)
+            element.set("_annotation", processName)
     
     #generic rule should work for all remaining nodes ?
     for sub_element in haven.findall(".//*[@consumeEvery]"):
@@ -134,7 +135,7 @@ def annotate(corePath):
         if not processes:
             continue
         for process in processes.find("processes"):
-            process.set("_process_name", elementNames[process.get("process")])
+            process.set("_annotation", elementNames[process.get("process")])
     
     for trade in haven.find('TradingValues').findall('.//t'):
         try:
