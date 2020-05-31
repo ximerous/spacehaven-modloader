@@ -217,7 +217,7 @@ class Window(Frame):
     def browseForSpacehaven(self):
         import platform
         
-        filetypes = [('spacehaven.jar', '*.jar'), ]
+        filetypes = []
         if platform.system() == "Windows":
             filetypes.append(('spacehaven.exe', '*.exe'))
         elif platform.system() == "Darwin":
@@ -328,10 +328,12 @@ class Window(Frame):
     can_quit = True
     def disable_UI(self, message):
         self.set_ui_state(DISABLED, message)
+        self.config(cursor = 'wait')
         self.can_quit = False
     
     def enable_UI(self, message):
         self.set_ui_state(NORMAL, message)
+        self.config(cursor = '')
         self.can_quit = True
     
     background_refresh_delay = 1000
