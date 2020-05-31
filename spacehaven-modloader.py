@@ -366,9 +366,13 @@ class Window(Frame):
         else:
             self.after(self.background_refresh_delay, self.update_background_state)
     
+    def _core_extract_path(self):
+        print(os.path.join(self.modPath, "spacehaven_" + self.gameInfo.version))
+        return os.path.join(self.modPath, "spacehaven_" + self.gameInfo.version)
+    
     def extract_assets(self):
         try:
-            corePath = os.path.join(self.modPath, "spacehaven")
+            corePath = self._core_extract_path()
             
             loader.extract.extract(self.jarPath, corePath)
             ui.launcher.open(os.path.join(corePath, 'library'))
@@ -377,7 +381,7 @@ class Window(Frame):
     
     def annotate(self):
         try:
-            corePath = os.path.join(self.modPath, "spacehaven")
+            corePath = self._core_extract_path()
             
             loader.assets.annotate.annotate(corePath)
             
@@ -388,14 +392,15 @@ class Window(Frame):
     def current_mods_signature(self):
         import hashlib
         
-        mods_signature = []
+        mods_signature = ["spacehaven", self.gameInfo.version]
+        # mods are supposedly ordered alphabetically 
         for mod in self.modDatabase.mods:
             if not mod.enabled:
                 continue
             mods_signature.append(mod.name)
-            mods_signature.append(mod.version or "NO_VERSION_INFO")
+            mods_signature.append(mod.version or "VERSION_UNKNOWN")
         
-        text_sig = "__".join(mods_signature)
+        text_sig = "__".join(mods_signature).lower()
         md5 = hashlib.md5(text_sig.encode('utf-8')).hexdigest()
         return md5
     
