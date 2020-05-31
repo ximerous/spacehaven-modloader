@@ -37,6 +37,8 @@ mods/
 
 5. When you're ready click "Launch Space Haven!" to play with mods. The mod loader will load the mods into the game, launch the game, and then unload them again when the game exits.
 
+6. Once you've played with a given set of mods, the loader will keep a quick launch file for them. The next time they will load a lot faster. If you want to develop your own mod or tweak one, you should always click on "Clear QuickLaunch file" before running the game, so your changes are taken into account. 
+
 ## Known issues
 
 If you change the language or restart the game from within itself, the modloader will think the game has quit and will throw an error. Nothing permanent.
@@ -47,9 +49,12 @@ Running the game from the modloader will not load your cloud credentials correct
 
 Mods are stored as a series of XML files in roughly the same format as the game's library.
 
-You can take a look at the library by clicking the "Extract & annotate game assets" button. That will extract the game library from `spacehaven.jar` into `mods/spacehaven/` and open the folder.
+You can take a look at the library by clicking the "Extract game assets" button. That will extract the game library from `spacehaven.jar` into `mods/spacehaven/` and open the folder.
 
-The main file of interest is `library/haven.annotated.xml`, which is an annotated copy of `library/haven`, which is the main game library. It contains definitions for most of the things in the game (buildings, items, ships, characters, objectives, generation parameters, etc). Also of interest are `library/texts`, `library/animations`, and `library/textures`.
+Once that's done, you can also click "Annotate XML":
+The main file of interest is `library/haven_annotated.xml`, which is an annotated copy of `library/haven`, which is the main game library. It contains definitions for most of the things in the game (buildings, items, ships, characters, objectives, generation parameters, etc). Also of interest are `library/texts`, `library/animations`, and `library/textures`.
+
+`library/animations_annotated.xml` will be created as well, with the textures names for some of the individual blocks I have personnally used. You can add/change textures names by editing the the `textures_annotations.xml` file in the modloader directory. You should copy the corresponding line from `library/textures` and add an `_annotation` tag with the name that makes sense for you, after finding the textures of interest in `library/textures.exploded/`.
 
 Mods follow the same folder structure and file format and should be reasonably obvious from the included sample mods.
 
