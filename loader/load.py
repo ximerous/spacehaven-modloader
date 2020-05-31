@@ -60,5 +60,6 @@ def unload(jarPath, message = True):
         return
     
     ui.log.log("  Unloading {} from {}".format(jarPath, vanillaPath))
+    # FIXME check if the game is running again if that fails ? Restarting from ingame after a language change does that
     os.remove(jarPath)
     os.rename(vanillaPath, jarPath)

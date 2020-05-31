@@ -37,6 +37,11 @@ mods/
 
 5. When you're ready click "Launch Space Haven!" to play with mods. The mod loader will load the mods into the game, launch the game, and then unload them again when the game exits.
 
+## Known issues
+
+If you change the language or restart the game from within itself, the modloader will think the game has quit and will throw an error. Nothing permanent.
+
+Running the game from the modloader will not load your cloud credentials correctly. 
 
 ## Modding Guide
 

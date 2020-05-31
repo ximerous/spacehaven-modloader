@@ -121,7 +121,10 @@ class Window(Frame):
         self.quitButton.pack(side=RIGHT, expand = False, padx=8, pady=4)
         #self.quitButton.grid(column = 2, padx=4, pady=4)
         
-        self.extractButton = Button(self, text="Extract game assets", command=self.extractAndAnnotate_wrapper)
+        self.annotateButton = Button(self, text="Annotate XML", command = lambda: self.start_background_task(self.annotate, "Annotating"))
+        self.annotateButton.pack(side=RIGHT, expand = False, padx=8, pady=4)
+        
+        self.extractButton = Button(self, text="Extract game assets", command = lambda: self.start_background_task(self.extract_assets, "Extracting"))
         self.extractButton.pack(side=RIGHT, expand = False, padx=8, pady=4)
         #self.extractButton.grid(column = 0, padx=4, pady=4)
         
@@ -315,9 +318,11 @@ class Window(Frame):
         self.launchButton.config(state = state, text = message)
         self.modEnableDisable.config(state = state)
         self.spacehavenBrowse.config(state = state)
+        self.quickLaunchClear.config(state = state)
         self.modListRefresh.config(state = state)
         self.modListOpenFolder.config(state = state)
         self.extractButton.config(state = state)
+        self.annotateButton.config(state = state)
         self.quitButton.config(state = state)
     
     can_quit = True
@@ -343,8 +348,7 @@ class Window(Frame):
         self.background_counter = 0
         self.background_thread = threading.Thread(target = task)
         self.background_thread.start()
-        # first run asap to update the UI
-        self.after(1, self.update_background_state)
+        self.after(self.background_refresh_delay, self.update_background_state)
         
     def update_background_state(self):
         extra_label = "." * (self.background_counter % 5)
@@ -359,14 +363,21 @@ class Window(Frame):
         else:
             self.after(self.background_refresh_delay, self.update_background_state)
     
-    def extractAndAnnotate_wrapper(self):
-        self.start_background_task(self.extractAndAnnotate, "Extracting")
-    
-    def extractAndAnnotate(self):
+    def extract_assets(self):
         try:
             corePath = os.path.join(self.modPath, "spacehaven")
             
             loader.extract.extract(self.jarPath, corePath)
+            ui.launcher.open(corePath)
+        finally:
+            self.background_finished = True
+    
+    def annotate(self):
+        try:
+            corePath = os.path.join(self.modPath, "spacehaven")
+            
+            loader.assets.annotate.annotate(corePath)
+            
             ui.launcher.open(corePath)
         finally:
             self.background_finished = True
@@ -418,6 +429,7 @@ class Window(Frame):
         try:
             loader.load.quickload(self.jarPath, self.current_mods_signature())
             ui.launcher.launchAndWait(self.gamePath)
+            # FIXME this will crash if the game restarts by itself (changing language)
             loader.load.unload(self.jarPath)
         except Exception as ex:
             import traceback
