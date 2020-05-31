@@ -1,0 +1,387 @@
+<f>
+	<font5Large id="2199" t="TTF" p="AlteDIN1451Mittelschrift.ttf" s="30" x="0" y="0">
+		<params color="ffffffa6" border="ffffff40" shadow="1a1a1abe" borderWidth="0.5" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="4"/>
+		<langSub>
+			<l lang="KO">
+				<font fid="2940"/>
+			</l>
+			<l lang="PL">
+				<font fid="2962"/>
+			</l>
+			<l lang="CN">
+				<font fid="2977"/>
+			</l>
+			<l lang="RU">
+				<font fid="2962"/>
+			</l>
+			<l lang="JA">
+				<font fid="3004"/>
+			</l>
+			<l lang="CS">
+				<font fid="2962"/>
+			</l>
+		</langSub>
+	</font5Large>
+	<esFont4 id="3486" t="TTF" p="neuzeit.ttf" s="16" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d959" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</esFont4>
+	<frFont4 id="3485" t="TTF" p="neuzeit.ttf" s="16" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d959" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</frFont4>
+	<japaneseFont2 id="3001" t="TTF" p="KintoSans-Bold.ttf" s="16" finc="1" x="0" y="0">
+		<params color="ffffff72" border="ffffff26" shadow="000000ff" borderWidth="0.35" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="4"/>
+	</japaneseFont2>
+	<deFont4 id="3484" t="TTF" p="neuzeit.ttf" s="16" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d959" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</deFont4>
+	<japaneseCharacterFont id="3000" t="TTF" p="YuGothicUI-Semibold-03.ttf" s="13" finc="1" x="0" y="0">
+		<params color="ffffffbe" border="000000d8" shadow="000000d8" borderWidth="1.25" hinting="AutoMedium" borderStraight="false" borderGamma="2.0" shadowOffsetX="1" shadowOffsetY="1" renderCount="4"/>
+	</japaneseCharacterFont>
+	<selectLanguageFont id="3482" t="TTF" p="neuzeit.ttf" s="16" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d959" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+		<langSub>
+			<l lang="KO">
+				<font fid="2630"/>
+			</l>
+			<l lang="JA">
+				<font fid="2999"/>
+			</l>
+			<l lang="CN">
+				<font fid="2635"/>
+			</l>
+			<l lang="RU">
+				<font fid="2637"/>
+			</l>
+			<l lang="PL">
+				<font fid="2968"/>
+			</l>
+			<l lang="CS">
+				<font fid="2968"/>
+			</l>
+			<l lang="DE">
+				<font fid="3484"/>
+			</l>
+			<l lang="FR">
+				<font fid="3485"/>
+			</l>
+			<l lang="ES">
+				<font fid="3486"/>
+			</l>
+			<l lang="IT">
+				<font fid="3487"/>
+			</l>
+			<l lang="PTBR">
+				<font fid="3489"/>
+			</l>
+		</langSub>
+	</selectLanguageFont>
+	<koreanCharacterFont1 id="2944" t="TTF" p="Sunflower-Bold.ttf" s="14" finc="1" x="0" y="0">
+		<params color="ffffffbf" border="000000d9" shadow="000000d9" borderWidth="1.25" hinting="AutoMedium" borderStraight="false" borderGamma="2.0" shadowOffsetX="1" shadowOffsetY="1" renderCount="4"/>
+	</koreanCharacterFont1>
+	<characterFontOrg id="2349" t="TTF" p="RobotoCondensed-Bold_0.ttf" s="14" x="0" y="0">
+		<params color="ffffffbe" border="000000d9" shadow="000000bf" borderWidth="1.25" hinting="AutoMedium" borderStraight="false" borderGamma="2.0" shadowOffsetX="1" shadowOffsetY="0" renderCount="4"/>
+	</characterFontOrg>
+	<koreanFont7 id="2943" t="TTF" p="BMDOHYEON_ttf.ttf" s="15" finc="1" x="0" y="0"/>
+	<koreanFont6 id="2942" t="TTF" p="Sunflower-Medium.ttf" s="14" finc="1" x="0" y="0"/>
+	<koreanFont3 id="2941" t="TTF" p="BMDOHYEON_ttf.ttf" s="15" finc="1" x="0" y="0"/>
+	<koreanFont5Large id="2940" t="TTF" p="BMDOHYEON_ttf.ttf" s="24" finc="1" x="0" y="0"/>
+	<creditsTitle id="3599" t="TTF" p="ProximaNovaExCn-Bold.ttf" s="19" finc="1" x="0" y="-2">
+		<params color="ffffff66" border="e5e5e526" shadow="1a1a1abe" borderWidth="0.2" hinting="AutoSlight" borderStraight="false" borderGamma="0.25" shadowOffsetX="0" shadowOffsetY="0" renderCount="5"/>
+	</creditsTitle>
+	<creditsNormal id="3598" t="TTF" p="ProximaNovaCond-Semibold.ttf" s="16" finc="1" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d959" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</creditsNormal>
+	<russianFont2 id="2982" t="TTF" p="ProximaNovaExCn-Semibold.ttf" s="17" x="0" y="-1">
+		<params color="ffffff72" border="ffffff26" shadow="000000ff" borderWidth="0.35" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="4"/>
+	</russianFont2>
+	<russianFont5Small id="2981" t="TTF" p="ProximaNovaExCn-Bold.ttf" s="16" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d958" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</russianFont5Small>
+	<japaneseFont4_6 id="2999" t="TTF" p="YuGothicUI-Regular-02.ttf" s="15" finc="1" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d958" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</japaneseFont4_6>
+	<chineseFont1_isometric id="3604" t="TTF" p="Microsoft Yahei Bold.ttf" s="17" finc="1" x="0" y="0">
+		<params color="ffffffbe" border="b2b2b240" shadow="00000066" borderWidth="0.5" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</chineseFont1_isometric>
+	<font5small id="2833" t="TTF" p="D-DINCondensed-Bold.ttf" s="17" x="0" y="0">
+		<params color="ffffffb2" border="cccccc40" shadow="00000066" borderWidth="0.35" hinting="AutoSlight" borderStraight="false" borderGamma="3.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+		<langSub>
+			<l lang="KO">
+				<font fid="2939"/>
+			</l>
+			<l lang="PL">
+				<font fid="2963"/>
+			</l>
+			<l lang="CN">
+				<font fid="2975"/>
+			</l>
+			<l lang="RU">
+				<font fid="2981"/>
+			</l>
+			<l lang="JA">
+				<font fid="3006"/>
+			</l>
+			<l lang="CS">
+				<font fid="2963"/>
+			</l>
+		</langSub>
+	</font5small>
+	<xjapaneseFont1_7 id="2998" t="TTF" p="YuGothicUI-Bold-02.ttf" s="17" finc="1" x="0" y="0">
+		<params color="ffffffbe" border="b2b2b240" shadow="00000066" borderWidth="0.5" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</xjapaneseFont1_7>
+	<chineseFont4_6 id="2635" t="TTF" p="MicrosoftYaHeiUI-02.ttf" s="14" finc="1" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d958" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</chineseFont4_6>
+	<japaneseFont1_isometric id="3603" t="TTF" p="KintoSans-Bold.ttf" s="17" finc="1" x="0" y="4">
+		<params color="ffffffbe" border="b2b2b240" shadow="00000066" borderWidth="0.5" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</japaneseFont1_isometric>
+	<xjapaneseFont4 id="2633" t="TTF" p="YuGothic-Medium-01.ttf" s="16" finc="1" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d958" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</xjapaneseFont4>
+	<japaneseFont5small id="3006" t="TTF" p="logotypejp_mp_m_1.ttf" s="15" finc="1" x="0" y="0">
+		<params color="ffffffb8" border="cccccc40" shadow="000000ff" borderWidth="0.25" hinting="AutoSlight" borderStraight="false" borderGamma="0.5" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</japaneseFont5small>
+	<ptbrFont4 id="3489" t="TTF" p="neuzeit.ttf" s="16" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d959" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</ptbrFont4>
+	<japaneseFont1_3_5_7 id="2994" t="TTF" p="KintoSans-Bold.ttf" s="17" finc="1" x="0" y="4">
+		<params color="ffffffbe" border="b2b2b240" shadow="00000066" borderWidth="0.5" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</japaneseFont1_3_5_7>
+	<plFont4 id="3488" t="TTF" p="neuzeit.ttf" s="16" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d959" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</plFont4>
+	<koreanFont4 id="2630" t="TTF" p="Sunflower-Medium.ttf" s="16" finc="1" x="0" y="0"/>
+	<japaneseFont5Large id="3004" t="TTF" p="YuGothicUI-Semibold-03.ttf" s="26" finc="1" x="0" y="0">
+		<params color="ffffffbe" border="000000d8" shadow="000000d8" borderWidth="1.25" hinting="AutoMedium" borderStraight="false" borderGamma="2.0" shadowOffsetX="1" shadowOffsetY="1" renderCount="4"/>
+	</japaneseFont5Large>
+	<itFont4 id="3487" t="TTF" p="neuzeit.ttf" s="16" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d959" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</itFont4>
+	<polishFont3 id="2959" t="TTF" p="ProximaNovaExCn-Bold.ttf" s="23" x="0" y="0"/>
+	<polishFont2 id="2958" t="TTF" p="ProximaNovaCond-Semibold.ttf" s="16" x="0" y="0">
+		<params color="ffffff72" border="ffffff26" shadow="000000ff" borderWidth="0.35" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="4"/>
+	</polishFont2>
+	<polishFont1 id="2957" t="TTF" p="DIN 2014 Narrow Demi.ttf" s="20" x="0" y="2">
+		<params color="ffffff66" border="e5e5e526" shadow="1a1a1abe" borderWidth="0.2" hinting="AutoSlight" borderStraight="false" borderGamma="0.75" shadowOffsetX="0" shadowOffsetY="0" renderCount="5"/>
+	</polishFont1>
+	<russianFont4 id="2637" t="TTF" p="ProximaNovaCond-Semibold.ttf" s="16" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d958" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</russianFont4>
+	<polishFont7 id="2965" t="TTF" p="ProximaNovaExCn-Bold.ttf" s="20" x="0" y="0"/>
+	<polishFont6 id="2964" t="TTF" p="ProximaNovaCond-Semibold.ttf" s="15" x="0" y="0">
+		<params color="ffffffb2" border="f2f2f258" shadow="00000066" borderWidth="0.15" hinting="None" borderStraight="true" borderGamma="0.5" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</polishFont6>
+	<polishFont5Small id="2963" t="TTF" p="ProximaNovaExCn-Bold.ttf" s="17" x="0" y="0">
+		<params color="ffffffb2" border="cccccc40" shadow="00000066" borderWidth="0.35" hinting="AutoSlight" borderStraight="false" borderGamma="3.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</polishFont5Small>
+	<Font1 id="774" t="TTF" p="D-DINCondensed-Bold.ttf" s="21" x="0" y="2">
+		<params color="ffffffbe" border="b2b2b240" shadow="1a1a1abe" borderWidth="0.5" hinting="AutoSlight" borderStraight="true" borderGamma="1.25" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+		<langSub>
+			<l lang="KO">
+				<font fid="2936"/>
+			</l>
+			<l lang="PL">
+				<font fid="2957"/>
+			</l>
+			<l lang="CN">
+				<font fid="2974"/>
+			</l>
+			<l lang="RU">
+				<font fid="2957"/>
+			</l>
+			<l lang="JA">
+				<font fid="2994"/>
+			</l>
+			<l lang="CS">
+				<font fid="2957"/>
+			</l>
+		</langSub>
+	</Font1>
+	<polishFont5Large id="2962" t="TTF" p="ProximaNovaCond-Semibold.ttf" s="32" x="0" y="0"/>
+	<Font2 id="775" t="TTF" p="D-DIN-Bold.ttf" s="15" x="0" y="0">
+		<params color="ffffff73" border="ffffff26" shadow="000000ff" borderWidth="0.35" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="4"/>
+		<langSub>
+			<l lang="KO">
+				<font fid="2937"/>
+			</l>
+			<l lang="PL">
+				<font fid="2958"/>
+			</l>
+			<l lang="CN">
+				<font fid="2975"/>
+			</l>
+			<l lang="RU">
+				<font fid="2982"/>
+			</l>
+			<l lang="JA">
+				<font fid="3001"/>
+			</l>
+			<l lang="CS">
+				<font fid="2958"/>
+			</l>
+		</langSub>
+	</Font2>
+	<polishFont5 id="2961" t="TTF" p="ProximaNovaExCn-Bold.ttf" s="19" x="0" y="-2">
+		<params color="ffffff66" border="e5e5e526" shadow="1a1a1abe" borderWidth="0.2" hinting="AutoSlight" borderStraight="false" borderGamma="0.25" shadowOffsetX="0" shadowOffsetY="0" renderCount="5"/>
+	</polishFont5>
+	<Font3 id="776" t="TTF" p="Helvetica LT 67 Medium Condensed.ttf" s="20" x="0" y="0">
+		<params color="ffffffbf" border="ffffff58" shadow="00000066" borderWidth="0.25" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="2"/>
+		<langSub>
+			<l lang="KO">
+				<font fid="2941"/>
+			</l>
+			<l lang="PL">
+				<font fid="2959"/>
+			</l>
+			<l lang="CN">
+				<font fid="2974"/>
+			</l>
+			<l lang="RU">
+				<font fid="2959"/>
+			</l>
+			<l lang="KO">
+				<font fid="2994"/>
+			</l>
+			<l lang="CS">
+				<font fid="2959"/>
+			</l>
+		</langSub>
+	</Font3>
+	<Font4 id="777" t="TTF" p="neuzeit.ttf" s="16" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d959" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+		<langSub>
+			<l lang="KO">
+				<font fid="2630"/>
+			</l>
+			<l lang="JA">
+				<font fid="2999"/>
+			</l>
+			<l lang="CN">
+				<font fid="2635"/>
+			</l>
+			<l lang="RU">
+				<font fid="2637"/>
+			</l>
+			<l lang="PL">
+				<font fid="2968"/>
+			</l>
+			<l lang="CS">
+				<font fid="2968"/>
+			</l>
+		</langSub>
+	</Font4>
+	<Font5 id="778" t="TTF" p="D-DINCondensed-Bold.ttf" s="19" x="0" y="0">
+		<params color="ffffff66" border="e5e5e526" shadow="1a1a1abe" borderWidth="0.2" hinting="AutoSlight" borderStraight="false" borderGamma="0.25" shadowOffsetX="0" shadowOffsetY="0" renderCount="5"/>
+		<langSub>
+			<l lang="KO">
+				<font fid="2938"/>
+			</l>
+			<l lang="PL">
+				<font fid="2961"/>
+			</l>
+			<l lang="CN">
+				<font fid="2974"/>
+			</l>
+			<l lang="RU">
+				<font fid="2961"/>
+			</l>
+			<l lang="JA">
+				<font fid="2994"/>
+			</l>
+			<l lang="CS">
+				<font fid="2961"/>
+			</l>
+		</langSub>
+	</Font5>
+	<polishFont4 id="2968" t="TTF" p="ProximaNovaCond-Semibold.ttf" s="16" x="0" y="0">
+		<params color="ffffffb8" border="d9d9d959" shadow="00000066" borderWidth="0.4" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</polishFont4>
+	<font4Shadow id="1053" t="TTF" p="RobotoCondensed-Regular.ttf" s="15" nlin="1" x="0" y="0">
+		<params color="ffffffff" border="0d0d0d80" shadow="bfbfbf80" borderWidth="0.85" hinting="AutoMedium" borderStraight="false" borderGamma="0.8" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</font4Shadow>
+	<hollowFont1 id="1052" t="TTF" p="RobotoMono-Medium.ttf" s="13" x="0" y="0">
+		<params color="ffffffff" border="000000ff" shadow="000000ff" borderWidth="1.0" hinting="AutoMedium" borderStraight="false" borderGamma="0.25" shadowOffsetX="0" shadowOffsetY="0" renderCount="4"/>
+	</hollowFont1>
+	<characterFont id="1051" t="TTF" p="Pixellari.ttf" s="14" x="0" y="0">
+		<params color="ffffffbf" border="000000ff" shadow="000000ff" borderWidth="2.0" hinting="Full" borderStraight="true" borderGamma="1.5" shadowOffsetX="2" shadowOffsetY="2" renderCount="4"/>
+	</characterFont>
+	<characterFont1 id="1129" t="TTF" p="RobotoCondensed-Bold_0.ttf" s="14" x="0" y="0">
+		<params color="ffffffbe" border="000000d9" shadow="000000d9" borderWidth="1.25" hinting="AutoMedium" borderStraight="false" borderGamma="2.0" shadowOffsetX="1" shadowOffsetY="1" renderCount="4"/>
+		<langSub>
+			<l lang="KO">
+				<font fid="2944"/>
+			</l>
+			<l lang="CN">
+				<font fid="2979"/>
+			</l>
+			<l lang="JA">
+				<font fid="3000"/>
+			</l>
+		</langSub>
+	</characterFont1>
+	<chineseFont5Large id="2977" t="TTF" p="Microsoft Yahei Bold.ttf" s="25" finc="1" x="0" y="0"/>
+	<xchineseFont3_5 id="2976" t="TTF" p="Microsoft Yahei Bold.ttf" s="17" finc="1" x="0" y="0">
+		<params color="ffffffff" border="000000ff" shadow="000000ff" borderWidth="0.2" hinting="AutoSlight" borderStraight="false" borderGamma="0.25" shadowOffsetX="0" shadowOffsetY="0" renderCount="5"/>
+	</xchineseFont3_5>
+	<chineseFont2_5small id="2975" t="TTF" p="MicrosoftYaHeiUI-02.ttf" s="15" finc="1" x="0" y="0">
+		<params color="ffffff72" border="ffffff26" shadow="000000ff" borderWidth="0.35" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="4"/>
+	</chineseFont2_5small>
+	<Font6 id="784" t="TTF" p="din1451alt.ttf" s="14" x="0" y="0">
+		<params color="ffffffb2" border="f2f2f259" shadow="00000066" borderWidth="0.15" hinting="None" borderStraight="true" borderGamma="0.5" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+		<langSub>
+			<l lang="KO">
+				<font fid="2942"/>
+			</l>
+			<l lang="PL">
+				<font fid="2964"/>
+			</l>
+			<l lang="CN">
+				<font fid="2635"/>
+			</l>
+			<l lang="RU">
+				<font fid="2964"/>
+			</l>
+			<l lang="JA">
+				<font fid="2999"/>
+			</l>
+			<l lang="CS">
+				<font fid="2964"/>
+			</l>
+		</langSub>
+	</Font6>
+	<chineseFont1_3_5_7 id="2974" t="TTF" p="Microsoft Yahei Bold.ttf" s="17" finc="1" x="0" y="0">
+		<params color="ffffffbe" border="b2b2b240" shadow="00000066" borderWidth="0.5" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</chineseFont1_3_5_7>
+	<Font7 id="787" t="TTF" p="Helvetica LT 67 Medium Condensed.ttf" s="18" x="0" y="0">
+		<params color="ffffffbe" border="ffffff58" shadow="00000066" borderWidth="0.25" hinting="AutoSlight" borderStraight="true" borderGamma="1.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="2"/>
+		<langSub>
+			<l lang="KO">
+				<font fid="2943"/>
+			</l>
+			<l lang="PL">
+				<font fid="2965"/>
+			</l>
+			<l lang="CN">
+				<font fid="2974"/>
+			</l>
+			<l lang="RU">
+				<font fid="2965"/>
+			</l>
+			<l lang="JA">
+				<font fid="2994"/>
+			</l>
+			<l lang="CS">
+				<font fid="2965"/>
+			</l>
+		</langSub>
+	</Font7>
+	<koreanFont5Small id="2939" t="TTF" p="BMDOHYEON_ttf.ttf" s="13" finc="1" x="0" y="0">
+		<params color="ffffffb2" border="cccccc40" shadow="00000066" borderWidth="0.35" hinting="AutoSlight" borderStraight="false" borderGamma="3.0" shadowOffsetX="0" shadowOffsetY="0" renderCount="3"/>
+	</koreanFont5Small>
+	<koreanFont5 id="2938" t="TTF" p="BMDOHYEON_ttf.ttf" s="14" finc="1" x="0" y="0"/>
+	<koreanFont2 id="2937" t="TTF" p="Sunflower-Bold.ttf" s="15" finc="1" x="0" y="0"/>
+	<koreanFont1 id="2936" t="TTF" p="BMDOHYEON_ttf.ttf" s="16" finc="1" x="0" y="0"/>
+	<chineseCharacterFont1 id="2979" t="TTF" p="Microsoft Yahei Bold.ttf" s="12" finc="1" x="0" y="0">
+		<params color="ffffffbe" border="000000d9" shadow="000000d9" borderWidth="1.25" hinting="AutoMedium" borderStraight="false" borderGamma="2.0" shadowOffsetX="1" shadowOffsetY="1" renderCount="4"/>
+	</chineseCharacterFont1>
+</f>

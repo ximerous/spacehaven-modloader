@@ -61,6 +61,10 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         # no textures.xml file, we're done
         return modded_textures
     
+    for texture_pack in modLibrary['library/textures'].xpath("//t[@i]"):
+        cim_id = texture_pack.get('i')
+        coreLibrary['_custom_textures_cim'][cim_id] = texture_pack.attrib
+    
     for region in modLibrary['library/textures'].xpath("//re[@n]"):
         region_id = region.get('n')
         _add_texture(region_id)
@@ -98,11 +102,12 @@ def mods(corePath, modPaths):
         with open(_core_path(filename), 'rb') as f:
             coreLibrary[filename] = lxml.etree.parse(f, parser=lxml.etree.XMLParser(recover=True))
     
-    all_modded_textures = {}
     # find the last region in the texture file and remember its index
     # we will need this to add mod textures with consecutive indexes...
     coreLibrary['_last_core_region_id'] = int(coreLibrary['library/textures'].find("//re[@n][last()]").get('n'))
     coreLibrary['_next_region_id'] = coreLibrary['_last_core_region_id'] + 1
+    coreLibrary['_all_modded_textures'] = {}
+    coreLibrary['_custom_textures_cim'] = {}
     
     # Merge in modded files
     for mod in modPaths:
@@ -165,7 +170,7 @@ def mods(corePath, modPaths):
         mergeDefinitions(coreLibrary, modLibrary, file="library/texts", xpath="/t", idAttribute="id")
         
         # do that before merging animations and textures because references might have to be remapped!
-        all_modded_textures.update(_detect_textures(coreLibrary, modLibrary, mod))
+        coreLibrary['_all_modded_textures'].update(_detect_textures(coreLibrary, modLibrary, mod))
         
         # this way the last mod loaded will overwrite previous textures
         #FIXME reimplement this test
@@ -196,19 +201,20 @@ def mods(corePath, modPaths):
     for region in coreLibrary['library/textures'].xpath("//re[@n]"):
         name = region.get("n")
         
-        if name not in all_modded_textures:
+        if name not in coreLibrary['_all_modded_textures']:
             continue
         
-        png_file = all_modded_textures[name]['path']
+        png_file = coreLibrary['_all_modded_textures'][name]['path']
         
         page = region.get("t")
         if not page in cims:
             cim_name = '{}.cim'.format(page)
             kwargs = {'create': False}
+            # TODO better cross checking of texture packs
             if 'library/' + cim_name not in PATCHABLE_CIM_FILES:
                 kwargs['create'] = True
-                kwargs['width'] = region.get("w")
-                kwargs['height'] = region.get("h")
+                kwargs['width'] = coreLibrary['_custom_textures_cim'][page]['w']
+                kwargs['height'] = coreLibrary['_custom_textures_cim'][page]['h']
                 extra_assets.append('library/' + cim_name)
             cims[page] = Texture(os.path.join(corePath, 'library', cim_name), **kwargs)
                 

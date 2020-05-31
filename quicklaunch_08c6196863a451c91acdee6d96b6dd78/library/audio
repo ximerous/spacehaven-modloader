@@ -1,0 +1,68 @@
+<audio>
+	<a n="general_select_object" at="Sound" id="968" mp3="library/sound/mp3/general_select_object.mp3" mp3l="0.235" vo="70"/>
+	<a n="general_tactical_view_select_01" at="Sound" id="969" mp3="library/sound/mp3/general_tactical_view_select_01.mp3" mp3l="0.417" vo="70"/>
+	<a n="general_tactical_view_select_02" at="Sound" id="970" mp3="library/sound/mp3/general_tactical_view_select_02.mp3" mp3l="0.417" vo="70"/>
+	<a n="general_toggle_button" at="Sound" id="971" mp3="library/sound/mp3/general_toggle_button.mp3" mp3l="0.287" vo="70"/>
+	<a n="general_ui_button_click_01" at="Sound" id="972" mp3="library/sound/mp3/general_ui_button_click_01.mp3" mp3l="0.261" vo="70"/>
+	<a n="general_ui_cancel_button" at="Sound" id="973" mp3="library/sound/mp3/general_ui_cancel_button.mp3" mp3l="0.208" vo="70"/>
+	<a n="general_ui_close_view" at="Sound" id="974" mp3="library/sound/mp3/general_ui_close_view.mp3" mp3l="0.156" vo="70"/>
+	<a n="open_notification_02" at="Sound" id="975" mp3="library/sound/mp3/open_notification_02.mp3" mp3l="0.651" vo="70"/>
+	<a n="open_notification_short" at="Sound" id="976" mp3="library/sound/mp3/open_notification_short.mp3" mp3l="0.339" vo="70"/>
+	<a n="select_facility_to_build" at="Sound" id="977" mp3="library/sound/mp3/select_facility_to_build.mp3" mp3l="0.313" vo="70"/>
+	<a n="general_open_view" at="Sound" id="978" mp3="library/sound/mp3/general_open_view.mp3" mp3l="0.287" vo="70"/>
+	<a n="general_open_view_short" at="Sound" id="979" mp3="library/sound/mp3/general_open_view_short.mp3" mp3l="0.18285714" vo="70"/>
+	<a n="general_place_facility" at="Sound" id="980" mp3="library/sound/mp3/general_place_facility.mp3" mp3l="0.287" vo="70"/>
+	<a n="door_open" at="Sound" id="981" mp3="library/sound/mp3/door_open.mp3" mp3l="0.677" vo="30"/>
+	<a n="general_place_facility_error_sound" at="Sound" id="982" mp3="library/sound/mp3/general_place_facility_error_sound.mp3" mp3l="0.13" vo="70"/>
+	<a n="general_place_facility_error_sound_2" at="Sound" id="983" mp3="library/sound/mp3/general_place_facility_error_sound_2.mp3" mp3l="0.495" vo="70"/>
+	<a n="hatch_box_insert" at="Sound" id="984" mp3="library/sound/mp3/hatch_box_insert.mp3" mp3l="0.417" vo="70"/>
+	<a n="hatch_box_withdraw" at="Sound" id="985" mp3="library/sound/mp3/hatch_box_withdraw.mp3" mp3l="0.391" vo="70"/>
+	<a n="move_character" at="Sound" id="986" mp3="library/sound/mp3/move_character.mp3" mp3l="0.313" vo="70"/>
+	<a n="box_drop" at="Sound" id="987" mp3="library/sound/mp3/box_drop.mp3" mp3l="0.365" vo="70"/>
+	<a n="building_facility" at="Sound" id="988" mp3="library/sound/mp3/building_facility_2.mp3" mp3l="0.573" vo="70"/>
+	<a n="door_close" at="Sound" id="989" mp3="library/sound/mp3/door_close.mp3" mp3l="0.677" vo="30"/>
+	<a n="weapon_pistol_fire" at="Sound" id="990" mp3="library/sound/mp3/weapon_pistol_fire.mp3" mp3l="1.068" vo="70"/>
+	<a n="general_ui_button_click_02" at="Sound" id="991" mp3="library/sound/mp3/general_ui_button_click_02.mp3" mp3l="0.261" vo="70"/>
+	<a n="general_ui_button_click_04" at="Sound" id="992" mp3="library/sound/mp3/general_ui_button_click_04.mp3" mp3l="0.182" vo="70"/>
+	<a n="general_ui_button_click_05" at="Sound" id="993" mp3="library/sound/mp3/general_ui_button_click_05.mp3" mp3l="0.235" vo="70"/>
+	<a n="missile_1Z2" at="Sound" id="2356" mp3="library/sound/mp3/missile_1z2.mp3" mp3l="0.0" vo="70"/>
+	<a n="energy_turret_01" at="Sound" id="2357" mp3="library/sound/mp3/energy_turret_01.mp3" mp3l="0.0" vo="70"/>
+	<a n="shield_explosion_02" at="Sound" id="2358" mp3="library/sound/mp3/shield_explosion_02.mp3" mp3l="0.0" vo="70"/>
+	<a n="shield_explosion_03" at="Sound" id="2359" mp3="library/sound/mp3/shield_explosion_03.mp3" mp3l="0.0" vo="70"/>
+	<a n="shield_explosion_04" at="Sound" id="2360" mp3="library/sound/mp3/shield_explosion_04.mp3" mp3l="0.0" vo="70"/>
+	<a n="shield_explosion_05" at="Sound" id="2361" mp3="library/sound/mp3/shield_explosion_05.mp3" mp3l="0.0" vo="70"/>
+	<a n="explosion_bomb_cut" at="Sound" id="2362" mp3="library/sound/mp3/explosion_bomb_cut.mp3" mp3l="0.0" vo="70"/>
+	<a n="explosion_spacey_02" at="Sound" id="2363" mp3="library/sound/mp3/explosion_spacey_02.mp3" mp3l="0.0" vo="70"/>
+	<a n="general_explosion_01" at="Sound" id="2364" mp3="library/sound/mp3/general_explosion_01.mp3" mp3l="0.0" vo="70"/>
+	<a n="general_explosion_01_short" at="Sound" id="2365" mp3="library/sound/mp3/general_explosion_01_short.mp3" mp3l="0.0" vo="70"/>
+	<a n="energy_turret_01_no_echo" at="Sound" id="2367" mp3="library/sound/mp3/energy_turret_01_no_echo.mp3" mp3l="0.0" vo="70"/>
+	<a n="energy_turret_06" at="Sound" id="2368" mp3="library/sound/mp3/energy_turret_06.mp3" mp3l="0.0" vo="70"/>
+	<a n="energy_turret_14" at="Sound" id="2369" mp3="library/sound/mp3/energy_turret_14.mp3" mp3l="0.0" vo="70"/>
+	<a n="weapon_shotgun_fire" at="Sound" id="3612" mp3="library/sound/mp3/weapon_shotgun_fire.mp3" mp3l="0.73" vo="70"/>
+	<a n="180911_ANOMALY_Exploring_LOOP02" at="Music" id="1060" ogg="library/music/ogg/180911_anomaly_exploring_loop02.ogg" oggl="41.0" vo="70"/>
+	<a n="180911_ANOMALY_Combat_LOOP02" at="Music" id="1061" ogg="library/music/ogg/180911_anomaly_combat_loop02.ogg" oggl="41.0" vo="70"/>
+	<a n="random_hammer_short" at="Music" id="1063" mp3="library/music/mp3/random_hammer_short.mp3" mp3l="6.048" vo="70"/>
+	<a n="random_swoosh" at="Music" id="1064" mp3="library/music/mp3/random_swoosh.mp3" mp3l="10.95" vo="70"/>
+	<a n="random_clang01" at="Music" id="1065" mp3="library/music/mp3/random_clang01.mp3" mp3l="5.657" vo="70"/>
+	<a n="random_clang02" at="Music" id="1066" mp3="library/music/mp3/random_clang02.mp3" mp3l="5.683" vo="70"/>
+	<a n="random_clash" at="Music" id="1067" mp3="library/music/mp3/random_clash.mp3" mp3l="6.648" vo="70"/>
+	<a n="random_crackle" at="Music" id="1068" mp3="library/music/mp3/random_crackle.mp3" mp3l="7.978" vo="70"/>
+	<a n="random_hammer_long" at="Music" id="1069" mp3="library/music/mp3/random_hammer_long.mp3" mp3l="20.31" vo="70"/>
+	<a n="random_hammer_medium" at="Music" id="1070" mp3="library/music/mp3/random_hammer_medium.mp3" mp3l="6.257" vo="70"/>
+	<a n="Ambience01" at="Music" id="1082" ogg="library/music/ogg/ambience01.ogg" oggl="66.45" vo="70"/>
+	<a n="To_The_Moon_Synth" at="Music" id="1131" ogg="library/music/ogg/to_the_moon_synth.ogg" oggl="43.0" vo="70"/>
+	<a n="180831_NEBULA SIGNALS_master_layer" at="Music" id="1296" ogg="library/music/ogg/180831_nebulasignals_master_layer.ogg" oggl="190.0" vo="70"/>
+	<a n="Home_Away_master_layer" at="Music" id="1297" ogg="library/music/ogg/home_away_master_layer.ogg" oggl="184.0" vo="70"/>
+	<a n="Gravity_master_layer" at="Music" id="1298" ogg="library/music/ogg/gravity_master_layer.ogg" oggl="182.0" vo="70"/>
+	<a n="190117_an_ocean_of_stars" at="Music" id="1360" ogg="library/music/ogg/190117_an_ocean_of_stars.ogg" oggl="192.0" vo="70"/>
+	<a n="190404 System Running" at="Music" id="1594" ogg="library/music/ogg/190404systemrunning.ogg" oggl="176.0" vo="70"/>
+	<a n="190330 Drifter" at="Music" id="1595" ogg="library/music/ogg/190330drifter.ogg" oggl="179.0" vo="70"/>
+	<a n="190605 Charged Up" at="Music" id="1748" ogg="library/music/ogg/190605chargedup.ogg" oggl="170.0" vo="70"/>
+	<a n="190529_Siren Worlds" at="Music" id="1824" ogg="library/music/ogg/190529_sirenworlds.ogg" oggl="208.0" vo="70"/>
+	<a n="Infested_Combat 02_Loop02" at="Music" id="2260" ogg="library/music/ogg/infested_combat02_loop02.ogg" oggl="32.0" vo="70"/>
+	<a n="Infested_Exploration 02_Loop02" at="Music" id="2261" ogg="library/music/ogg/infested_exploration02_loop02.ogg" oggl="32.0" vo="70"/>
+	<a n="191211_INFINITY_02" at="Music" id="2278" ogg="library/music/ogg/191211_infinity_02.ogg" oggl="202.0" vo="70"/>
+	<a n="191209_Time_Will_Pass_03" at="Music" id="2279" ogg="library/music/ogg/191209_time_will_pass_03.ogg" oggl="192.0" vo="70"/>
+	<a n="200128_ARE_WE_LOST" at="Music" id="2326" ogg="library/music/ogg/200128_are_we_lost.ogg" oggl="170.0" vo="70"/>
+	<a n="200204 Memories" at="Music" id="2339" ogg="library/music/ogg/200204memories.ogg" oggl="194.0" vo="70"/>
+</audio>

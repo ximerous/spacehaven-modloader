@@ -1,0 +1,49 @@
+[Topic]Localization Provider
+CHL Translations, Inc.
+
+[Topic]Localization Project Manager
+Carlos Hidalgo López
+
+[Topic]Brazilian Portuguese
+Carlos A R de Souza - Translator
+Thiago Araujo - Reviewer
+
+[Topic]Castilian Spanish
+Carlos Hidalgo López - Translator
+Amaranta Pérez Águila - Reviewer
+
+[Topic]Czech
+Vojtěch Schubert - Translator
+Martin Kořenek - Reviewer
+
+[Topic]French
+Goulven Le Goff - Translator
+Raphaël Rouby - Reviewer
+
+[Topic]German
+Simon Weisgerber - Translator & Reviewer
+Tanja Braun - Translator
+
+[Topic]Italian
+Federica Gaeta - Translator
+Alessandra Lombardo - Reviewer
+
+[Topic]Japanese
+Takashi Yamaguchi - Translator
+Kaori Nozawa - Reviewer
+
+[Topic]Korean
+Lee Gyeongsu - Translator
+Kyungsik Hwang - Reviewer
+
+[Topic]Polish
+Marcin Krzysztof Gutowski - Translator
+Ewelina Zatryb - Reviewer
+
+[Topic]Russian
+Mikhail Kondrashev - Translator
+Vera Levina-Prod’Homme - Reviewer
+
+[Topic]Simplified Chinese
+Ronan Shang - Translator
+Xiaochun Zhang - Reviewer
