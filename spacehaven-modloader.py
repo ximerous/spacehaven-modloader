@@ -256,6 +256,7 @@ class Window(Frame):
             mod_idx += 1
         
         self.check_quick_launch()
+        # FIXME reselect the same mod if possible
         self.showCurrentMod()
     
     def selected_mod(self):
@@ -437,8 +438,8 @@ class Window(Frame):
             import traceback
             traceback.print_exc()
             messagebox.showerror("Error during quick launch", traceback.format_exc(3))
-        
-        self.background_finished = True
+        finally:
+            self.background_finished = True
     
     def patchAndLaunch(self):
         activeModPaths = []
@@ -455,8 +456,8 @@ class Window(Frame):
             import traceback
             traceback.print_exc()
             messagebox.showerror("Error loading mods", traceback.format_exc(3))
-        
-        self.background_finished = True
+        finally:
+            self.background_finished = True
     
     def quit(self):
         if self.can_quit:

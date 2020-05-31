@@ -61,11 +61,14 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         # no textures.xml file, we're done
         return modded_textures
     
-    for texture_pack in modLibrary['library/textures'].xpath("//t[@i]"):
+    #FIXME verify that there's only one file
+    textures_mod = modLibrary['library/textures'][0]
+    
+    for texture_pack in textures_mod.xpath("//t[@i]"):
         cim_id = texture_pack.get('i')
         coreLibrary['_custom_textures_cim'][cim_id] = texture_pack.attrib
     
-    for region in modLibrary['library/textures'].xpath("//re[@n]"):
+    for region in textures_mod.xpath("//re[@n]"):
         region_id = region.get('n')
         _add_texture(region_id)
     
@@ -73,15 +76,16 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         # no custom mod textures, no need to remap ids 
         return modded_textures
     
-    for asset in modLibrary['library/animations'].xpath("//assetPos[@a]"):
-        mod_local_id = asset.get('a')
-        if mod_local_id not in mapping_n_region:
-            continue
-        new_id = mapping_n_region[mod_local_id]
-        ui.log.log("  Mapping animation 'assetPos' {} to {}...".format(mod_local_id, new_id))
-        asset.set('a', new_id)
+    for animation_chunk in modLibrary['library/animations']:
+        for asset in animation_chunk.xpath("//assetPos[@a]"):
+            mod_local_id = asset.get('a')
+            if mod_local_id not in mapping_n_region:
+                continue
+            new_id = mapping_n_region[mod_local_id]
+            ui.log.log("  Mapping animation 'assetPos' {} to {}...".format(mod_local_id, new_id))
+            asset.set('a', new_id)
     
-    for asset in modLibrary['library/textures'].xpath("//re[@n]"):
+    for asset in textures_mod.xpath("//re[@n]"):
         mod_local_id = asset.get('n')
         if mod_local_id not in mapping_n_region:
             continue
@@ -120,15 +124,28 @@ def mods(corePath, modPaths):
         def _mod_path(filename):
             return os.path.join(mod, filename.replace('/', os.sep))
         
-        for filename in PATCHABLE_XML_FILES:
-            mod_file = _mod_path(filename)
+        mod_files = []
+        for mod_file in os.listdir(_mod_path('library')):
+            mod_files.append('library/' + mod_file)
+        
+        # we allow breaking down mod xml files into smaller pieces for readability
+        for target in PATCHABLE_XML_FILES:
+            for mod_file in mod_files:
+                if not mod_file.startswith(target):
+                    continue
+                if target not in modLibrary:
+                    modLibrary[target] = []
+                ui.log.log("{} => {}".format(mod_file, target))
+                with open(_mod_path(mod_file)) as f:
+                    modLibrary[target].append(lxml.etree.parse(f, parser=lxml.etree.XMLParser(remove_comments=True)))
+                    
+                    
+            mod_file = _mod_path(target)
             if not os.path.exists(mod_file):
                 # try again with the extension ?
                 mod_file += '.xml'
                 if not os.path.exists(mod_file):
                     continue
-            with open(mod_file) as f:
-                modLibrary[filename] = lxml.etree.parse(f, parser=lxml.etree.XMLParser(remove_comments=True))
 
         # Do an element-wise merge (replacing conflicts)
         mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Randomizer", idAttribute="id")
@@ -192,7 +209,7 @@ def mods(corePath, modPaths):
         with open(_core_path(filename), "wb") as f:
             f.write(lxml.etree.tostring(coreLibrary[filename], pretty_print=True, encoding="UTF-8"))
     
-    ui.log.updateLaunchState("Packing textures".format(mod))
+    ui.log.updateLaunchState("Packing textures")
     # add or overwrite textures from mods. This is done after all the XML has been merged into the core "textures" file
     cims = {}
     reexport_cims = {}
@@ -247,18 +264,28 @@ def mergeDefinitions(baseLibrary, modLibrary, file, xpath, idAttribute):
         return
 
     try:
-        modRoot = modLibrary[file].xpath(xpath)[0]
         baseRoot = baseLibrary[file].xpath(xpath)[0]
     except IndexError:
-        # ui.log.log("    {}: Nothing at {}".format(file, xpath))
+        #that's a big error if we can't find it in the core!
+        ui.log.log("    {}: ERROR CORE NOTHING AT {}".format(file, xpath))
         return
+    
+    for mod_xml in modLibrary[file]:
+        try:
+            modRoot = mod_xml.xpath(xpath)[0]
+        except:
+            continue
+        
+        merged = 0
+        for element in list(modRoot):
+            conflicts = baseRoot.xpath("*[@{}='{}']".format(idAttribute, element.get(idAttribute)))
 
-    for element in list(modRoot):
-        conflicts = baseRoot.xpath("*[@{}='{}']".format(idAttribute, element.get(idAttribute)))
+            for conflict in conflicts:
+                baseRoot.remove(conflict)
 
-        for conflict in conflicts:
-            baseRoot.remove(conflict)
-
-        baseRoot.append(copy.deepcopy(element))
-
-    ui.log.log("    {}: Merged {} elements into {}".format(file, len(list(modRoot)), xpath))
+            baseRoot.append(copy.deepcopy(element))
+            merged += 1
+        
+        if merged:
+            # TODO add source filename
+            ui.log.log("    {}: Merged {} elements into {}".format(file, merged, xpath))
