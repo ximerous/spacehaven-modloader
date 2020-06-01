@@ -205,7 +205,7 @@ class Window(Frame):
 
         self.spacehavenText.delete(0, 'end')
         self.spacehavenText.insert(0, self.gamePath)
-
+        
         self.refreshModList()
 
     def checkForLoadedMods(self):
@@ -239,6 +239,12 @@ class Window(Frame):
         pass
 
     def refreshModList(self):
+        try:
+            # might fail at init time
+            previously_selected = self.selected_mod()
+        except:
+            previously_selected = None
+            pass
         self.modList.delete(0, END)
 
         if self.modPath is None:
@@ -250,14 +256,21 @@ class Window(Frame):
         mod_idx = 0
         for mod in self.modDatabase.mods:
             self.modList.insert(END, mod.name)
-            # TODO reimplement later (must also do it when enabling/disabling via the UI)
-            #if not mod.enabled:
-            #    self.modList.itemconfig(mod_idx, fg = 'grey')
+            mod.display_idx = mod_idx
+            
+            self.update_list_style(mod)
+            if previously_selected and mod == previously_selected.name:
+                self.modList.selection_set(mod_idx)
             mod_idx += 1
         
         self.check_quick_launch()
-        # FIXME reselect the same mod if possible
         self.showCurrentMod()
+    
+    def update_list_style(self, mod):
+        if mod.enabled:
+            self.modList.itemconfig(mod.display_idx, foreground = 'black', selectforeground = 'white')
+        else:
+            self.modList.itemconfig(mod.display_idx, foreground = 'grey', selectforeground = 'lightgrey')
     
     def selected_mod(self):
         if not len(self.modDatabase.mods):
@@ -282,10 +295,10 @@ class Window(Frame):
             mod.disable()
         else:
             mod.enable()
-        # TODO update style in listbox
-                
-        self.check_quick_launch()
+        
+        self.update_list_style(mod)
         self.showMod(mod)
+        self.check_quick_launch()
     
     def update_description(self, description):
         self.modDetailsDescription.config(state="normal")
