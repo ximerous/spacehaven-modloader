@@ -347,9 +347,16 @@ class Window(Frame):
         ui.log.logger.backgroundState = message
         
         self.background_finished = False
-
+        # for counting the iterations in update_background_state
         self.background_counter = 0
-        self.background_thread = threading.Thread(target = task)
+        
+        def _wrapper():
+            try:
+                task()
+            finally:
+                self.background_finished = True
+        
+        self.background_thread = threading.Thread(target = _wrapper)
         self.background_thread.start()
         self.after(self.background_refresh_delay, self.update_background_state)
         
@@ -367,36 +374,30 @@ class Window(Frame):
             self.after(self.background_refresh_delay, self.update_background_state)
     
     def _core_extract_path(self):
-        print(os.path.join(self.modPath, "spacehaven_" + self.gameInfo.version))
         return os.path.join(self.modPath, "spacehaven_" + self.gameInfo.version)
     
     def extract_assets(self):
-        try:
-            corePath = self._core_extract_path()
-            
-            loader.extract.extract(self.jarPath, corePath)
-            ui.launcher.open(os.path.join(corePath, 'library'))
-        finally:
-            self.background_finished = True
+        corePath = self._core_extract_path()
+        
+        loader.extract.extract(self.jarPath, corePath)
+        ui.launcher.open(os.path.join(corePath, 'library'))
     
     def annotate(self):
-        try:
-            corePath = self._core_extract_path()
-            
-            loader.assets.annotate.annotate(corePath)
-            
-            ui.launcher.open(os.path.join(corePath, 'library'))
-        finally:
-            self.background_finished = True
+        corePath = self._core_extract_path()
+        
+        loader.assets.annotate.annotate(corePath)
+        
+        ui.launcher.open(os.path.join(corePath, 'library'))
+    
+    def mods_enabled(self):
+        return [mod for mod in self.modDatabase.mods if mod.enabled]
     
     def current_mods_signature(self):
         import hashlib
         
         mods_signature = ["spacehaven", self.gameInfo.version]
         # mods are supposedly ordered alphabetically 
-        for mod in self.modDatabase.mods:
-            if not mod.enabled:
-                continue
+        for mod in self.mods_enabled():
             mods_signature.append(mod.name)
             mods_signature.append(mod.version or "VERSION_UNKNOWN")
         
@@ -409,7 +410,10 @@ class Window(Frame):
         return os.path.isfile(loader.load.quick_launch_filename(mods_sig))
     
     def check_quick_launch(self):
-        if self.quick_launch_available():
+        if not self.mods_enabled():
+            self.launchButton_default_text = "LAUNCH ORIGINAL GAME"
+            self.quickLaunchClear.config(state = DISABLED)
+        elif self.quick_launch_available():
             self.launchButton_default_text = "QUICKLAUNCH!"
             self.quickLaunchClear.config(state = NORMAL)
         else:
@@ -425,13 +429,20 @@ class Window(Frame):
         self.check_quick_launch()
     
     def launch_wrapper(self):
-        if self.quick_launch_available():
+        if not self.mods_enabled():
+            task = self.launch_vanilla
+            message = "Launching original game"
+        elif self.quick_launch_available():
             task = self.quick_launch
             message = "Quicklaunching"
         else:
             task = self.patchAndLaunch
             message = "Launching"
+        
         self.start_background_task(task, message)
+    
+    def launch_vanilla(self):
+        ui.launcher.launchAndWait(self.gamePath)
     
     def quick_launch(self):
         try:
@@ -443,8 +454,6 @@ class Window(Frame):
             import traceback
             traceback.print_exc()
             messagebox.showerror("Error during quick launch", traceback.format_exc(3))
-        finally:
-            self.background_finished = True
     
     def patchAndLaunch(self):
         activeModPaths = []
@@ -461,8 +470,6 @@ class Window(Frame):
             import traceback
             traceback.print_exc()
             messagebox.showerror("Error loading mods", traceback.format_exc(3))
-        finally:
-            self.background_finished = True
     
     def quit(self):
         if self.can_quit:
