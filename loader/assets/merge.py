@@ -163,6 +163,7 @@ def mods(corePath, modPaths):
         mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Encounter", idAttribute="id")
         mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/CostGroup", idAttribute="id")
         mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/CharacterSet", idAttribute="cid")
+        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/DifficultySettings", idAttribute="id")
         mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Room", idAttribute="rid")
         mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/ObjectiveCollection", idAttribute="nid")
         mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Notes", idAttribute="id")

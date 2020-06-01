@@ -88,35 +88,21 @@ def annotate(corePath):
             for sub_l in customPrice:
                 _annotate_elt(sub_l)
     
-    # specific processes for the crops
-    for element in []: #ProductRoot:
-        if element.get('type', None) != 'Crop':
-            continue
-        for need in element.findall(".//needs"):
-            for sub_l in need:
-                _annotate_elt(sub_l)
-        
-        for product in element.findall(".//products"):
-            for sub_l in product:
-                _annotate_elt(sub_l)
-    
     # Annotate facility processes, now that we know the names of all the products involved
     for element in ProductRoot:
         processName = []
-        needs = element.find("needs") or []
-        for need in needs:
+        for need in element.xpath("needs/l"):
             name = _annotate_elt(need)
             processName.append(name)
-
+        
         processName.append("to")
-
-        products = element.find("products") or []
-        for product in products:
+        
+        for product in element.xpath("products/l"):
             name = _annotate_elt(product)
             processName.append(name)
-
-        processName = " ".join(processName)
+        
         if len(processName) > 2 and not element.get("_annotation"):
+            processName = " ".join(processName)
             elementNames[element.get("eid")] = processName
             element.set("_annotation", processName)
     
@@ -125,24 +111,39 @@ def annotate(corePath):
         try:
             _annotate_elt(sub_element)
         except:
+            pass
             # error on 446, weird stuff
-            print(sub_element.tag)
-            print(sub_element.attrib)
+            #print(sub_element.tag)
+            #print(sub_element.attrib)
     
     # iterate again once we have built all the process names
-    for element in ProductRoot:
-        processes = element.find("list")
-        if not processes:
-            continue
-        for process in processes.find("processes"):
-            process.set("_annotation", elementNames[process.get("process")])
+    for process in ProductRoot.xpath('.//list/processes/l[@process]'):
+        process.set("_annotation", elementNames[process.get("process")])
     
     for trade in haven.find('TradingValues').findall('.//t'):
         try:
             _annotate_elt(trade, attr = 'eid')
         except:
-            print(trade.tag)
-            print(trade.attrib)
+            pass
+    
+    DifficultySettings = haven.find('DifficultySettings')
+    for settings in DifficultySettings:
+        name = nameOf(settings)
+        
+        if name:
+            settings.set("_annotation", name)
+    
+    for res in DifficultySettings.xpath('.//l'):
+        try:
+            _annotate_elt(res, attr = 'elementId')
+        except:
+            pass
+        
+    for res in DifficultySettings.xpath('.//rules/r'):
+        try:
+            _annotate_elt(res, attr = 'cat')
+        except:
+            pass
     
     annotatedHavenPath = os.path.join(corePath, "library", "haven_annotated.xml")
     haven.write(annotatedHavenPath)
