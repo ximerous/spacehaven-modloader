@@ -333,6 +333,9 @@ class Window(Frame):
             description += "\n\n" + "KNOWN ISSUES: " + mod.known_issues
         if mod.author:
             description += "\n\n" + "AUTHOR: " + mod.author
+        if mod.website:
+            # FIXME make it a separate textfield, can't select from this one
+            description += "\n\n" + "URL: " + mod.website
         
         self.update_description(description)
     

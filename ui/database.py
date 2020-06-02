@@ -88,6 +88,8 @@ class Mod:
             self.known_issues = _optional("knownIssues")
             self.version = _optional("version")
             self.author = _optional("author")
+            self.website = _optional("website")
+            self.updates = _optional("updates")
             
             self.verifyLoaderVersion(mod)
             self.verifyGameVersion(mod, self.gameInfo)
