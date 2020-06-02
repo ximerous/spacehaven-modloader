@@ -9,5 +9,5 @@ previous_spacehaven_path.txt
 *.patch
 *.orig
 *.rej
-quicklaunch_*
+quicklaunch_*/
 extra_mods_path.txt
