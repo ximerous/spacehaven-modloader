@@ -206,6 +206,15 @@ class Window(Frame):
         self.spacehavenText.delete(0, 'end')
         self.spacehavenText.insert(0, self.gamePath)
         
+        self.modPath = [self.modPath, ]
+        try:
+            with open("extra_mods_path.txt", 'r') as f:
+                for mod_path in f.read().split('\n'):
+                    if mod_path.strip():
+                        self.modPath.append(mod_path.strip())
+        except:
+            pass
+        
         self.refreshModList()
 
     def checkForLoadedMods(self):
@@ -319,14 +328,20 @@ class Window(Frame):
         
         self.modDetailsName.config(text = title)
         self.modEnableDisable.config(text = command_label)
-        self.update_description(mod.description)
+        description = mod.description
+        if mod.known_issues:
+            description += "\n\n" + "KNOWN ISSUES: " + mod.known_issues
+        if mod.author:
+            description += "\n\n" + "AUTHOR: " + mod.author
+        
+        self.update_description(description)
     
     def showModError(self, title, error):
         self.modDetailsName.config(text = title)
         self.update_description(error)
         
     def openModFolder(self):
-        ui.launcher.open(self.modPath)
+        ui.launcher.open(self.modPath[0])
     
     def set_ui_state(self, state, message):
         self.launchButton.config(state = state, text = message)
@@ -387,7 +402,7 @@ class Window(Frame):
             self.after(self.background_refresh_delay, self.update_background_state)
     
     def _core_extract_path(self):
-        return os.path.join(self.modPath, "spacehaven_" + self.gameInfo.version)
+        return os.path.join(self.modPath[0], "spacehaven_" + self.gameInfo.version)
     
     def extract_assets(self):
         corePath = self._core_extract_path()
