@@ -205,10 +205,13 @@ def mods(corePath, modPaths):
     return extra_assets
 
 
-def doMerges(coreLib, modLib, mod):
-    def mergeShim(file, xpath, idAttribute):
+def doMerges(coreLib, modLib, mod: str):
+    """Do merge-based modding sequence"""
+    def mergeShim(file: str, xpath: str, idAttribute: str):
+        '''Shim to reduce function call complexity'''
         mergeDefinitions(coreLib, modLib, file, xpath, idAttribute)
 
+    # Lookup table for all nodes in library/haven based on element and the expected ID format
     havenIDLookUpTable = {
         "/data/Randomizer": "id",
         "/data/GOAPAction": "id",
