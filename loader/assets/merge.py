@@ -102,6 +102,35 @@ def mods(corePath, modPaths):
     def _core_path(filename):
         return os.path.join(corePath, filename.replace('/', os.sep))
 
+    def buildLibrary(location: str):
+        """Build up a library dict of files in `location`"""
+        def _mod_path(filename):
+            return os.path.join(mod, filename.replace('/', os.sep))
+        location_library = {}
+        try:
+            location_files = [location + '/' + mod_file for mod_file in os.listdir(_mod_path(location))]
+        except FileNotFoundError:
+            location_files = []
+
+        # we allow breaking down mod xml files into smaller pieces for readability
+        for target in PATCHABLE_XML_FILES:
+            targetInLocation = target.replace('library', location)
+            for mod_file in location_files:
+                if not mod_file.startswith(targetInLocation): continue
+                if target not in location_library:  location_library[target] = []
+
+                ui.log.log("    {} <= {}".format(target, mod_file))
+                with open(_mod_path(mod_file)) as f:
+                    location_library[target].append(lxml.etree.parse(f, parser=lxml.etree.XMLParser(remove_comments=True)))
+
+            mod_file = _mod_path(target)
+            # try again with the extension ?
+            if not os.path.exists(mod_file):
+                mod_file += '.xml'
+                if not os.path.exists(mod_file):
+                    continue
+        return location_library
+
     for filename in PATCHABLE_XML_FILES:
         with open(_core_path(filename), 'rb') as f:
             coreLibrary[filename] = lxml.etree.parse(f, parser=lxml.etree.XMLParser(recover=True))
@@ -120,32 +149,7 @@ def mods(corePath, modPaths):
         ui.log.log("  Loading mod {}...".format(mod))
 
         # Load the mod's library
-        modLibrary = {}
-        def _mod_path(filename):
-            return os.path.join(mod, filename.replace('/', os.sep))
-
-        mod_files = []
-        for mod_file in os.listdir(_mod_path('library')):
-            mod_files.append('library/' + mod_file)
-
-        # we allow breaking down mod xml files into smaller pieces for readability
-        for target in PATCHABLE_XML_FILES:
-            for mod_file in mod_files:
-                if not mod_file.startswith(target):
-                    continue
-                if target not in modLibrary:
-                    modLibrary[target] = []
-                ui.log.log("{} => {}".format(mod_file, target))
-                with open(_mod_path(mod_file)) as f:
-                    modLibrary[target].append(lxml.etree.parse(f, parser=lxml.etree.XMLParser(remove_comments=True)))
-
-
-            mod_file = _mod_path(target)
-            if not os.path.exists(mod_file):
-                # try again with the extension ?
-                mod_file += '.xml'
-                if not os.path.exists(mod_file):
-                    continue
+        modLibrary = buildLibrary('library')
 
         doMerges(coreLibrary, modLibrary, mod)
 
