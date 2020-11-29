@@ -260,11 +260,11 @@ def doMerges(coreLib, modLib, mod: str):
 
     # this way the last mod loaded will overwrite previous textures
     #FIXME reimplement this test
-    #                if region_id in all_modded_textures:
-    #            ui.log.log("  ERROR CONFLICT {}...".format(filename))
-    #            ui.log.log("  ERROR CONFLICT {}...".format(filename))
-    #            ui.log.log("  ERROR CONFLICT {}...".format(filename))
-    #            continue
+    #if region_id in all_modded_textures:
+    #    ui.log.log("  ERROR CONFLICT {}...".format(filename))
+    #    ui.log.log("  ERROR CONFLICT {}...".format(filename))
+    #    ui.log.log("  ERROR CONFLICT {}...".format(filename))
+    #    continue
 
     mergeShim("library/animations", "/AllAnimations/animations", "n")
     mergeShim("library/textures", "/AllTexturesAndRegions/textures", "i")
