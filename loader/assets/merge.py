@@ -153,6 +153,12 @@ def mods(corePath, modPaths):
 
         doMerges(coreLibrary, modLibrary, mod)
 
+    # Do patches after merges to avoid clobbers
+    for mod in modPaths:
+        ui.log.updateLaunchState(f"Patching {os.path.basename(mod)}")
+        ui.log.log(f"  Loading patches {mod}...")
+        modPatchesLibrary = buildLibrary('patches')
+
     ui.log.updateLaunchState("Updating XML")
 
     # Write out the new base library
