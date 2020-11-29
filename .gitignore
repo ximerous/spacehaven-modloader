@@ -13,3 +13,4 @@ quicklaunch_*.jar
 quicklaunch_*/
 extra_mods_path.txt
 env/
+.vscode/.ropeproject/
