@@ -147,61 +147,7 @@ def mods(corePath, modPaths):
                 if not os.path.exists(mod_file):
                     continue
 
-        # Do an element-wise merge (replacing conflicts)
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Randomizer", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/GOAPAction", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/BackPack", idAttribute="mid")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Element", idAttribute="mid")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Product", idAttribute="eid")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/DataLogFragment", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/RandomShip", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/IsoFX", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Item", idAttribute="mid")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/SubCat", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Monster", idAttribute="cid")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/PersonalitySettings", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Encounter", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/CostGroup", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/CharacterSet", idAttribute="cid")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/DifficultySettings", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Room", idAttribute="rid")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/ObjectiveCollection", idAttribute="nid")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Notes", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/DialogChoice", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Faction", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/CelestialObject", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Character", idAttribute="cid")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Craft", idAttribute="cid")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Sector", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/DataLog", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Plan", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/BackStory", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/DefaultStuff", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/TradingValues", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/CharacterTrait", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Effect", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/CharacterCondition", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/Ship", idAttribute="rid")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/IdleAnim", idAttribute="id")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/haven", xpath="/data/MainCat", idAttribute="id")
-
-        mergeDefinitions(coreLibrary, modLibrary, file="library/texts", xpath="/t", idAttribute="id")
-        
-        # do that before merging animations and textures because references might have to be remapped!
-        coreLibrary['_all_modded_textures'].update(_detect_textures(coreLibrary, modLibrary, mod))
-        
-        # this way the last mod loaded will overwrite previous textures
-        #FIXME reimplement this test
-        #                if region_id in all_modded_textures:
-        #            ui.log.log("  ERROR CONFLICT {}...".format(filename))
-        #            ui.log.log("  ERROR CONFLICT {}...".format(filename))
-        #            ui.log.log("  ERROR CONFLICT {}...".format(filename))
-        #            continue
-        
-        mergeDefinitions(coreLibrary, modLibrary, file="library/animations", xpath="/AllAnimations/animations", idAttribute="n")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/textures", xpath="/AllTexturesAndRegions/textures", idAttribute="i")
-        mergeDefinitions(coreLibrary, modLibrary, file="library/textures", xpath="/AllTexturesAndRegions/regions", idAttribute="n")
-        
+        doMerges(coreLibrary, modLibrary, mod)
 
     ui.log.updateLaunchState("Updating XML")
     
@@ -257,6 +203,69 @@ def mods(corePath, modPaths):
             cims[page].export_png(os.path.join(path, 'modded_cim_{}.png'.format(page)))
     
     return extra_assets
+
+
+def doMerges(coreLib, modLib, mod):
+    def mergeShim(file, xpath, idAttribute):
+        mergeDefinitions(coreLib, modLib, file, xpath, idAttribute)
+
+    havenIDLookUpTable = {
+        "/data/Randomizer": "id",
+        "/data/GOAPAction": "id",
+        "/data/BackPack": "mid",
+        "/data/Element": "mid",
+        "/data/Product": "eid",
+        "/data/DataLogFragment": "id",
+        "/data/RandomShip": "id",
+        "/data/IsoFX": "id",
+        "/data/Item": "mid",
+        "/data/SubCat": "id",
+        "/data/Monster": "cid",
+        "/data/PersonalitySettings": "id",
+        "/data/Encounter": "id",
+        "/data/CostGroup": "id",
+        "/data/CharacterSet": "cid",
+        "/data/DifficultySettings": "id",
+        "/data/Room": "rid",
+        "/data/ObjectiveCollection": "nid",
+        "/data/Notes": "id",
+        "/data/DialogChoice": "id",
+        "/data/Faction": "id",
+        "/data/CelestialObject": "id",
+        "/data/Character": "cid",
+        "/data/Craft": "cid",
+        "/data/Sector": "id",
+        "/data/DataLog": "id",
+        "/data/Plan": "id",
+        "/data/BackStory": "id",
+        "/data/DefaultStuff": "id",
+        "/data/TradingValues": "id",
+        "/data/CharacterTrait": "id",
+        "/data/Effect": "id",
+        "/data/CharacterCondition": "id",
+        "/data/Ship": "rid",
+        "/data/IdleAnim": "id",
+        "/data/MainCat": "id",
+    }
+
+    # Do an element-wise merge (replacing conflicts)
+    for k,v in havenIDLookUpTable.items(): mergeShim("library/haven", k, v)
+    mergeShim("library/texts", "/t", idAttribute="id")
+
+    # do that before merging animations and textures because references might have to be remapped!
+    coreLib['_all_modded_textures'].update(_detect_textures(coreLib, modLib, mod))
+
+    # this way the last mod loaded will overwrite previous textures
+    #FIXME reimplement this test
+    #                if region_id in all_modded_textures:
+    #            ui.log.log("  ERROR CONFLICT {}...".format(filename))
+    #            ui.log.log("  ERROR CONFLICT {}...".format(filename))
+    #            ui.log.log("  ERROR CONFLICT {}...".format(filename))
+    #            continue
+
+    mergeShim("library/animations", "/AllAnimations/animations", "n")
+    mergeShim("library/textures", "/AllTexturesAndRegions/textures", "i")
+    mergeShim("library/textures", "/AllTexturesAndRegions/regions", "n")
 
 
 def mergeDefinitions(baseLibrary, modLibrary, file, xpath, idAttribute):
