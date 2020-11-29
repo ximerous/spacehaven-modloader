@@ -215,6 +215,10 @@ def doMerges(coreLib, modLib, mod: str):
         '''Shim to reduce function call complexity'''
         mergeDefinitions(coreLib, modLib, file, xpath, idAttribute)
 
+    def mergeAbortMessage(filename: str):
+        """Shim to standardize error message"""
+        ui.log.log(f"    No merges needed: {filename}")
+
     # Lookup table for all nodes in library/haven based on element and the expected ID format
     havenIDLookUpTable = {
         "/data/BackPack": "mid",
@@ -256,8 +260,15 @@ def doMerges(coreLib, modLib, mod: str):
     }
 
     # Do an element-wise merge (replacing conflicts)
-    for k,v in havenIDLookUpTable.items(): mergeShim("library/haven", k, v)
-    mergeShim("library/texts", "/t", idAttribute="id")
+    currentFile = "library/haven"
+    if currentFile in modLib:
+        for path, idText in havenIDLookUpTable.items(): mergeShim(currentFile, path, idText)
+    else: mergeAbortMessage(currentFile)
+
+    currentFile = "library/texts"
+    if currentFile in modLib:
+        mergeShim(currentFile, "/t", idAttribute="id")
+    else: mergeAbortMessage(currentFile)
 
     # do that before merging animations and textures because references might have to be remapped!
     coreLib['_all_modded_textures'].update(_detect_textures(coreLib, modLib, mod))
@@ -270,9 +281,16 @@ def doMerges(coreLib, modLib, mod: str):
     #    ui.log.log("  ERROR CONFLICT {}...".format(filename))
     #    continue
 
-    mergeShim("library/animations", "/AllAnimations/animations", "n")
-    mergeShim("library/textures", "/AllTexturesAndRegions/textures", "i")
-    mergeShim("library/textures", "/AllTexturesAndRegions/regions", "n")
+
+    currentFile = "library/animations"
+    if currentFile in modLib:
+        mergeShim(currentFile, "/AllAnimations/animations", "n")
+    else: mergeAbortMessage(currentFile)
+
+    currentFile = "library/textures"
+    if currentFile in modLib:
+        mergeShim(currentFile, "/AllTexturesAndRegions/regions", "n")
+    else: mergeAbortMessage(currentFile)
 
 
 def mergeDefinitions(baseLibrary, modLibrary, file, xpath, idAttribute):
