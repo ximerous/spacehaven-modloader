@@ -215,6 +215,71 @@ def mods(corePath, modPaths):
 
     return extra_assets
 
+
+
+def AttributeSet(currentCoreLibElems, value, attribute):
+    """Set the attribute on the node, adding if not present"""
+    elem : lxml.etree._Element
+    for elem in currentCoreLibElems: elem.set(attribute, value.text)
+
+def AttributeAdd(currentCoreLibElems, value, attribute):
+    """Adds the attribute to the node IFF the attribute name is not already present"""
+    elem : lxml.etree._Element
+    for elem in currentCoreLibElems:
+        if elem.get(attribute, None) is not None:
+            raise KeyError(f"Attribute '{attribute}' already exists")
+        elem.set(attribute, value.text)
+
+def AttributeRemove(currentCoreLibElems, value, attribute):
+    """Remove the attribute from the node"""
+    ui.log.log(f"{logIndent}WARNING: REMOVING ATTRIBUTES MAY BREAK THE GAME")
+    elem : lxml.etree._Element
+    for elem in currentCoreLibElems: elem.attrib.pop(attribute)
+
+def NodeAdd(currentCoreLibElems, value, attribute):
+    """Adds a provided child node to the selected node"""
+    elem : lxml.etree._Element
+    parent: lxml.etree._Element
+    for elem in currentCoreLibElems:
+        lastelemIDX = len(elem.getchildren())
+        elem.insert(lastelemIDX + 1, copy.deepcopy(value[0]))
+
+def NodeInsert(currentCoreLibElems, value, attribute):
+    """Adds a provided sibling node to the selected node"""
+    elem : lxml.etree._Element
+    parent: lxml.etree._Element
+    for elem in currentCoreLibElems:
+        parent = elem.find('./..')
+        elemIDX = parent.index(elem)
+        parent.insert(elemIDX + 1, copy.deepcopy(value[0]))
+
+def NodeRemove(currentCoreLibElems, value, attribute):
+    """Deletes the selected node"""
+    elem : lxml.etree._Element
+    parent: lxml.etree._Element
+    for elem in currentCoreLibElems:
+        parent = elem.find('./..')
+        parent.remove(elem)
+
+def NodeReplace(currentCoreLibElems, value, attribute):
+    """Replaces the selected node with the provided node"""
+    elem : lxml.etree._Element
+    parent: lxml.etree._Element
+    for elem in currentCoreLibElems:
+        parent = elem.find('./..')
+        parent.replace(elem, copy.deepcopy(value[0]))
+
+patchDispatcher = {
+    "AttributeSet" :    AttributeSet,
+    "AttributeAdd" :    AttributeAdd,
+    "AttributeRemove" : AttributeRemove,
+    "Add":              NodeAdd,
+    "Insert":           NodeInsert,
+    "Remove":           NodeRemove,
+    "Replace":          NodeReplace,
+}
+
+
 def doPatches(coreLib, modLib: dict, mod: str):
     # Pretyping
     patchList : lxml.etree._ElementTree
@@ -243,67 +308,12 @@ def doPatches(coreLib, modLib: dict, mod: str):
         if len(currentCoreLibElems) == 0:
             ui.log.log(f"{logIndent}Unable to perform patch. XPath found no results {xpath}")
             return
-
-        def AttributeSet():
-            """Set the attribute on the node, adding if not present"""
-            elem : lxml.etree._Element
-            for elem in currentCoreLibElems: elem.set(attribute, value.text)
-        def AttributeAdd():
-            """Adds the attribute to the node IFF the attribute name is not already present"""
-            elem : lxml.etree._Element
-            for elem in currentCoreLibElems:
-                if elem.get(attribute, None) is not None:
-                    raise KeyError(f"Attribute '{attribute}' already exists")
-                elem.set(attribute, value.text)
-        def AttributeRemove():
-            """Remove the attribute from the node"""
-            ui.log.log(f"{logIndent}WARNING: REMOVING ATTRIBUTES MAY BREAK THE GAME")
-            elem : lxml.etree._Element
-            for elem in currentCoreLibElems: elem.attrib.pop(attribute)
-
-        def NodeAdd():
-            """Adds a provided child node to the selected node"""
-            elem : lxml.etree._Element
-            parent: lxml.etree._Element
-            for elem in currentCoreLibElems:
-                lastelemIDX = len(elem.getchildren())
-                elem.insert(lastelemIDX + 1, copy.deepcopy(value[0]))
-        def NodeInsert():
-            """Adds a provided sibling node to the selected node"""
-            elem : lxml.etree._Element
-            parent: lxml.etree._Element
-            for elem in currentCoreLibElems:
-                parent = elem.find('./..')
-                elemIDX = parent.index(elem)
-                parent.insert(elemIDX + 1, copy.deepcopy(value[0]))
-        def NodeRemove():
-            """Deletes the selected node"""
-            elem : lxml.etree._Element
-            parent: lxml.etree._Element
-            for elem in currentCoreLibElems:
-                parent = elem.find('./..')
-                parent.remove(elem)
-        def NodeReplace():
-            """Replaces the selected node with the provided node"""
-            elem : lxml.etree._Element
-            parent: lxml.etree._Element
-            for elem in currentCoreLibElems:
-                parent = elem.find('./..')
-                parent.replace(elem, copy.deepcopy(value[0]))
-        def BadOp():
+        def BadOp(currentCoreLibElems, value, attribute):
             raise SyntaxError(f"BAD PATCH OPERATION")
 
-        patchDispatcher = {
-            "AttributeSet" :    AttributeSet,
-            "AttributeAdd" :    AttributeAdd,
-            "AttributeRemove" : AttributeRemove,
-            "Add":              NodeAdd,
-            "Insert":           NodeInsert,
-            "Remove":           NodeRemove,
-            "Replace":          NodeReplace,
-        }
 
-        patchDispatcher.get(pType,BadOp)()
+
+        patchDispatcher.get(pType,BadOp)(currentCoreLibElems, value, attribute)
 
     # Execution
     for location in modLib:
