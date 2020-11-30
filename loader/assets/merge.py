@@ -247,6 +247,30 @@ def AttributeRemove(patchArgs):
     for elem in currentCoreLibElems: elem.attrib.pop(attribute)
 
 
+def AttributeMath(patchArgs):
+    """Set the attribute on the node, via math"""
+    elem : lxml.etree._Element
+    currentCoreLibElems = patchArgs["coreLibElems"]
+    attribute = patchArgs["attribute"].text
+    value = patchArgs["value"]
+    opType = value.get("opType", None)
+    valueFloat = float(value.text)
+    for elem in currentCoreLibElems:
+        startVal = float(elem.get(attribute, 0))
+        if opType == "add":
+            newVal = startVal + valueFloat
+        elif opType == "subtract":
+            newVal = startVal - valueFloat
+        elif opType == "multiply":
+            newVal = startVal * valueFloat
+        elif opType == "divide":
+            newVal = startVal / valueFloat
+        else:
+            raise AttributeError("Unknown opType")
+
+        elem.set(attribute, f"{newVal:.3}")
+
+
 def NodeAdd(patchArgs):
     """Adds a provided child node to the selected node"""
     elem : lxml.etree._Element
@@ -300,6 +324,7 @@ patchDispatcher = {
     "AttributeSet" :    AttributeSet,
     "AttributeAdd" :    AttributeAdd,
     "AttributeRemove" : AttributeRemove,
+    "AttributeMath" :   AttributeMath,
     "Add":              NodeAdd,
     "Insert":           NodeInsert,
     "Remove":           NodeRemove,
