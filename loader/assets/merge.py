@@ -302,7 +302,7 @@ def doPatches(coreLib, modLib: dict, mod: str):
                     uri = patchOperation.base
                     line = patchOperation.sourceline
                     ui.log.log(f"    Failed to apply patch operation {uri}:{line}")
-                    ui.log.log(f"    Reason: {repr(e)}")
+                    ui.log.log(f"      Reason: {repr(e)}")
                     raise SyntaxError("Issue in patch operation. Check logs for info.") from None
 
 
