@@ -365,6 +365,8 @@ def doPatches(coreLib, modLib: dict, mod: str):
     # Execution
     for location in modLib:
         for patchList in modLib[location]:
+            if patchList.find("Noload") is not None:
+                continue
             for patchOperation in patchList.getroot():
                 try:
                     doPatchType(patchOperation, location)
