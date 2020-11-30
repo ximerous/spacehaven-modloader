@@ -217,57 +217,84 @@ def mods(corePath, modPaths):
 
 
 
-def AttributeSet(currentCoreLibElems, value, attribute):
+def AttributeSet(patchArgs):
     """Set the attribute on the node, adding if not present"""
     elem : lxml.etree._Element
+    currentCoreLibElems = patchArgs["coreLibElems"]
+    attribute = patchArgs["attribute"].text
+    value = patchArgs["value"]
     for elem in currentCoreLibElems: elem.set(attribute, value.text)
 
-def AttributeAdd(currentCoreLibElems, value, attribute):
+
+def AttributeAdd(patchArgs):
     """Adds the attribute to the node IFF the attribute name is not already present"""
     elem : lxml.etree._Element
+    currentCoreLibElems = patchArgs["coreLibElems"]
+    attribute = patchArgs["attribute"].text
+
     for elem in currentCoreLibElems:
         if elem.get(attribute, None) is not None:
             raise KeyError(f"Attribute '{attribute}' already exists")
         elem.set(attribute, value.text)
 
-def AttributeRemove(currentCoreLibElems, value, attribute):
+
+def AttributeRemove(patchArgs):
     """Remove the attribute from the node"""
-    ui.log.log(f"{logIndent}WARNING: REMOVING ATTRIBUTES MAY BREAK THE GAME")
+    ui.log.log(f"    WARNING: REMOVING ATTRIBUTES MAY BREAK THE GAME")
     elem : lxml.etree._Element
+    currentCoreLibElems = patchArgs["coreLibElems"]
+    attribute = patchArgs["attribute"].text
     for elem in currentCoreLibElems: elem.attrib.pop(attribute)
 
-def NodeAdd(currentCoreLibElems, value, attribute):
+
+def NodeAdd(patchArgs):
     """Adds a provided child node to the selected node"""
     elem : lxml.etree._Element
     parent: lxml.etree._Element
+    currentCoreLibElems = patchArgs["coreLibElems"]
+    value = patchArgs["value"]
     for elem in currentCoreLibElems:
         lastelemIDX = len(elem.getchildren())
         elem.insert(lastelemIDX + 1, copy.deepcopy(value[0]))
 
-def NodeInsert(currentCoreLibElems, value, attribute):
+
+def NodeInsert(patchArgs):
     """Adds a provided sibling node to the selected node"""
     elem : lxml.etree._Element
     parent: lxml.etree._Element
+    currentCoreLibElems = patchArgs["coreLibElems"]
+    value = patchArgs["value"]
     for elem in currentCoreLibElems:
         parent = elem.find('./..')
         elemIDX = parent.index(elem)
         parent.insert(elemIDX + 1, copy.deepcopy(value[0]))
 
-def NodeRemove(currentCoreLibElems, value, attribute):
+
+def NodeRemove(patchArgs):
     """Deletes the selected node"""
     elem : lxml.etree._Element
     parent: lxml.etree._Element
+    currentCoreLibElems = patchArgs["coreLibElems"]
     for elem in currentCoreLibElems:
         parent = elem.find('./..')
         parent.remove(elem)
 
-def NodeReplace(currentCoreLibElems, value, attribute):
+
+def NodeReplace(patchArgs):
     """Replaces the selected node with the provided node"""
     elem : lxml.etree._Element
     parent: lxml.etree._Element
+    currentCoreLibElems = patchArgs["coreLibElems"]
+    value = patchArgs["value"]
     for elem in currentCoreLibElems:
         parent = elem.find('./..')
         parent.replace(elem, copy.deepcopy(value[0]))
+
+
+# Default case function
+def BadOp(patchArgs):
+    raise SyntaxError(f"BAD PATCH OPERATION")
+
 
 patchDispatcher = {
     "AttributeSet" :    AttributeSet,
@@ -291,29 +318,24 @@ def doPatches(coreLib, modLib: dict, mod: str):
         # Pretyping
         currentCoreLib : lxml.etree._ElementTree
         patchOperation : lxml.etree._Element
-        xpath: str
         value: lxml.etree._Element
 
-        logIndent = " " * 4
-        pType = patch.attrib["Class"]
+        pType =  patch.attrib["Class"]
         xpath = patch.find('xpath').text
-        value = patch.find('value')
-        if "Attribute" in pType:
-            attribute = patch.find("attribute").text
+        currentCoreLibElems = coreLib[location].xpath(xpath)
 
-        ui.log.log(f"{logIndent}XPATH => {location:>15}: {pType:18}{xpath}")
-
-        currentCoreLib = coreLib[location]
-        currentCoreLibElems = currentCoreLib.xpath(xpath)
+        ui.log.log(f"    XPATH => {location:>15}: {pType:18}{xpath}")
         if len(currentCoreLibElems) == 0:
-            ui.log.log(f"{logIndent}Unable to perform patch. XPath found no results {xpath}")
+            ui.log.log(f"    Unable to perform patch. XPath found no results {xpath}")
             return
-        def BadOp(currentCoreLibElems, value, attribute):
-            raise SyntaxError(f"BAD PATCH OPERATION")
 
+        patchArgs = {
+            "value":        patch.find('value'),
+            "attribute":    patch.find("attribute"),     # Defer exception throw to later.
+            "coreLibElems": currentCoreLibElems,
+        }
 
-
-        patchDispatcher.get(pType,BadOp)(currentCoreLibElems, value, attribute)
+        patchDispatcher.get(pType,BadOp)(patchArgs)
 
     # Execution
     for location in modLib:
