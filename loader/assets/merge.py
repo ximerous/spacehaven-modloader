@@ -244,23 +244,31 @@ def doPatches(coreLib, modLib: dict, mod: str):
             ui.log.log(f"{logIndent}Unable to perform patch. XPath found no results {xpath}")
             return
 
-        # AttributeAdd and AttributeSet are able to use the same code due to
-        # lxml backing library implementation
         def AttributeSet():
+            """Set the attribute on the node, adding if not present"""
             elem : lxml.etree._Element
             for elem in currentCoreLibElems: elem.set(attribute, value.text)
         def AttributeAdd():
+            """Adds the attribute to the node IFF the attribute name is not already present"""
             elem : lxml.etree._Element
             for elem in currentCoreLibElems: elem.set(attribute, value.text)
         def AttributeRemove():
+            """Remove the attribute from the node"""
             ui.log.log(f"{logIndent}WARNING: REMOVING ATTRIBUTES MAY BREAK THE GAME")
             elem : lxml.etree._Element
             for elem in currentCoreLibElems: elem.attrib.pop(attribute)
 
-        def NodeAdd(): raise NotImplementedError()
-        def NodeInsert(): raise NotImplementedError()
-        def NodeRemove(): raise NotImplementedError()
+        def NodeAdd():
+            """Adds a provided child node to the selected node"""
+            raise NotImplementedError()
+        def NodeInsert():
+            """Adds a provided sibling node to the selected node"""
+            raise NotImplementedError()
+        def NodeRemove():
+            """Deletes the selected node"""
+            raise NotImplementedError()
         def NodeReplace():
+            """Replaces the selected node with the provided node"""
             elem : lxml.etree._Element
             parent: lxml.etree._Element
             for elem in currentCoreLibElems:
