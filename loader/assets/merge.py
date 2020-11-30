@@ -254,6 +254,7 @@ def AttributeMath(patchArgs):
     attribute = patchArgs["attribute"].text
     value = patchArgs["value"]
     opType = value.get("opType", None)
+    isFloat = value.attrib.has_key("float")
     valueFloat = float(value.text)
     for elem in currentCoreLibElems:
         startVal = float(elem.get(attribute, 0))
@@ -268,7 +269,11 @@ def AttributeMath(patchArgs):
         else:
             raise AttributeError("Unknown opType")
 
-        elem.set(attribute, f"{newVal:.3}")
+        if isFloat:
+            elem.set(attribute, f"{newVal:.1f}")
+        else:
+            newVal = int(newVal)
+            elem.set(attribute, f"{newVal}")
 
 
 def NodeAdd(patchArgs):
