@@ -254,29 +254,29 @@ def doPatches(coreLib, modLib: dict, mod: str):
             elem : lxml.etree._Element
             for elem in currentCoreLibElems: elem.attrib.pop(attribute)
 
-        def NodeSet(): pass
-        def NodeAdd(): pass
-        def NodeRemove(): pass
+        def NodeAdd(): raise NotImplementedError()
+        def NodeInsert(): raise NotImplementedError()
+        def NodeRemove(): raise NotImplementedError()
         def NodeReplace():
             elem : lxml.etree._Element
             parent: lxml.etree._Element
             for elem in currentCoreLibElems:
                 parent = elem.find('./..')
                 parent.replace(elem, copy.deepcopy(value[0]))
-        def BadOp(): pass
+        def BadOp():
+            raise SyntaxError(f"BAD PATCH OPERATION")
 
         patchDispatcher = {
             "AttributeSet" :    AttributeSet,
             "AttributeAdd" :    AttributeAdd,
             "AttributeRemove" : AttributeRemove,
-            "Set":              NodeSet,
             "Add":              NodeAdd,
+            "Insert":           NodeInsert,
             "Remove":           NodeRemove,
             "Replace":          NodeReplace,
         }
 
         patchDispatcher.get(pType,BadOp)()
-
 
     # Execution
     for location in modLib:
