@@ -269,7 +269,11 @@ def doPatches(coreLib, modLib: dict, mod: str):
             raise NotImplementedError()
         def NodeRemove():
             """Deletes the selected node"""
-            raise NotImplementedError()
+            elem : lxml.etree._Element
+            parent: lxml.etree._Element
+            for elem in currentCoreLibElems:
+                parent = elem.find('./..')
+                parent.remove(elem)
         def NodeReplace():
             """Replaces the selected node with the provided node"""
             elem : lxml.etree._Element
