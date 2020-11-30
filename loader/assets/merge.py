@@ -153,6 +153,13 @@ def mods(corePath, modPaths):
 
         doMerges(coreLibrary, modLibrary, mod)
 
+    # Do patches after merges to avoid clobbers
+    for mod in modPaths:
+        ui.log.updateLaunchState(f"Patching {os.path.basename(mod)}")
+        ui.log.log(f"  Loading patches {mod}...")
+        modPatchesLibrary = buildLibrary('patches')
+        doPatches(coreLibrary, modPatchesLibrary, mod)
+
     ui.log.updateLaunchState("Updating XML")
 
     # Write out the new base library
@@ -207,6 +214,109 @@ def mods(corePath, modPaths):
             cims[page].export_png(os.path.join(path, 'modded_cim_{}.png'.format(page)))
 
     return extra_assets
+
+def doPatches(coreLib, modLib: dict, mod: str):
+    # Pretyping
+    patchList : lxml.etree._ElementTree
+    patchOperation : lxml.etree._Element
+
+    # Helper functions
+    def doPatchType(patch: lxml.etree._Element, location: str):
+        """Execute a single patch. Provided to reduce indentation level"""
+        # Pretyping
+        currentCoreLib : lxml.etree._ElementTree
+        patchOperation : lxml.etree._Element
+        xpath: str
+        value: lxml.etree._Element
+
+        logIndent = " " * 4
+        pType = patch.attrib["Class"]
+        xpath = patch.find('xpath').text
+        value = patch.find('value')
+        if "Attribute" in pType:
+            attribute = patch.find("attribute").text
+
+        ui.log.log(f"{logIndent}XPATH => {location:>15}: {pType:18}{xpath}")
+
+        currentCoreLib = coreLib[location]
+        currentCoreLibElems = currentCoreLib.xpath(xpath)
+        if len(currentCoreLibElems) == 0:
+            ui.log.log(f"{logIndent}Unable to perform patch. XPath found no results {xpath}")
+            return
+
+        def AttributeSet():
+            """Set the attribute on the node, adding if not present"""
+            elem : lxml.etree._Element
+            for elem in currentCoreLibElems: elem.set(attribute, value.text)
+        def AttributeAdd():
+            """Adds the attribute to the node IFF the attribute name is not already present"""
+            elem : lxml.etree._Element
+            for elem in currentCoreLibElems:
+                if elem.get(attribute, None) is not None:
+                    raise KeyError(f"Attribute '{attribute}' already exists")
+                elem.set(attribute, value.text)
+        def AttributeRemove():
+            """Remove the attribute from the node"""
+            ui.log.log(f"{logIndent}WARNING: REMOVING ATTRIBUTES MAY BREAK THE GAME")
+            elem : lxml.etree._Element
+            for elem in currentCoreLibElems: elem.attrib.pop(attribute)
+
+        def NodeAdd():
+            """Adds a provided child node to the selected node"""
+            elem : lxml.etree._Element
+            parent: lxml.etree._Element
+            for elem in currentCoreLibElems:
+                lastelemIDX = len(elem.getchildren())
+                elem.insert(lastelemIDX + 1, copy.deepcopy(value[0]))
+        def NodeInsert():
+            """Adds a provided sibling node to the selected node"""
+            elem : lxml.etree._Element
+            parent: lxml.etree._Element
+            for elem in currentCoreLibElems:
+                parent = elem.find('./..')
+                elemIDX = parent.index(elem)
+                parent.insert(elemIDX + 1, copy.deepcopy(value[0]))
+        def NodeRemove():
+            """Deletes the selected node"""
+            elem : lxml.etree._Element
+            parent: lxml.etree._Element
+            for elem in currentCoreLibElems:
+                parent = elem.find('./..')
+                parent.remove(elem)
+        def NodeReplace():
+            """Replaces the selected node with the provided node"""
+            elem : lxml.etree._Element
+            parent: lxml.etree._Element
+            for elem in currentCoreLibElems:
+                parent = elem.find('./..')
+                parent.replace(elem, copy.deepcopy(value[0]))
+        def BadOp():
+            raise SyntaxError(f"BAD PATCH OPERATION")
+
+        patchDispatcher = {
+            "AttributeSet" :    AttributeSet,
+            "AttributeAdd" :    AttributeAdd,
+            "AttributeRemove" : AttributeRemove,
+            "Add":              NodeAdd,
+            "Insert":           NodeInsert,
+            "Remove":           NodeRemove,
+            "Replace":          NodeReplace,
+        }
+
+        patchDispatcher.get(pType,BadOp)()
+
+    # Execution
+    for location in modLib:
+        for patchList in modLib[location]:
+            for patchOperation in patchList.getroot():
+                try:
+                    doPatchType(patchOperation, location)
+                except Exception as e:
+                    uri = patchOperation.base
+                    line = patchOperation.sourceline
+                    ui.log.log(f"    Failed to apply patch operation {uri}:{line}")
+                    ui.log.log(f"      Reason: {repr(e)}")
+                    raise SyntaxError("Issue in patch operation. Check logs for info.") from None
 
 
 def doMerges(coreLib, modLib, mod: str):
