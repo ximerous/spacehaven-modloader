@@ -258,7 +258,11 @@ def doPatches(coreLib, modLib: dict, mod: str):
         def NodeAdd(): pass
         def NodeRemove(): pass
         def NodeReplace():
-            ui.log.log(f"    Replacing node {xpath}")
+            elem : lxml.etree._Element
+            parent: lxml.etree._Element
+            for elem in currentCoreLibElems:
+                parent = elem.find('./..')
+                parent.replace(elem, copy.deepcopy(value[0]))
         def BadOp(): pass
 
         patchDispatcher = {
