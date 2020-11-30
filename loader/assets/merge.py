@@ -276,7 +276,14 @@ def doPatches(coreLib, modLib: dict, mod: str):
     for location in modLib:
         for patchList in modLib[location]:
             for patchOperation in patchList.getroot():
-                doPatchType(patchOperation, location)
+                try:
+                    doPatchType(patchOperation, location)
+                except Exception as e:
+                    uri = patchOperation.base
+                    line = patchOperation.sourceline
+                    ui.log.log(f"    Failed to apply patch operation {uri}:{line}")
+                    ui.log.log(f"    Reason: {repr(e)}")
+                    raise SyntaxError("Issue in patch operation. Check logs for info.") from None
 
 
 def doMerges(coreLib, modLib, mod: str):
