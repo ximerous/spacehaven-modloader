@@ -251,7 +251,10 @@ def doPatches(coreLib, modLib: dict, mod: str):
         def AttributeAdd():
             """Adds the attribute to the node IFF the attribute name is not already present"""
             elem : lxml.etree._Element
-            for elem in currentCoreLibElems: elem.set(attribute, value.text)
+            for elem in currentCoreLibElems:
+                if elem.get(attribute, None) is not None:
+                    raise KeyError(f"Attribute '{attribute}' already exists")
+                elem.set(attribute, value.text)
         def AttributeRemove():
             """Remove the attribute from the node"""
             ui.log.log(f"{logIndent}WARNING: REMOVING ATTRIBUTES MAY BREAK THE GAME")
