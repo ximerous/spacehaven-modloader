@@ -263,7 +263,11 @@ def doPatches(coreLib, modLib: dict, mod: str):
 
         def NodeAdd():
             """Adds a provided child node to the selected node"""
-            raise NotImplementedError()
+            elem : lxml.etree._Element
+            parent: lxml.etree._Element
+            for elem in currentCoreLibElems:
+                lastelemIDX = len(elem.getchildren())
+                elem.insert(lastelemIDX + 1, copy.deepcopy(value[0]))
         def NodeInsert():
             """Adds a provided sibling node to the selected node"""
             elem : lxml.etree._Element
