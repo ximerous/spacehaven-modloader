@@ -224,6 +224,7 @@ def doPatches(coreLib, modLib: dict, mod: str):
         """Execute a single patch. Provided to reduce indentation level"""
         # Pretyping
         currentCoreLib : lxml.etree._ElementTree
+        patchOperation : lxml.etree._Element
 
         logIndent = " " * 4
         pType = patch.attrib["Class"]
