@@ -233,6 +233,8 @@ def doPatches(coreLib, modLib: dict, mod: str):
         if "Attribute" in pType:
             attribute = patch.find("attribute").text
 
+        ui.log.log(f"{logIndent}XPATH => {location:>15}: {pType:18}{xpath}")
+
         currentCoreLib = coreLib[location]
         currentCoreLibElems = currentCoreLib.xpath(xpath)
         if len(currentCoreLibElems) == 0:
@@ -249,7 +251,6 @@ def doPatches(coreLib, modLib: dict, mod: str):
             for elem in currentCoreLibElems: elem.set(attribute, value.text)
         def AttributeRemove():
             ui.log.log(f"{logIndent}WARNING: REMOVING ATTRIBUTES MAY BREAK THE GAME")
-            ui.log.log(f"{logIndent}Remove '{attribute}' from nodes: {xpath}")
             elem : lxml.etree._Element
             for elem in currentCoreLibElems: elem.attrib.pop(attribute)
 
