@@ -225,6 +225,7 @@ def doPatches(coreLib, modLib: dict, mod: str):
         # Pretyping
         currentCoreLib : lxml.etree._ElementTree
 
+        logIndent = " " * 4
         pType = patch.attrib["Class"]
         xpath = patch.find('xpath').text
         value = patch.find('value')
@@ -233,13 +234,23 @@ def doPatches(coreLib, modLib: dict, mod: str):
 
         currentCoreLib = coreLib[location]
         currentCoreLibElems = currentCoreLib.xpath(xpath)
+        if len(currentCoreLibElems) == 0:
+            ui.log.log(f"{logIndent}Unable to perform patch. XPath found no results {xpath}")
+            return
 
+        # AttributeAdd and AttributeSet are able to use the same code due to
+        # lxml backing library implementation
         def AttributeSet():
-            ui.log.log(f"    Set attr {attribute} on node {xpath}")
-            for elem in currentCoreLibElems:
-                elem.set(attribute, value.text)
-        def AttributeAdd(): pass
-        def AttributeRemove(): pass
+            elem : lxml.etree._Element
+            for elem in currentCoreLibElems: elem.set(attribute, value.text)
+        def AttributeAdd():
+            elem : lxml.etree._Element
+            for elem in currentCoreLibElems: elem.set(attribute, value.text)
+        def AttributeRemove():
+            ui.log.log(f"{logIndent}WARNING: REMOVING ATTRIBUTES MAY BREAK THE GAME")
+            ui.log.log(f"{logIndent}Remove '{attribute}' from nodes: {xpath}")
+            elem : lxml.etree._Element
+            for elem in currentCoreLibElems: elem.attrib.pop(attribute)
 
         def NodeSet(): pass
         def NodeAdd(): pass
