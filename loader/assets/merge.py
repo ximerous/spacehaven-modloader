@@ -158,6 +158,7 @@ def mods(corePath, modPaths):
         ui.log.updateLaunchState(f"Patching {os.path.basename(mod)}")
         ui.log.log(f"  Loading patches {mod}...")
         modPatchesLibrary = buildLibrary('patches')
+        doPatches(coreLibrary, modPatchesLibrary, mod)
 
     ui.log.updateLaunchState("Updating XML")
 
@@ -213,6 +214,58 @@ def mods(corePath, modPaths):
             cims[page].export_png(os.path.join(path, 'modded_cim_{}.png'.format(page)))
 
     return extra_assets
+
+def doPatches(coreLib, modLib: dict, mod: str):
+    # Pretyping
+    patchList : lxml.etree._ElementTree
+    patchOperation : lxml.etree._Element
+
+    def doPatchType(patch: lxml.etree._Element, location: str):
+        """Execute a single patch. Provided to reduce indentation level"""
+        # Pretyping
+        currentCoreLib : lxml.etree._ElementTree
+
+        pType = patch.attrib["Class"]
+        xpath = patch.find('xpath').text
+        value = patch.find('value')
+        if "Attribute" in pType:
+            attribute = patch.find("attribute").text
+
+        currentCoreLib = coreLib[location]
+        currentCoreLibElems = currentCoreLib.xpath(xpath)
+
+        def AttributeSet():
+            ui.log.log(f"    Set attr {attribute} on node {xpath}")
+            for elem in currentCoreLibElems:
+                elem.set(attribute, value.text)
+        def AttributeAdd(): pass
+        def AttributeRemove(): pass
+
+        def NodeSet(): pass
+        def NodeAdd(): pass
+        def NodeRemove(): pass
+        def NodeReplace():
+            ui.log.log(f"    Replacing node {xpath}")
+        def BadOp(): pass
+
+        patchDispatcher = {
+            "AttributeSet" :    AttributeSet,
+            "AttributeAdd" :    AttributeAdd,
+            "AttributeRemove" : AttributeRemove,
+            "Set":              NodeSet,
+            "Add":              NodeAdd,
+            "Remove":           NodeRemove,
+            "Replace":          NodeReplace,
+        }
+
+        patchDispatcher.get(pType,BadOp)()
+
+
+    # Execution
+    for location in modLib:
+        for patchList in modLib[location]:
+            for patchOperation in patchList.getroot():
+                doPatchType(patchOperation, location)
 
 
 def doMerges(coreLib, modLib, mod: str):
