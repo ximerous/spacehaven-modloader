@@ -371,6 +371,7 @@ def doPatches(coreLib, modLib: dict, mod: str):
     for location in modLib:
         for patchList in modLib[location]:
             if patchList.find("Noload") is not None:
+                ui.log.log(f"    Skipping file {patchList.getroot().base} (Noload tag)")
                 continue
             for patchOperation in patchList.getroot():
                 try:
