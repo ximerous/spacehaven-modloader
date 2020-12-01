@@ -254,10 +254,10 @@ def AttributeMath(patchArgs):
     attribute = patchArgs["attribute"].text
     value = patchArgs["value"]
     opType = value.get("opType", None)
-    isFloat = value.attrib.has_key("float")
     valueFloat = float(value.text)
     for elem in currentCoreLibElems:
         startVal = float(elem.get(attribute, 0))
+        isFloat = "." in elem.get(attribute, 0)
         if opType == "add":
             newVal = startVal + valueFloat
         elif opType == "subtract":
