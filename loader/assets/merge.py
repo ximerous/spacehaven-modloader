@@ -336,20 +336,10 @@ patchDispatcher = {
     "Replace":          NodeReplace,
 }
 
-
-def doPatches(coreLib, modLib: dict, mod: str):
-    # Pretyping
-    patchList : lxml.etree._ElementTree
-    patchOperation : lxml.etree._Element
-
-    # Helper functions
+def doPatches(coreLib, modLib, mod: str):
+    # Helper function
     def doPatchType(patch: lxml.etree._Element, location: str):
         """Execute a single patch. Provided to reduce indentation level"""
-        # Pretyping
-        currentCoreLib : lxml.etree._ElementTree
-        patchOperation : lxml.etree._Element
-        value: lxml.etree._Element
-
         pType =  patch.attrib["Class"]
         xpath = patch.find('xpath').text
         currentCoreLibElems = coreLib[location].xpath(xpath)
@@ -370,10 +360,12 @@ def doPatches(coreLib, modLib: dict, mod: str):
     # Execution
     for location in modLib:
         for patchList in modLib[location]:
+            patchList : lxml.etree._ElementTree
             if patchList.find("Noload") is not None:
                 ui.log.log(f"    Skipping file {patchList.getroot().base} (Noload tag)")
                 continue
             for patchOperation in patchList.getroot():
+                patchOperation : lxml.etree._Element
                 try:
                     doPatchType(patchOperation, location)
                 except Exception as e:
