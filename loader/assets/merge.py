@@ -32,7 +32,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
 
         ui.log.log("  Found {}...".format(filename))
         if int(region_id) > coreLibrary['_last_core_region_id']:
-            # adding a new texture, this gets tricky as they have to have consecutive numbers. 
+            # adding a new texture, this gets tricky as they have to have consecutive numbers.
             core_region_id = str(coreLibrary['_next_region_id'])
             mapping_n_region[region_id] = core_region_id
             coreLibrary['_next_region_id'] += 1
@@ -43,7 +43,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         modded_textures[core_region_id] = {
             'mapped_from_id' : region_id,
             'filename' : filename,
-            'path' : path, 
+            'path' : path,
             }
 
     for filename in os.listdir(textures_path):
@@ -73,7 +73,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         _add_texture(region_id)
 
     if not mapping_n_region:
-        # no custom mod textures, no need to remap ids 
+        # no custom mod textures, no need to remap ids
         return modded_textures
 
     for animation_chunk in modLibrary['library/animations']:
@@ -163,7 +163,7 @@ def mods(corePath, modPaths):
     ui.log.updateLaunchState("Updating XML")
 
     # Write out the new base library
-    for filename in PATCHABLE_XML_FILES:        
+    for filename in PATCHABLE_XML_FILES:
         with open(_core_path(filename), "wb") as f:
             f.write(lxml.etree.tostring(coreLibrary[filename], pretty_print=True, encoding="UTF-8"))
 
@@ -214,7 +214,6 @@ def mods(corePath, modPaths):
             cims[page].export_png(os.path.join(path, 'modded_cim_{}.png'.format(page)))
 
     return extra_assets
-
 
 
 def AttributeSet(patchArgs):
@@ -350,7 +349,7 @@ def doPatches(coreLib, modLib, mod: str):
         ui.log.log(f"    XPATH => {location:>15}: {pType:18}{xpath}")
         if len(currentCoreLibElems) == 0:
             ui.log.log(f"    Unable to perform patch. XPath found no results {xpath}")
-            return
+            return      # Don't perform patch if no matches
 
         patchArgs = {
             "value":        patch.find('value'),
