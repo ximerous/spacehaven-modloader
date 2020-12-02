@@ -96,40 +96,41 @@ def _detect_textures(coreLibrary, modLibrary, mod):
     return modded_textures
 
 
+def buildLibrary(location: str):
+    """Build up a library dict of files in `location`"""
+    def _mod_path(filename):
+        return os.path.join(mod, filename.replace('/', os.sep))
+    location_library = {}
+    try:
+        location_files = [location + '/' + mod_file for mod_file in os.listdir(_mod_path(location))]
+    except FileNotFoundError:
+        location_files = []
+
+    # we allow breaking down mod xml files into smaller pieces for readability
+    for target in PATCHABLE_XML_FILES:
+        targetInLocation = target.replace('library', location)
+        for mod_file in location_files:
+            if not mod_file.startswith(targetInLocation): continue
+            if target not in location_library:  location_library[target] = []
+
+            ui.log.log("    {} <= {}".format(target, mod_file))
+            with open(_mod_path(mod_file)) as f:
+                location_library[target].append(lxml.etree.parse(f, parser=lxml.etree.XMLParser(remove_comments=True)))
+
+        mod_file = _mod_path(target)
+        # try again with the extension ?
+        if not os.path.exists(mod_file):
+            mod_file += '.xml'
+            if not os.path.exists(mod_file):
+                continue
+    return location_library
+
+
 def mods(corePath, modPaths):
     # Load the core library files
     coreLibrary = {}
     def _core_path(filename):
         return os.path.join(corePath, filename.replace('/', os.sep))
-
-    def buildLibrary(location: str):
-        """Build up a library dict of files in `location`"""
-        def _mod_path(filename):
-            return os.path.join(mod, filename.replace('/', os.sep))
-        location_library = {}
-        try:
-            location_files = [location + '/' + mod_file for mod_file in os.listdir(_mod_path(location))]
-        except FileNotFoundError:
-            location_files = []
-
-        # we allow breaking down mod xml files into smaller pieces for readability
-        for target in PATCHABLE_XML_FILES:
-            targetInLocation = target.replace('library', location)
-            for mod_file in location_files:
-                if not mod_file.startswith(targetInLocation): continue
-                if target not in location_library:  location_library[target] = []
-
-                ui.log.log("    {} <= {}".format(target, mod_file))
-                with open(_mod_path(mod_file)) as f:
-                    location_library[target].append(lxml.etree.parse(f, parser=lxml.etree.XMLParser(remove_comments=True)))
-
-            mod_file = _mod_path(target)
-            # try again with the extension ?
-            if not os.path.exists(mod_file):
-                mod_file += '.xml'
-                if not os.path.exists(mod_file):
-                    continue
-        return location_library
 
     for filename in PATCHABLE_XML_FILES:
         with open(_core_path(filename), 'rb') as f:
@@ -150,7 +151,6 @@ def mods(corePath, modPaths):
 
         # Load the mod's library
         modLibrary = buildLibrary('library')
-
         doMerges(coreLibrary, modLibrary, mod)
 
     # Do patches after merges to avoid clobbers
