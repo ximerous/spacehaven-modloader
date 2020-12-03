@@ -334,7 +334,7 @@ patchDispatcher = {
     "Remove":           NodeRemove,
     "Replace":          NodeReplace,
 }
-def PatchDispatch(ptype):
+def PatchDispatch(pType):
     """Return the correct PatchOperation function"""
     return patchDispatcher.get(pType,BadOp)
 
@@ -356,7 +356,7 @@ def doPatches(coreLib, modLib, mod: str):
             "attribute":    patch.find("attribute"),     # Defer exception throw to later.
             "coreLibElems": currentCoreLibElems,
         }
-        PatchDispatch(ptype)(patchArgs)
+        PatchDispatch(pType)(patchArgs)
 
     # Execution
     for location in modLib:
