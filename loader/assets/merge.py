@@ -32,7 +32,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
 
         ui.log.log("  Found {}...".format(filename))
         if int(region_id) > coreLibrary['_last_core_region_id']:
-            # adding a new texture, this gets tricky as they have to have consecutive numbers. 
+            # adding a new texture, this gets tricky as they have to have consecutive numbers.
             core_region_id = str(coreLibrary['_next_region_id'])
             mapping_n_region[region_id] = core_region_id
             coreLibrary['_next_region_id'] += 1
@@ -43,7 +43,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         modded_textures[core_region_id] = {
             'mapped_from_id' : region_id,
             'filename' : filename,
-            'path' : path, 
+            'path' : path,
             }
 
     for filename in os.listdir(textures_path):
@@ -73,7 +73,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         _add_texture(region_id)
 
     if not mapping_n_region:
-        # no custom mod textures, no need to remap ids 
+        # no custom mod textures, no need to remap ids
         return modded_textures
 
     for animation_chunk in modLibrary['library/animations']:
@@ -96,40 +96,41 @@ def _detect_textures(coreLibrary, modLibrary, mod):
     return modded_textures
 
 
+def buildLibrary(location: str, mod: str):
+    """Build up a library dict of files in `location`"""
+    def _mod_path(filename):
+        return os.path.join(mod, filename.replace('/', os.sep))
+    location_library = {}
+    try:
+        location_files = [location + '/' + mod_file for mod_file in os.listdir(_mod_path(location))]
+    except FileNotFoundError:
+        location_files = []
+
+    # we allow breaking down mod xml files into smaller pieces for readability
+    for target in PATCHABLE_XML_FILES:
+        targetInLocation = target.replace('library', location)
+        for mod_file in location_files:
+            if not mod_file.startswith(targetInLocation): continue
+            if target not in location_library:  location_library[target] = []
+
+            ui.log.log("    {} <= {}".format(target, mod_file))
+            with open(_mod_path(mod_file)) as f:
+                location_library[target].append(lxml.etree.parse(f, parser=lxml.etree.XMLParser(remove_comments=True)))
+
+        mod_file = _mod_path(target)
+        # try again with the extension ?
+        if not os.path.exists(mod_file):
+            mod_file += '.xml'
+            if not os.path.exists(mod_file):
+                continue
+    return location_library
+
+
 def mods(corePath, modPaths):
     # Load the core library files
     coreLibrary = {}
     def _core_path(filename):
         return os.path.join(corePath, filename.replace('/', os.sep))
-
-    def buildLibrary(location: str):
-        """Build up a library dict of files in `location`"""
-        def _mod_path(filename):
-            return os.path.join(mod, filename.replace('/', os.sep))
-        location_library = {}
-        try:
-            location_files = [location + '/' + mod_file for mod_file in os.listdir(_mod_path(location))]
-        except FileNotFoundError:
-            location_files = []
-
-        # we allow breaking down mod xml files into smaller pieces for readability
-        for target in PATCHABLE_XML_FILES:
-            targetInLocation = target.replace('library', location)
-            for mod_file in location_files:
-                if not mod_file.startswith(targetInLocation): continue
-                if target not in location_library:  location_library[target] = []
-
-                ui.log.log("    {} <= {}".format(target, mod_file))
-                with open(_mod_path(mod_file)) as f:
-                    location_library[target].append(lxml.etree.parse(f, parser=lxml.etree.XMLParser(remove_comments=True)))
-
-            mod_file = _mod_path(target)
-            # try again with the extension ?
-            if not os.path.exists(mod_file):
-                mod_file += '.xml'
-                if not os.path.exists(mod_file):
-                    continue
-        return location_library
 
     for filename in PATCHABLE_XML_FILES:
         with open(_core_path(filename), 'rb') as f:
@@ -149,21 +150,20 @@ def mods(corePath, modPaths):
         ui.log.log("  Loading mod {}...".format(mod))
 
         # Load the mod's library
-        modLibrary = buildLibrary('library')
-
+        modLibrary = buildLibrary('library', mod)
         doMerges(coreLibrary, modLibrary, mod)
 
     # Do patches after merges to avoid clobbers
     for mod in modPaths:
         ui.log.updateLaunchState(f"Patching {os.path.basename(mod)}")
         ui.log.log(f"  Loading patches {mod}...")
-        modPatchesLibrary = buildLibrary('patches')
+        modPatchesLibrary = buildLibrary('patches', mod)
         doPatches(coreLibrary, modPatchesLibrary, mod)
 
     ui.log.updateLaunchState("Updating XML")
 
     # Write out the new base library
-    for filename in PATCHABLE_XML_FILES:        
+    for filename in PATCHABLE_XML_FILES:
         with open(_core_path(filename), "wb") as f:
             f.write(lxml.etree.tostring(coreLibrary[filename], pretty_print=True, encoding="UTF-8"))
 
@@ -216,7 +216,6 @@ def mods(corePath, modPaths):
     return extra_assets
 
 
-
 def AttributeSet(patchArgs):
     """Set the attribute on the node, adding if not present"""
     elem : lxml.etree._Element
@@ -245,6 +244,35 @@ def AttributeRemove(patchArgs):
     currentCoreLibElems = patchArgs["coreLibElems"]
     attribute = patchArgs["attribute"].text
     for elem in currentCoreLibElems: elem.attrib.pop(attribute)
+
+
+def AttributeMath(patchArgs):
+    """Set the attribute on the node, via math"""
+    elem : lxml.etree._Element
+    currentCoreLibElems = patchArgs["coreLibElems"]
+    attribute = patchArgs["attribute"].text
+    value = patchArgs["value"]
+    opType = value.get("opType", None)
+    valueFloat = float(value.text)
+    for elem in currentCoreLibElems:
+        startVal = float(elem.get(attribute, 0))
+        isFloat = "." in elem.get(attribute, 0)
+        if opType == "add":
+            newVal = startVal + valueFloat
+        elif opType == "subtract":
+            newVal = startVal - valueFloat
+        elif opType == "multiply":
+            newVal = startVal * valueFloat
+        elif opType == "divide":
+            newVal = startVal / valueFloat
+        else:
+            raise AttributeError("Unknown opType")
+
+        if isFloat:
+            elem.set(attribute, f"{newVal:.1f}")
+        else:
+            newVal = int(newVal)
+            elem.set(attribute, f"{newVal}")
 
 
 def NodeAdd(patchArgs):
@@ -300,26 +328,20 @@ patchDispatcher = {
     "AttributeSet" :    AttributeSet,
     "AttributeAdd" :    AttributeAdd,
     "AttributeRemove" : AttributeRemove,
+    "AttributeMath" :   AttributeMath,
     "Add":              NodeAdd,
     "Insert":           NodeInsert,
     "Remove":           NodeRemove,
     "Replace":          NodeReplace,
 }
+def PatchDispatch(pType):
+    """Return the correct PatchOperation function"""
+    return patchDispatcher.get(pType,BadOp)
 
-
-def doPatches(coreLib, modLib: dict, mod: str):
-    # Pretyping
-    patchList : lxml.etree._ElementTree
-    patchOperation : lxml.etree._Element
-
-    # Helper functions
+def doPatches(coreLib, modLib, mod: str):
+    # Helper function
     def doPatchType(patch: lxml.etree._Element, location: str):
         """Execute a single patch. Provided to reduce indentation level"""
-        # Pretyping
-        currentCoreLib : lxml.etree._ElementTree
-        patchOperation : lxml.etree._Element
-        value: lxml.etree._Element
-
         pType =  patch.attrib["Class"]
         xpath = patch.find('xpath').text
         currentCoreLibElems = coreLib[location].xpath(xpath)
@@ -327,20 +349,24 @@ def doPatches(coreLib, modLib: dict, mod: str):
         ui.log.log(f"    XPATH => {location:>15}: {pType:18}{xpath}")
         if len(currentCoreLibElems) == 0:
             ui.log.log(f"    Unable to perform patch. XPath found no results {xpath}")
-            return
+            return      # Don't perform patch if no matches
 
         patchArgs = {
             "value":        patch.find('value'),
             "attribute":    patch.find("attribute"),     # Defer exception throw to later.
             "coreLibElems": currentCoreLibElems,
         }
-
-        patchDispatcher.get(pType,BadOp)(patchArgs)
+        PatchDispatch(pType)(patchArgs)
 
     # Execution
     for location in modLib:
         for patchList in modLib[location]:
+            patchList : lxml.etree._ElementTree
+            if patchList.find("Noload") is not None:
+                ui.log.log(f"    Skipping file {patchList.getroot().base} (Noload tag)")
+                continue
             for patchOperation in patchList.getroot():
+                patchOperation : lxml.etree._Element
                 try:
                     doPatchType(patchOperation, location)
                 except Exception as e:
