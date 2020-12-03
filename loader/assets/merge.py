@@ -96,7 +96,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
     return modded_textures
 
 
-def buildLibrary(location: str):
+def buildLibrary(location: str, mod: str):
     """Build up a library dict of files in `location`"""
     def _mod_path(filename):
         return os.path.join(mod, filename.replace('/', os.sep))
@@ -150,14 +150,14 @@ def mods(corePath, modPaths):
         ui.log.log("  Loading mod {}...".format(mod))
 
         # Load the mod's library
-        modLibrary = buildLibrary('library')
+        modLibrary = buildLibrary('library', mod)
         doMerges(coreLibrary, modLibrary, mod)
 
     # Do patches after merges to avoid clobbers
     for mod in modPaths:
         ui.log.updateLaunchState(f"Patching {os.path.basename(mod)}")
         ui.log.log(f"  Loading patches {mod}...")
-        modPatchesLibrary = buildLibrary('patches')
+        modPatchesLibrary = buildLibrary('patches', mod)
         doPatches(coreLibrary, modPatchesLibrary, mod)
 
     ui.log.updateLaunchState("Updating XML")
