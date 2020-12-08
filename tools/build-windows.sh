@@ -4,8 +4,9 @@ OLDPATH=$PATH
 source env/Scripts/activate
 VERSION=`python -c 'import version; print(version.version)'`
 
-PATH=$OLDPATH
+deactivate
 rm -rf build/* dist/spacehaven-modloader dist/spacehaven-modloader-$VERSION.windows
+source env/Scripts/activate
 
 python -m PyInstaller --noconsole modloader.spec
 deactivate
