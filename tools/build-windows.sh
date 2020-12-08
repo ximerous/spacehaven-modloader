@@ -7,7 +7,7 @@ VERSION=`python -c 'import version; print(version.version)'`
 PATH=$OLDPATH
 rm -rf build/* dist/spacehaven-modloader dist/spacehaven-modloader-$VERSION.windows
 
-python -m PyInstaller --noconsole spacehaven-modloader.spec
+python -m PyInstaller --noconsole modloader.spec
 deactivate
 
 PATH=$OLDPATH
