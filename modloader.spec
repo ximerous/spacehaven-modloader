@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['spacehaven-modloader.py'],
-             pathex=['G:\\SteamLibrary\\steamapps\\common\\spacehaven\\modloader-dev'],
+             pathex=[],
              binaries=[],
              datas=[
                  ('textures_annotations.xml','.')
