@@ -7,7 +7,9 @@ a = Analysis(['spacehaven-modloader.py'],
              pathex=[],
              binaries=[],
              datas=[
-                 ('textures_annotations.xml','.')
+                 ('textures_annotations.xml','.'),
+                 ('README.md','.'),
+                 ('CHANGELOG.md','.'),
                 ],
              hiddenimports=['click', 'lxml', 'pypng'],
              hookspath=[],
