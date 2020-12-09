@@ -431,6 +431,7 @@ def doMerges(coreLib, modLib, mod: str):
 
     currentFile = "library/textures"
     if currentFile in modLib:
+        mergeShim(currentFile, "/AllTexturesAndRegions/textures", "i")
         mergeShim(currentFile, "/AllTexturesAndRegions/regions", "n")
     else: mergeAbortMessage(currentFile)
 
