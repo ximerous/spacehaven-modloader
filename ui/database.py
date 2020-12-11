@@ -11,11 +11,15 @@ import ui.gameinfo
 
 class ModDatabase:
     """Information about a collection of mods"""
+    __instance = None
 
     def __init__(self, path_list, gameInfo):
+        if ModDatabase.__instance is not None:
+             raise Exception("Cannot insantiate more than one ModDatabase")
         self.path_list = path_list
         self.gameInfo = gameInfo
         self.locateMods()
+        ModDatabase.__instance = self
 
     def locateMods(self):
         self.mods = []
@@ -42,6 +46,11 @@ class ModDatabase:
             _get_mods_from_dir(path)
         
         self.mods.sort(key=lambda mod: mod.name)
+
+    def getInstance():
+        if ModDatabase is None:
+            raise Exception("Mod Database not ready.")
+        return ModDatabase.__instance
 
 DISABLED_MARKER = "disabled.txt"
 class Mod:
