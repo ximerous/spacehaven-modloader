@@ -124,6 +124,18 @@ class Mod:
             title += " (%s)" % self.version
         return title
     
+    def getDescription(self):
+        """Build a description from the mod data"""
+        description = self.description
+        if self.known_issues:
+            description += "\n\n" + "KNOWN ISSUES: " + self.known_issues
+        if self.author:
+            description += "\n\n" + "AUTHOR: " + self.author
+        if self.website:
+            # FIXME make it a separate textfield, can't select from this one
+            description += "\n\n" + "URL: " + self.website
+        return description
+
     def verifyLoaderVersion(self, mod):
         self.minimumLoaderVersion = mod.find("minimumLoaderVersion").text
         if distutils.version.StrictVersion(self.minimumLoaderVersion) > distutils.version.StrictVersion(version.version):

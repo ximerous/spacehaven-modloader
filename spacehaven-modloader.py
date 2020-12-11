@@ -328,16 +328,7 @@ class Window(Frame):
         
         self.modDetailsName.config(text = title)
         self.modEnableDisable.config(text = command_label)
-        description = mod.description
-        if mod.known_issues:
-            description += "\n\n" + "KNOWN ISSUES: " + mod.known_issues
-        if mod.author:
-            description += "\n\n" + "AUTHOR: " + mod.author
-        if mod.website:
-            # FIXME make it a separate textfield, can't select from this one
-            description += "\n\n" + "URL: " + mod.website
-        
-        self.update_description(description)
+        self.update_description(mod.getDescription())
     
     def showModError(self, title, error):
         self.modDetailsName.config(text = title)
