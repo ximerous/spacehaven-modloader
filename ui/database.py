@@ -1,12 +1,12 @@
 
-import os
 import distutils.version
-
+import os
 from xml.etree import ElementTree
 
 import version
-import ui.log
+
 import ui.gameinfo
+import ui.log
 
 
 class ModDatabase:
