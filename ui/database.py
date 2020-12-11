@@ -23,7 +23,7 @@ class ModDatabase:
         self.mods = []
 
         ui.log.log("Locating mods...")
-        def _get_mods_from_dir(path):
+        for path in self.path_list:
             for modFolder in os.listdir(path):
                 if 'spacehaven' in modFolder:
                     continue  # don't need to load core game definitions
@@ -32,16 +32,16 @@ class ModDatabase:
                     # TODO add support for zip files ? unzip them on the fly ?
                     continue  # don't load logs, prefs, etc
                 
+                # TODO Pass the mod path to Mod() instead of the info_file and let it handle
+                # the info file check. It already does this! Let it do its job!
                 info_file = os.path.join(modPath, "info")
-                if os.path.isfile(info_file):
-                    self.mods.append(Mod(info_file, self.gameInfo))
-                else:
+                if not os.path.isfile(info_file):
                     info_file += '.xml'
-                    if os.path.isfile(info_file):
-                        self.mods.append(Mod(info_file, self.gameInfo))
-        
-        for path in self.path_list:
-            _get_mods_from_dir(path)
+                if not os.path.isfile(info_file):
+                    # no info file, don't create a mod.
+                    continue
+
+                self.mods.append(Mod(info_file, self.gameInfo))
         
         self.mods.sort(key=lambda mod: mod.name)
 
