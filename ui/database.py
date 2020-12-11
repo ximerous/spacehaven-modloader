@@ -127,14 +127,17 @@ class Mod:
     
     def getDescription(self):
         """Build a description from the mod data"""
-        description = self.description
-        if self.known_issues:
-            description += "\n\n" + "KNOWN ISSUES: " + self.known_issues
+        description = ""
         if self.author:
-            description += "\n\n" + "AUTHOR: " + self.author
+            description += f"AUTHOR: {self.author}\n"
+        description += self.description + "\n"
+        if self.known_issues:
+            description += "\n" + "KNOWN ISSUES: " + self.known_issues
+        if self.prefix:
+            description += f"\nPREFIX: {self.prefix}"
         if self.website:
             # FIXME make it a separate textfield, can't select from this one
-            description += "\n\n" + "URL: " + self.website
+            description += f"\nURL: {self.website}"
         return description
 
     def verifyLoaderVersion(self, mod):
