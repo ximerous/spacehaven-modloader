@@ -60,13 +60,9 @@ class Mod:
         ui.log.log("  Loading mod at {}...".format(self.path))
         
         # TODO add a flag to warn users about savegame compatibility ?
-        
         self.name = os.path.basename(self.path)
-
         self.gameInfo = gameInfo
-        
         self.enabled = not os.path.isfile(os.path.join(self.path, DISABLED_MARKER))
-               
         self.loadInfo(info_file)
 
     def loadInfo(self, infoFile):
@@ -159,8 +155,6 @@ class Mod:
                 self.gameInfo.version,
                 ", ".join(self.gameVersions)
             ))
-
-
 
     def warn(self, message):
         ui.log.log("    Warning: {}".format(message))
