@@ -21,6 +21,8 @@ class ModDatabase:
 
     def locateMods(self):
         self.mods = []
+        self.modsActive = []
+        self.modsInactive = []
 
         ui.log.log("Locating mods...")
         for path in self.path_list:
@@ -41,7 +43,12 @@ class ModDatabase:
                     # no info file, don't create a mod.
                     continue
 
-                self.mods.append(Mod(info_file, self.gameInfo))
+                newMod = Mod(info_file, self.gameInfo)
+                self.mods.append(newMod)
+                if newMod.enabled:
+                    self.modsActive.append(newMod)
+                else:
+                    self.modsInactive.append(newMod)
         
         self.mods.sort(key=lambda mod: mod.name)
 
