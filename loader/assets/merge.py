@@ -482,6 +482,8 @@ def mergeDefinitions(baseLibrary, modLibrary, file, xpath, idAttribute):
 
         merged = 0
         for element in list(modRoot):
+            # TODO auto-id algo: if element.get(idAttribute + "_auto") then
+            # id = prefix * idSpaceSize + id
             conflicts = baseRoot.xpath("*[@{}='{}']".format(idAttribute, element.get(idAttribute)))
 
             for conflict in conflicts:
