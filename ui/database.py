@@ -27,7 +27,7 @@ class ModDatabase:
         ui.log.log("Locating mods...")
         def _get_mods_from_dir(path):
             for modFolder in os.listdir(path):
-                if modFolder == 'spacehaven':
+                if 'spacehaven' in modFolder:
                     continue  # don't need to load core game definitions
                 modPath = os.path.join(path, modFolder)
                 if os.path.isfile(modPath):
