@@ -94,6 +94,7 @@ class Mod:
             self.author = _optional("author")
             self.website = _optional("website")
             self.updates = _optional("updates")
+            self.prefix = int(_optional("modPrefix") or "0")
             
             self.verifyLoaderVersion(mod)
             self.verifyGameVersion(mod, self.gameInfo)
