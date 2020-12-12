@@ -63,6 +63,9 @@ class ModDatabase:
             if not mod.enabled
         ]
 
+    def isEmpty(self):
+        return not len(self.mods)
+
         """Return the last generated instance of a mod database."""
         if ModDatabase is None:
             raise Exception("Mod Database not ready.")
