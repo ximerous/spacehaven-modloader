@@ -297,7 +297,7 @@ class Window(Frame):
             self.modList.itemconfig(mod.display_idx, foreground = 'grey', selectforeground = 'lightgrey')
     
     def selected_mod(self):
-        if not len(self.modDatabase.mods):
+        if self.modDatabase.isEmpty():
             return None
         if len(self.modList.curselection()) == 0:
             self.modList.selection_set(0)
@@ -343,16 +343,7 @@ class Window(Frame):
         
         self.modDetailsName.config(text = title)
         self.modEnableDisable.config(text = command_label)
-        description = mod.description
-        if mod.known_issues:
-            description += "\n\n" + "KNOWN ISSUES: " + mod.known_issues
-        if mod.author:
-            description += "\n\n" + "AUTHOR: " + mod.author
-        if mod.website:
-            # FIXME make it a separate textfield, can't select from this one
-            description += "\n\n" + "URL: " + mod.website
-        
-        self.update_description(description)
+        self.update_description(mod.getDescription())
     
     def showModError(self, title, error):
         self.modDetailsName.config(text = title)
@@ -440,7 +431,7 @@ class Window(Frame):
         ui.launcher.open(os.path.join(corePath, 'library'))
     
     def mods_enabled(self):
-        return [mod for mod in self.modDatabase.mods if mod.enabled]
+        return ui.database.ModDatabase.getActiveMods()
     
     def current_mods_signature(self):
         import hashlib
@@ -506,11 +497,7 @@ class Window(Frame):
             messagebox.showerror("Error during quick launch", traceback.format_exc(3))
     
     def patchAndLaunch(self):
-        activeModPaths = []
-        for mod in self.modDatabase.mods:
-            if not mod.enabled:
-                continue
-            activeModPaths.append(mod.path)
+        activeModPaths = [mod.path for mod in ui.database.ModDatabase.getActiveMods()]
         
         try:
             loader.load.load(self.jarPath, activeModPaths, self.current_mods_signature())

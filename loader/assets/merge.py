@@ -1,13 +1,14 @@
 
-import os
 import copy
-import lxml.etree
+import os
 
 import loader.assets.library
-from .library import PATCHABLE_XML_FILES, PATCHABLE_CIM_FILES
-from .explode import Texture
-
+import lxml.etree
 import ui.log
+
+from .explode import Texture
+from .library import PATCHABLE_CIM_FILES, PATCHABLE_XML_FILES
+
 
 def _detect_textures(coreLibrary, modLibrary, mod):
     textures_path = os.path.join(mod, 'textures')
