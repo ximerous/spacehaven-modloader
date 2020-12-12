@@ -282,7 +282,7 @@ class Window(Frame):
             self.modList.itemconfig(mod.display_idx, foreground = 'grey', selectforeground = 'lightgrey')
     
     def selected_mod(self):
-        if not len(self.modDatabase.mods):
+        if self.modDatabase.isEmpty():
             return None
         if len(self.modList.curselection()) == 0:
             self.modList.selection_set(0)
@@ -416,7 +416,7 @@ class Window(Frame):
         ui.launcher.open(os.path.join(corePath, 'library'))
     
     def mods_enabled(self):
-        return [mod for mod in self.modDatabase.mods if mod.enabled]
+        return ui.database.ModDatabase.getActiveMods()
     
     def current_mods_signature(self):
         import hashlib
@@ -482,11 +482,7 @@ class Window(Frame):
             messagebox.showerror("Error during quick launch", traceback.format_exc(3))
     
     def patchAndLaunch(self):
-        activeModPaths = []
-        for mod in self.modDatabase.mods:
-            if not mod.enabled:
-                continue
-            activeModPaths.append(mod.path)
+        activeModPaths = [mod.path for mod in ui.database.ModDatabase.getActiveMods()]
         
         try:
             loader.load.load(self.jarPath, activeModPaths, self.current_mods_signature())
