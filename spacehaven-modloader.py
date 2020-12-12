@@ -162,21 +162,16 @@ class Window(Frame):
             traceback.print_exc()
             pass
         
-        try:
-            registry_path = "SOFTWARE\\WOW6432Node\\Valve\\Steam" if (platform.architecture()[0] == "64bit") else "SOFTWARE\\Valve\\Steam"
-            steam_path = winreg.QueryValueEx(winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, registry_path), "InstallPath")[0]
-            library_folders = acf.load(open(steam_path + "\\steamapps\\libraryfolders.vdf"), wrapper=OrderedDict)
-            locations = [steam_path + "\\steamapps\\common\\SpaceHaven\\spacehaven.exe"]
-            for key, value in library_folders["LibraryFolders"].items():
-                if str.isnumeric(key): locations.append(value + "\\steamapps\\common\\SpaceHaven\\spacehaven.exe")
-            for location in locations:
-                if os.path.exists(location):
-                    self.locateSpacehaven(location)
-                    return
-        except:
-            import traceback
-            traceback.print_exc()
-            pass
+        registry_path = "SOFTWARE\\WOW6432Node\\Valve\\Steam" if (platform.architecture()[0] == "64bit") else "SOFTWARE\\Valve\\Steam"
+        steam_path = winreg.QueryValueEx(winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, registry_path), "InstallPath")[0]
+        library_folders = acf.load(open(steam_path + "\\steamapps\\libraryfolders.vdf"), wrapper=OrderedDict)
+        locations = [steam_path + "\\steamapps\\common\\SpaceHaven\\spacehaven.exe"]
+        for key, value in library_folders["LibraryFolders"].items():
+            if str.isnumeric(key): locations.append(value + "\\steamapps\\common\\SpaceHaven\\spacehaven.exe")
+        for location in locations:
+            if os.path.exists(location):
+                self.locateSpacehaven(location)
+                return
 
         for location in POSSIBLE_SPACEHAVEN_LOCATIONS:
             try: 
@@ -186,7 +181,7 @@ class Window(Frame):
                     return
             except:
                 pass
-    
+
     def locateSpacehaven(self, path):
         if path is None:
             return
