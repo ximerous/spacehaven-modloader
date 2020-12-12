@@ -21,8 +21,6 @@ class ModDatabase:
 
     def locateMods(self):
         self.mods = []
-        self.modsActive = []
-        self.modsInactive = []
 
         ui.log.log("Locating mods...")
         for path in self.path_list:
@@ -45,14 +43,26 @@ class ModDatabase:
 
                 newMod = Mod(info_file, self.gameInfo)
                 self.mods.append(newMod)
-                if newMod.enabled:
-                    self.modsActive.append(newMod)
-                else:
-                    self.modsInactive.append(newMod)
         
         self.mods.sort(key=lambda mod: mod.name)
 
     def getInstance():
+    def getActiveMods():
+        mod: Mod
+        return [
+            mod
+            for mod in ModDatabase.getInstance().mods
+            if mod.enabled
+        ]
+
+    def getInactiveMods():
+        mod: Mod
+        return [
+            mod
+            for mod in ModDatabase.getInstance().mods
+            if not mod.enabled
+        ]
+
         """Return the last generated instance of a mod database."""
         if ModDatabase is None:
             raise Exception("Mod Database not ready.")
