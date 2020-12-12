@@ -1,4 +1,5 @@
 
+from __future__ import annotations  # Required to annotate ModDatabase.getInstance() with own type
 import distutils.version
 import os
 from xml.etree import ElementTree
@@ -46,8 +47,7 @@ class ModDatabase:
         
         self.mods.sort(key=lambda mod: mod.name)
 
-    def getInstance():
-    def getActiveMods():
+    def getActiveMods() -> list[Mod]:
         mod: Mod
         return [
             mod
@@ -55,7 +55,7 @@ class ModDatabase:
             if mod.enabled
         ]
 
-    def getInactiveMods():
+    def getInactiveMods() -> list[Mod]:
         mod: Mod
         return [
             mod
@@ -63,9 +63,10 @@ class ModDatabase:
             if not mod.enabled
         ]
 
-    def isEmpty(self):
+    def isEmpty(self) -> bool:
         return not len(self.mods)
 
+    def getInstance() -> ModDatabase:
         """Return the last generated instance of a mod database."""
         if ModDatabase is None:
             raise Exception("Mod Database not ready.")
