@@ -20,7 +20,10 @@ def _detect_textures(coreLibrary, modLibrary, mod):
     seen_textures = set()
 
     def _add_texture(filename):
-        region_id = str.join(".", filename.split('.')[:-1])
+        if '.' in filename:
+            region_id = str.join(".", filename.split('.')[:-1])
+        else:
+            region_id = filename
         # Early exit if this texture exists
         if (region_id in modded_textures) or (region_id in mapping_n_region):
             return
