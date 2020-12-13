@@ -13,6 +13,7 @@ import ui.log
 class ModDatabase:
     """Information about a collection of mods"""
     __lastInstance = None
+    Prefixes = {}
 
     def __init__(self, path_list, gameInfo):
         self.path_list = path_list
@@ -23,6 +24,7 @@ class ModDatabase:
 
     def locateMods(self):
         self.mods = []
+        ModDatabase.Prefixes = {}
 
         ui.log.log("Locating mods...")
         for path in self.path_list:
@@ -44,6 +46,11 @@ class ModDatabase:
                     continue
 
                 newMod = Mod(info_file, self.gameInfo)
+                if newMod.prefix:
+                    if newMod.prefix in ModDatabase.Prefixes and ModDatabase.Prefixes[newMod.prefix]:
+                        ui.log.log(f"  Warning: Mod prefix {newMod.prefix} for mod {newMod.title()} is already in use.")
+                    else:
+                        ModDatabase.Prefixes[newMod.prefix] = newMod.enabled
                 self.mods.append(newMod)
         
         self.mods.sort(key=lambda mod: mod.name)
