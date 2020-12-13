@@ -71,6 +71,12 @@ class ModDatabase:
             if not mod.enabled
         ]
 
+    def getMod(modPath):
+        """Get a specific mod from its installation path."""
+        for mod in ModDatabase.getInstance().mods:
+            if mod.path == modPath:
+                return mod
+
     def isEmpty(self) -> bool:
         return not len(self.mods)
 
