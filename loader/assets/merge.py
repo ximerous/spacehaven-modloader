@@ -11,7 +11,7 @@ from .library import PATCHABLE_CIM_FILES, PATCHABLE_XML_FILES
 
 
 def _detect_textures(coreLibrary, modLibrary, mod):
-    textures_path = os.path.join(mod, 'textures')
+    textures_path = os.path.join(mod, 'textures').replace("\\","/")
     if not os.path.isdir(textures_path):
         return {}
 
@@ -50,7 +50,14 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             'path' : path,
             }
 
-    for filename in os.listdir(textures_path):
+    texture_files = [
+        f"{cur}/{file}".replace("\\","/")
+        for cur, dirs, files in os.walk(textures_path)
+        for file in files
+        if ".png" in file and "modded_cim" not in file
+    ]
+    texture_files = [x.replace(textures_path + "/", "") for x in texture_files]
+    for filename in texture_files:
         # also scan the directory for overwriting existing core textures
         if not filename.endswith('.png'):
             continue
