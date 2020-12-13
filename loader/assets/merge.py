@@ -1,6 +1,9 @@
 
 import copy
 import os
+import png
+import rectpack
+import math
 
 import loader.assets.library
 import lxml.etree
@@ -82,14 +85,58 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         # no custom mod textures, no need to remap ids
         return modded_textures
 
+    needs_autogeneration = []
     for animation_chunk in modLibrary['library/animations']:
         for asset in animation_chunk.xpath("//assetPos[@a]"):
-            mod_local_id = asset.get('a')
+            mod_local_id = asset.get("filename")
+            if mod_local_id is None:
+                mod_local_id = asset.get('a')
+            elif mod_local_id not in needs_autogeneration:
+                needs_autogeneration.append(mod_local_id)
             if mod_local_id not in mapping_n_region:
                 continue
             new_id = mapping_n_region[mod_local_id]
             #ui.log.log("  Mapping animation 'assetPos' {} to {}...".format(mod_local_id, new_id))
             asset.set('a', new_id)
+
+    if len(needs_autogeneration):
+        import random
+        random.seed()
+        regionsNode = textures_mod.find("//regions")
+        texturesNode = textures_mod.find("//textures")
+        textureID = random.randrange(len(PATCHABLE_CIM_FILES), 500)
+        packer = rectpack.newPacker(rotation=False)
+        sum = 0
+        minRequiredDimension = 0
+        # First get all the files and pack them into a new texture square
+        for regionName in needs_autogeneration:
+            (w, h, rows, info) = png.Reader(textures_path + "/" + regionName + ".png").asRGBA()
+            packer.add_rect(w, h, regionName)
+            minRequiredDimension = max(minRequiredDimension, w, h)
+            sum += (w * h)
+
+        size = max(int(math.sqrt(sum) * 1.2), minRequiredDimension)
+
+        newTex = lxml.etree.SubElement(texturesNode, "t")
+        newTex.set("i", str(textureID))
+        newTex.set("w", str(size))
+        newTex.set("h", str(size))
+        coreLibrary['_custom_textures_cim'][str(textureID)] = newTex.attrib
+
+        packer.add_bin(size, size)
+        packer.pack()
+
+        for rect in packer.rect_list():
+            b, x, y, w, h, rid = rect
+            remappedID = mapping_n_region[rid]
+            remapData = modded_textures[remappedID]
+            newNode = lxml.etree.SubElement(regionsNode, "re")
+            newNode.set("n", remappedID)
+            newNode.set("t", str(textureID))
+            newNode.set("x", str(x))
+            newNode.set("y", str(y))
+            newNode.set("w", str(w))
+            newNode.set("h", str(h))
 
     for asset in textures_mod.xpath("//re[@n]"):
         mod_local_id = asset.get('n')
