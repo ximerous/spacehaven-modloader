@@ -23,20 +23,22 @@ def _detect_textures(coreLibrary, modLibrary, mod):
     seen_textures = set()
 
     def _add_texture(filename):
-        if '.' in filename:
-            region_id = str.join(".", filename.split('.')[:-1])
-        else:
-            region_id = filename
-        # Early exit if this texture exists
+        filename += ".png"
+        region_id = str.join(".", filename.split('.')[:-1])
+        isCoreRegion = region_id.isdecimal() and int(region_id) <= coreLibrary['_last_core_region_id']
         if (region_id in modded_textures) or (region_id in mapping_n_region):
+            # Early exit if this texture exists
             return
 
         path = os.path.join(textures_path, filename)
+        if isCoreRegion and not os.path.exists(path):
+            #core region file without an associated file, return early
+            return
         # Removed file existence check - file should already exist given how this function is being called
         # If the file no longer exists, let the program thrown an error later (plus the file might be
         # deleted by later anyway)
 
-        if not region_id.isdecimal() or int(region_id) > coreLibrary['_last_core_region_id']:
+        if not isCoreRegion:
             # adding a new texture, this gets tricky as they have to have consecutive numbers.
             core_region_id = str(coreLibrary['_next_region_id'])
             mapping_n_region[region_id] = core_region_id
@@ -52,19 +54,6 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             'filename' : filename,
             'path' : path,
             }
-
-    texture_files = [
-        f"{cur}/{file}".replace("\\","/")
-        for cur, dirs, files in os.walk(textures_path)
-        for file in files
-        if ".png" in file and "modded_cim" not in file
-    ]
-    texture_files = [x.replace(textures_path + "/", "") for x in texture_files]
-    for filename in texture_files:
-        # also scan the directory for overwriting existing core textures
-        if not filename.endswith('.png'):
-            continue
-        _add_texture(filename)
 
     if 'library/textures' not in modLibrary:
         # no textures.xml file, we're done
@@ -93,6 +82,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
                 mod_local_id = asset.get('a')
             elif mod_local_id not in needs_autogeneration:
                 needs_autogeneration.append(mod_local_id)
+            _add_texture(mod_local_id)
             if mod_local_id not in mapping_n_region:
                 continue
             new_id = mapping_n_region[mod_local_id]
