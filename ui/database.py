@@ -14,6 +14,7 @@ class ModDatabase:
     """Information about a collection of mods"""
     __lastInstance = None
     Prefixes = {}
+    mods: list[Mod]
 
     def __init__(self, path_list, gameInfo):
         self.path_list = path_list
@@ -56,7 +57,6 @@ class ModDatabase:
         self.mods.sort(key=lambda mod: mod.name)
 
     def getActiveMods() -> list[Mod]:
-        mod: Mod
         return [
             mod
             for mod in ModDatabase.getInstance().mods
@@ -64,7 +64,6 @@ class ModDatabase:
         ]
 
     def getInactiveMods() -> list[Mod]:
-        mod: Mod
         return [
             mod
             for mod in ModDatabase.getInstance().mods
