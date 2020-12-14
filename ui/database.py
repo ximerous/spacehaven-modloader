@@ -56,6 +56,7 @@ class ModDatabase:
         
         self.mods.sort(key=lambda mod: mod.name)
 
+    @staticmethod
     def getActiveMods() -> list[Mod]:
         return [
             mod
@@ -63,6 +64,7 @@ class ModDatabase:
             if mod.enabled
         ]
 
+    @staticmethod
     def getInactiveMods() -> list[Mod]:
         return [
             mod
@@ -70,6 +72,7 @@ class ModDatabase:
             if not mod.enabled
         ]
 
+    @staticmethod
     def getMod(modPath):
         """Get a specific mod from its installation path."""
         for mod in ModDatabase.getInstance().mods:
@@ -79,6 +82,7 @@ class ModDatabase:
     def isEmpty(self) -> bool:
         return not len(self.mods)
 
+    @staticmethod
     def getInstance() -> ModDatabase:
         """Return the last generated instance of a mod database."""
         if ModDatabase is None:
