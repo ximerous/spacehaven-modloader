@@ -76,6 +76,10 @@ class ModDatabase:
         ]
 
     @classmethod
+    def getRegisteredMods(cls) -> list[Mod]:
+        return cls.getInstance().mods
+
+    @classmethod
     def getMod(cls, modPath):
         """Get a specific mod from its installation path."""
         for mod in cls.getInstance().mods:
