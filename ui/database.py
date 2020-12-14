@@ -56,6 +56,9 @@ class ModDatabase:
         
         self.mods.sort(key=lambda mod: mod.name)
 
+    def isEmpty(self) -> bool:
+        return not len(self.mods)
+
     @staticmethod
     def getActiveMods() -> list[Mod]:
         return [
@@ -78,9 +81,6 @@ class ModDatabase:
         for mod in ModDatabase.getInstance().mods:
             if mod.path == modPath:
                 return mod
-
-    def isEmpty(self) -> bool:
-        return not len(self.mods)
 
     @staticmethod
     def getInstance() -> ModDatabase:
