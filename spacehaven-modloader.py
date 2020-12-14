@@ -41,6 +41,7 @@ POSSIBLE_SPACEHAVEN_LOCATIONS = [
     "~/Games/SpaceHaven/spacehaven",
     ".local/share/Steam/steamapps/common/SpaceHaven/spacehaven",
 ]
+DatabaseHandler = ui.database.ModDatabase
 
 class Window(Frame):
     def __init__(self, master=None):
@@ -215,6 +216,7 @@ class Window(Frame):
         except:
             pass
         
+        DatabaseHandler(self.modPath, self.gameInfo)
         self.refreshModList()
 
     def checkForLoadedMods(self):
@@ -260,10 +262,10 @@ class Window(Frame):
             self.showModError("Spacehaven not found", "Please use the 'Find game' button below to locate Spacehaven.")
             return
 
-        self.modDatabase = ui.database.ModDatabase(self.modPath, self.gameInfo)
+        DatabaseHandler.getInstance().locateMods()
         
         mod_idx = 0
-        for mod in self.modDatabase.mods:
+        for mod in DatabaseHandler.getRegisteredMods():
             self.modList.insert(END, mod.name)
             mod.display_idx = mod_idx
             
@@ -282,7 +284,7 @@ class Window(Frame):
             self.modList.itemconfig(mod.display_idx, foreground = 'grey', selectforeground = 'lightgrey')
     
     def selected_mod(self):
-        if self.modDatabase.isEmpty():
+        if DatabaseHandler.getInstance().isEmpty():
             return None
         if len(self.modList.curselection()) == 0:
             self.modList.selection_set(0)
@@ -290,7 +292,7 @@ class Window(Frame):
         else:
             selected = self.modList.curselection()[0]
         
-        return self.modDatabase.mods[self.modList.curselection()[0]]
+        return DatabaseHandler.getRegisteredMods()[self.modList.curselection()[0]]
             
     def showCurrentMod(self, _arg=None):
         self.showMod(self.selected_mod())
@@ -416,7 +418,7 @@ class Window(Frame):
         ui.launcher.open(os.path.join(corePath, 'library'))
     
     def mods_enabled(self):
-        return ui.database.ModDatabase.getActiveMods()
+        return DatabaseHandler.getActiveMods()
     
     def current_mods_signature(self):
         import hashlib
@@ -482,7 +484,7 @@ class Window(Frame):
             messagebox.showerror("Error during quick launch", traceback.format_exc(3))
     
     def patchAndLaunch(self):
-        activeModPaths = [mod.path for mod in ui.database.ModDatabase.getActiveMods()]
+        activeModPaths = [mod.path for mod in DatabaseHandler.getActiveMods()]
         
         try:
             loader.load.load(self.jarPath, activeModPaths, self.current_mods_signature())
