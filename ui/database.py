@@ -59,35 +59,35 @@ class ModDatabase:
     def isEmpty(self) -> bool:
         return not len(self.mods)
 
-    @staticmethod
-    def getActiveMods() -> list[Mod]:
+    @classmethod
+    def getActiveMods(cls) -> list[Mod]:
         return [
             mod
-            for mod in ModDatabase.getInstance().mods
+            for mod in cls.getInstance().mods
             if mod.enabled
         ]
 
-    @staticmethod
-    def getInactiveMods() -> list[Mod]:
+    @classmethod
+    def getInactiveMods(cls) -> list[Mod]:
         return [
             mod
-            for mod in ModDatabase.getInstance().mods
+            for mod in cls.getInstance().mods
             if not mod.enabled
         ]
 
-    @staticmethod
-    def getMod(modPath):
+    @classmethod
+    def getMod(cls, modPath):
         """Get a specific mod from its installation path."""
-        for mod in ModDatabase.getInstance().mods:
+        for mod in cls.getInstance().mods:
             if mod.path == modPath:
                 return mod
 
-    @staticmethod
-    def getInstance() -> ModDatabase:
+    @classmethod
+    def getInstance(cls) -> ModDatabase:
         """Return the last generated instance of a mod database."""
-        if ModDatabase is None:
+        if cls.__lastInstance is None:
             raise Exception("Mod Database not ready.")
-        return ModDatabase.__lastInstance
+        return cls.__lastInstance
 
 DISABLED_MARKER = "disabled.txt"
 class Mod:
