@@ -8,6 +8,7 @@ import math
 import loader.assets.library
 import lxml.etree
 import ui.log
+import ui.database
 
 from .explode import Texture
 from .library import PATCHABLE_CIM_FILES, PATCHABLE_XML_FILES
@@ -90,11 +91,9 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             asset.set('a', new_id)
 
     if len(needs_autogeneration):
-        import random
-        random.seed()
         regionsNode = textures_mod.find("//regions")
         texturesNode = textures_mod.find("//textures")
-        textureID = random.randrange(len(PATCHABLE_CIM_FILES), 500)
+        textureID = ui.database.ModDatabase.getMod(mod).prefix
         packer = rectpack.newPacker(rotation=False)
         sum = 0
         minRequiredDimension = 0
