@@ -1,12 +1,12 @@
 
 import copy
-import os
-import png
-import rectpack
 import math
+import os
 
 import loader.assets.library
 import lxml.etree
+import png
+import rectpack
 import ui.log
 import ui.database
 
