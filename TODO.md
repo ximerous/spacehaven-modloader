@@ -4,3 +4,4 @@
 
 # Repository
 - Create a powershell build script for Windows
+- Remove need for textures_annotations.xml?
