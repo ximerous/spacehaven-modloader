@@ -115,17 +115,26 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         packer.add_bin(size, size)
         packer.pack()
 
+        packedRectsSorted = {}
         for rect in packer.rect_list():
             b, x, y, w, h, rid = rect
             remappedID = mapping_n_region[rid]
+            packedRectsSorted[remappedID] = (str(x), str(y), str(w), str(h), str(rid))
+        # NOT YET SORTED
+        packedRectsSorted = {k: v for k,v in sorted(packedRectsSorted.items())}
+        # NOW SORTED: We need this to make sure the IDs are added to the textures file in the correct order
+
+        for remappedID, data in packedRectsSorted.items():
+            x, y, w, h, regionFileName = data
             remapData = modded_textures[remappedID]
             newNode = lxml.etree.SubElement(regionsNode, "re")
             newNode.set("n", remappedID)
             newNode.set("t", str(textureID))
-            newNode.set("x", str(x))
-            newNode.set("y", str(y))
-            newNode.set("w", str(w))
-            newNode.set("h", str(h))
+            newNode.set("x", x)
+            newNode.set("y", y)
+            newNode.set("w", w)
+            newNode.set("h", h)
+            newNode.set("file", regionFileName)
 
     for asset in textures_mod.xpath("//re[@n]"):
         mod_local_id = asset.get('n')
