@@ -56,9 +56,20 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             'path' : path,
             }
 
-    if 'library/textures' not in modLibrary:
+    autoAnimations = False
+    for animation_chunk in modLibrary['library/animations']:
+        filenameAssetPos = animation_chunk.find("//assetPos[@filename]")
+        if filenameAssetPos is not None:
+            autoAnimations = True
+
+    if 'library/textures' not in modLibrary and not autoAnimations:
         # no textures.xml file, we're done
         return modded_textures
+    if 'library/textures' not in modLibrary and autoAnimations:
+        texRoot = lxml.etree.Element("AllTexturesAndRegions")
+        lxml.etree.SubElement(texRoot, "textures")
+        lxml.etree.SubElement(texRoot, "regions")
+        modLibrary['library/textures'] = [lxml.etree.ElementTree(texRoot)]
 
     #FIXME verify that there's only one file
     textures_mod = modLibrary['library/textures'][0]
@@ -71,7 +82,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         region_id = region.get('n')
         _add_texture(region_id)
 
-    if not mapping_n_region:
+    if not mapping_n_region and not autoAnimations:
         # no custom mod textures, no need to remap ids
         return modded_textures
 
