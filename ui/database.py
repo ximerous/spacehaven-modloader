@@ -181,6 +181,14 @@ class Mod:
             description += f"\nURL: {self.website}"
         return description
 
+    def getAutomaticID(self, internalID):
+        """Returns a new ID prefixed by the mod prefix."""
+        autoIDAllocatedSize = 1000
+        id = self.prefix * autoIDAllocatedSize + internalID
+        if internalID > autoIDAllocatedSize:
+            raise RuntimeError(f"{self.title()} requested an ID outside of the auto-ID allocation limit ({internalID} limit {autoIDAllocatedSize}). File a bug report.")
+        return str(id)
+
     def verifyLoaderVersion(self, mod):
         self.minimumLoaderVersion = mod.find("minimumLoaderVersion").text
         if distutils.version.StrictVersion(self.minimumLoaderVersion) > distutils.version.StrictVersion(version.version):
