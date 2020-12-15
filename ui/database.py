@@ -103,6 +103,7 @@ class Mod:
         # TODO add a flag to warn users about savegame compatibility ?
         self.name = os.path.basename(self.path)
         self.gameInfo = gameInfo
+        self._mappedIDs = []
         self.enabled = not os.path.isfile(os.path.join(self.path, DISABLED_MARKER))
         self.loadInfo(info_file)
 
@@ -184,6 +185,9 @@ class Mod:
     def getAutomaticID(self, internalID):
         """Returns a new ID prefixed by the mod prefix."""
         autoIDAllocatedSize = 1000
+        if internalID in self._mappedIDs:
+            raise ValueError(f"{self.title()} tried to double-allocate internal ID {internalID}")
+        self._mappedIDs.append(internalID)
         id = self.prefix * autoIDAllocatedSize + internalID
         if internalID > autoIDAllocatedSize:
             raise RuntimeError(f"{self.title()} requested an ID outside of the auto-ID allocation limit ({internalID} limit {autoIDAllocatedSize}). File a bug report.")
