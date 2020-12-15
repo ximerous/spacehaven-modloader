@@ -16,7 +16,7 @@ Bugfix: textures were not being merged in due to missing file during the build p
 - General code refactoring
 
 ## v0.0.8
-Support for [PatchOperation](https://rimworldwiki.com/wiki/Modding_Tutorials/PatchOperations) modding
+Support for [PatchOperation][1] modding
 - AttributeSet -> PatchOperationAttributeSet
 - AttributeAdd -> PatchOperationAttributeAdd
 - AttributeRemove -> PatchOperationAttributeRemove
@@ -36,3 +36,6 @@ Patch failure is logged to logs.txt
 
 ## v0.0.1
 Initial Release
+
+
+[1]: <https://rimworldwiki.com/wiki/Modding_Tutorials/PatchOperations>
