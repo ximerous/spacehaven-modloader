@@ -13,16 +13,18 @@ import ui.log
 class ModDatabase:
     """Information about a collection of mods"""
     __lastInstance = None
+    Prefixes = {}
+    mods: list[Mod]
 
     def __init__(self, path_list, gameInfo):
         self.path_list = path_list
         self.gameInfo = gameInfo
-        self.mods = []
         self.locateMods()
         ModDatabase.__lastInstance = self
 
     def locateMods(self):
         self.mods = []
+        ModDatabase.Prefixes = {}
 
         ui.log.log("Locating mods...")
         for path in self.path_list:
@@ -44,34 +46,51 @@ class ModDatabase:
                     continue
 
                 newMod = Mod(info_file, self.gameInfo)
+                if newMod.prefix:
+                    if newMod.prefix in ModDatabase.Prefixes and ModDatabase.Prefixes[newMod.prefix]:
+                        ui.log.log(f"  Warning: Mod prefix {newMod.prefix} for mod {newMod.title()} is already in use.")
+                    else:
+                        ModDatabase.Prefixes[newMod.prefix] = newMod.enabled
                 self.mods.append(newMod)
         
         self.mods.sort(key=lambda mod: mod.name)
 
-    def getActiveMods() -> list[Mod]:
-        mod: Mod
-        return [
-            mod
-            for mod in ModDatabase.getInstance().mods
-            if mod.enabled
-        ]
-
-    def getInactiveMods() -> list[Mod]:
-        mod: Mod
-        return [
-            mod
-            for mod in ModDatabase.getInstance().mods
-            if not mod.enabled
-        ]
-
     def isEmpty(self) -> bool:
         return not len(self.mods)
 
-    def getInstance() -> ModDatabase:
+    @classmethod
+    def getActiveMods(cls) -> list[Mod]:
+        return [
+            mod
+            for mod in cls.getInstance().mods
+            if mod.enabled
+        ]
+
+    @classmethod
+    def getInactiveMods(cls) -> list[Mod]:
+        return [
+            mod
+            for mod in cls.getInstance().mods
+            if not mod.enabled
+        ]
+
+    @classmethod
+    def getRegisteredMods(cls) -> list[Mod]:
+        return cls.getInstance().mods
+
+    @classmethod
+    def getMod(cls, modPath):
+        """Get a specific mod from its installation path."""
+        for mod in cls.getInstance().mods:
+            if mod.path == modPath:
+                return mod
+
+    @classmethod
+    def getInstance(cls) -> ModDatabase:
         """Return the last generated instance of a mod database."""
-        if ModDatabase is None:
+        if cls.__lastInstance is None:
             raise Exception("Mod Database not ready.")
-        return ModDatabase.__lastInstance
+        return cls.__lastInstance
 
 DISABLED_MARKER = "disabled.txt"
 class Mod:
