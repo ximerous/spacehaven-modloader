@@ -92,6 +92,9 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             mod_local_id = asset.get("filename")
             if mod_local_id is None:
                 mod_local_id = asset.get('a')
+                if not str.isdecimal(mod_local_id):
+                    raise ValueError(f"Cannot specify a non-numerical 'a' attribute {mod_local_id}. " +
+                                     "Specify in 'filename' attribute instead.")
             elif mod_local_id not in needs_autogeneration:
                 needs_autogeneration.append(mod_local_id)
             _add_texture(mod_local_id)
