@@ -115,16 +115,20 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             minRequiredDimension = max(minRequiredDimension, w, h)
             sum += (w * h)
 
-        size = max(int(math.sqrt(sum) * 1.2), minRequiredDimension)
+        sizeEstimate = 1.2
+        size = max(int(math.sqrt(sum) * sizeEstimate), minRequiredDimension)
+
+        packer.add_bin(size, size)
+        packer.pack()
+        if len(needs_autogeneration) != len(packer.rect_list()):
+            raise IndexError(   f"Unable to pack all {len(needs_autogeneration)} regions with size estimate {sizeEstimate}" + 
+                                f", was able to pack {len(packer.rect_list())} rectangles. Please file a bug report.")
 
         newTex = lxml.etree.SubElement(texturesNode, "t")
         newTex.set("i", str(textureID))
         newTex.set("w", str(size))
         newTex.set("h", str(size))
         coreLibrary['_custom_textures_cim'][str(textureID)] = newTex.attrib
-
-        packer.add_bin(size, size)
-        packer.pack()
 
         packedRectsSorted = {}
         for rect in packer.rect_list():
