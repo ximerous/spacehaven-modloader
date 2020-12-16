@@ -1,17 +1,21 @@
 
 import copy
+import math
 import os
 
 import loader.assets.library
 import lxml.etree
+import png
+import rectpack
 import ui.log
+import ui.database
 
 from .explode import Texture
 from .library import PATCHABLE_CIM_FILES, PATCHABLE_XML_FILES
 
 
 def _detect_textures(coreLibrary, modLibrary, mod):
-    textures_path = os.path.join(mod, 'textures')
+    textures_path = os.path.join(mod, 'textures').replace("\\","/")
     if not os.path.isdir(textures_path):
         return {}
 
@@ -19,26 +23,31 @@ def _detect_textures(coreLibrary, modLibrary, mod):
     modded_textures = {}
     seen_textures = set()
 
-    def _add_texture(region_id):
-        filename = region_id + '.png'
-        if filename in seen_textures:
+    def _add_texture(filename):
+        filename += ".png"
+        region_id = str.join(".", filename.split('.')[:-1])
+        isCoreRegion = region_id.isdecimal() and int(region_id) <= coreLibrary['_last_core_region_id']
+        if (region_id in modded_textures) or (region_id in mapping_n_region):
+            # Early exit if this texture exists
             return
 
         path = os.path.join(textures_path, filename)
-        if not os.path.isfile(path):
-            ui.log.log("  ERROR MISSING {}...".format(filename))
-            ui.log.log("  ERROR MISSING {}...".format(filename))
-            ui.log.log("  ERROR MISSING {}...".format(filename))
+        if isCoreRegion and not os.path.exists(path):
+            #core region file without an associated file, return early
             return
+        # Removed file existence check - file should already exist given how this function is being called
+        # If the file no longer exists, let the program thrown an error later (plus the file might be
+        # deleted by later anyway)
 
-        ui.log.log("  Found {}...".format(filename))
-        if int(region_id) > coreLibrary['_last_core_region_id']:
+        if not isCoreRegion:
             # adding a new texture, this gets tricky as they have to have consecutive numbers.
             core_region_id = str(coreLibrary['_next_region_id'])
             mapping_n_region[region_id] = core_region_id
             coreLibrary['_next_region_id'] += 1
+            ui.log.log(f"    Allocated new core region idx {core_region_id:>5} to file {filename}")
         else:
             core_region_id = region_id
+            ui.log.log(f"    Mod updated texture region {core_region_id}")
 
         seen_textures.add(filename)
         modded_textures[core_region_id] = {
@@ -47,20 +56,20 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             'path' : path,
             }
 
-    for filename in os.listdir(textures_path):
-        # also scan the directory for overwriting existing core textures
-        if not filename.endswith('.png'):
-            continue
-        try:
-            int(filename.split('.')[0])
-        except:
-            # wrong format
-            continue
-        _add_texture(filename.split('.')[0])
+    autoAnimations = False
+    for animation_chunk in modLibrary['library/animations']:
+        filenameAssetPos = animation_chunk.find("//assetPos[@filename]")
+        if filenameAssetPos is not None:
+            autoAnimations = True
 
-    if 'library/textures' not in modLibrary:
+    if 'library/textures' not in modLibrary and not autoAnimations:
         # no textures.xml file, we're done
         return modded_textures
+    if 'library/textures' not in modLibrary and autoAnimations:
+        texRoot = lxml.etree.Element("AllTexturesAndRegions")
+        lxml.etree.SubElement(texRoot, "textures")
+        lxml.etree.SubElement(texRoot, "regions")
+        modLibrary['library/textures'] = [lxml.etree.ElementTree(texRoot)]
 
     #FIXME verify that there's only one file
     textures_mod = modLibrary['library/textures'][0]
@@ -73,18 +82,70 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         region_id = region.get('n')
         _add_texture(region_id)
 
-    if not mapping_n_region:
+    if not mapping_n_region and not autoAnimations:
         # no custom mod textures, no need to remap ids
         return modded_textures
 
+    needs_autogeneration = []
     for animation_chunk in modLibrary['library/animations']:
-        for asset in animation_chunk.xpath("//assetPos[@a]"):
-            mod_local_id = asset.get('a')
+        for asset in animation_chunk.xpath("//assetPos[@a | @filename]"):
+            mod_local_id = asset.get("filename")
+            if mod_local_id is None:
+                mod_local_id = asset.get('a')
+            elif mod_local_id not in needs_autogeneration:
+                needs_autogeneration.append(mod_local_id)
+            _add_texture(mod_local_id)
             if mod_local_id not in mapping_n_region:
                 continue
             new_id = mapping_n_region[mod_local_id]
-            ui.log.log("  Mapping animation 'assetPos' {} to {}...".format(mod_local_id, new_id))
+            #ui.log.log("  Mapping animation 'assetPos' {} to {}...".format(mod_local_id, new_id))
             asset.set('a', new_id)
+
+    if len(needs_autogeneration):
+        regionsNode = textures_mod.find("//regions")
+        texturesNode = textures_mod.find("//textures")
+        textureID = ui.database.ModDatabase.getMod(mod).prefix
+        packer = rectpack.newPacker(rotation=False)
+        sum = 0
+        minRequiredDimension = 0
+        # First get all the files and pack them into a new texture square
+        for regionName in needs_autogeneration:
+            (w, h, rows, info) = png.Reader(textures_path + "/" + regionName + ".png").asRGBA()
+            packer.add_rect(w, h, regionName)
+            minRequiredDimension = max(minRequiredDimension, w, h)
+            sum += (w * h)
+
+        size = max(int(math.sqrt(sum) * 1.2), minRequiredDimension)
+
+        newTex = lxml.etree.SubElement(texturesNode, "t")
+        newTex.set("i", str(textureID))
+        newTex.set("w", str(size))
+        newTex.set("h", str(size))
+        coreLibrary['_custom_textures_cim'][str(textureID)] = newTex.attrib
+
+        packer.add_bin(size, size)
+        packer.pack()
+
+        packedRectsSorted = {}
+        for rect in packer.rect_list():
+            b, x, y, w, h, rid = rect
+            remappedID = mapping_n_region[rid]
+            packedRectsSorted[remappedID] = (str(x), str(y), str(w), str(h), str(rid))
+        # NOT YET SORTED
+        packedRectsSorted = {k: v for k,v in sorted(packedRectsSorted.items())}
+        # NOW SORTED: We need this to make sure the IDs are added to the textures file in the correct order
+
+        for remappedID, data in packedRectsSorted.items():
+            x, y, w, h, regionFileName = data
+            remapData = modded_textures[remappedID]
+            newNode = lxml.etree.SubElement(regionsNode, "re")
+            newNode.set("n", remappedID)
+            newNode.set("t", str(textureID))
+            newNode.set("x", x)
+            newNode.set("y", y)
+            newNode.set("w", w)
+            newNode.set("h", h)
+            newNode.set("file", regionFileName)
 
     for asset in textures_mod.xpath("//re[@n]"):
         mod_local_id = asset.get('n')
