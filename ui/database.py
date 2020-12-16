@@ -97,7 +97,7 @@ class Mod:
     """Details about a specific mod (name, description)"""
 
     def __init__(self, info_file, gameInfo):
-        self.path = os.path.dirname(info_file)
+        self.path = os.path.normpath(os.path.dirname(info_file))
         ui.log.log("  Loading mod at {}...".format(self.path))
         
         # TODO add a flag to warn users about savegame compatibility ?
