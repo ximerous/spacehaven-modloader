@@ -88,7 +88,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
 
     needs_autogeneration = []
     for animation_chunk in modLibrary['library/animations']:
-        for asset in animation_chunk.xpath("//assetPos[@a]"):
+        for asset in animation_chunk.xpath("//assetPos[@a | @filename]"):
             mod_local_id = asset.get("filename")
             if mod_local_id is None:
                 mod_local_id = asset.get('a')
