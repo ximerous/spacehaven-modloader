@@ -258,7 +258,7 @@ def mods(corePath, modPaths):
             reexport_cims[page] = set()
 
         # write back the cim file as png for debugging
-        reexport_cims[page].add(os.path.dirname(png_file))
+        reexport_cims[page].add(os.path.normpath(mod + "/textures"))
 
         x = int(region.get("x"))
         y = int(region.get("y"))
