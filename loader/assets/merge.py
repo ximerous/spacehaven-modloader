@@ -16,7 +16,7 @@ from .patch import doPatches
 
 
 def _detect_textures(coreLibrary, modLibrary, mod):
-    textures_path = os.path.join(mod, 'textures').replace("\\","/")
+    textures_path = os.path.join(mod, 'textures')
     if not os.path.isdir(textures_path):
         return {}
 
@@ -25,25 +25,21 @@ def _detect_textures(coreLibrary, modLibrary, mod):
     seen_textures = set()
 
     def _add_texture(filename):
-        filename += ".png"
         region_id = str.join(".", filename.split('.')[:-1])
         isCoreRegion = region_id.isdecimal() and int(region_id) <= coreLibrary['_last_core_region_id']
+        # Early exit if this texture exists
         if (region_id in modded_textures) or (region_id in mapping_n_region):
-            # Early exit if this texture exists
             return
 
         path = os.path.join(textures_path, filename)
+        #core region file without an associated file, return early
         if isCoreRegion and not os.path.exists(path):
-            #core region file without an associated file, return early
             return
-        # Removed file existence check - file should already exist given how this function is being called
-        # If the file no longer exists, let the program thrown an error later (plus the file might be
-        # deleted by later anyway)
 
         if not isCoreRegion:
             # adding a new texture, this gets tricky as they have to have consecutive numbers.
             core_region_id = str(coreLibrary['_next_region_id'])
-            mapping_n_region[region_id] = core_region_id
+            mapping_n_region[filename] = core_region_id
             coreLibrary['_next_region_id'] += 1
             ui.log.log(f"    Allocated new core region idx {core_region_id:>5} to file {filename}")
         else:
@@ -63,9 +59,10 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         if filenameAssetPos is not None:
             autoAnimations = True
 
+    # no textures.xml file and no autoAnimations, we're done
     if 'library/textures' not in modLibrary and not autoAnimations:
-        # no textures.xml file, we're done
         return modded_textures
+    # Create a textures xml tree if there was no manually-defined file
     if 'library/textures' not in modLibrary and autoAnimations:
         texRoot = lxml.etree.Element("AllTexturesAndRegions")
         lxml.etree.SubElement(texRoot, "textures")
@@ -73,33 +70,48 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         modLibrary['library/textures'] = [lxml.etree.ElementTree(texRoot)]
 
     #FIXME verify that there's only one file
+    # TODO Maybe don't require only a single file?
     textures_mod = modLibrary['library/textures'][0]
 
+    # Allocate any manually defined texture regions into the CTC lib
     for texture_pack in textures_mod.xpath("//t[@i]"):
         cim_id = texture_pack.get('i')
         coreLibrary['_custom_textures_cim'][cim_id] = texture_pack.attrib
 
+    # Map manually defined regions in textures file to autoIDs
     for region in textures_mod.xpath("//re[@n]"):
         region_id = region.get('n')
         _add_texture(region_id)
 
+    # no custom mod textures, no need to remap ids
     if not mapping_n_region and not autoAnimations:
-        # no custom mod textures, no need to remap ids
         return modded_textures
 
-    needs_autogeneration = []
+    needs_autogeneration = set()
     for animation_chunk in modLibrary['library/animations']:
-        for asset in animation_chunk.xpath("//assetPos[@a | @filename]"):
-            mod_local_id = asset.get("filename")
-            if mod_local_id is None:
-                mod_local_id = asset.get('a')
-            elif mod_local_id not in needs_autogeneration:
-                needs_autogeneration.append(mod_local_id)
+        # iterate on autogeneration nodes
+        for asset in animation_chunk.xpath("//assetPos[@filename]"):
+            # asset.get will never return null here
+            mod_local_id = asset.get("filename").lstrip("/")
+            if ".png" not in mod_local_id:
+                mod_local_id += ".png"
+            needs_autogeneration.add(mod_local_id)
             _add_texture(mod_local_id)
             if mod_local_id not in mapping_n_region:
                 continue
             new_id = mapping_n_region[mod_local_id]
-            #ui.log.log("  Mapping animation 'assetPos' {} to {}...".format(mod_local_id, new_id))
+            asset.set('a', new_id)
+
+        # iterate on manually defined nodes
+        for asset in animation_chunk.xpath("//assetPos[@a and not(@filename)]"):
+            mod_local_id = asset.get('a')
+            if not str.isdecimal(mod_local_id):
+                raise ValueError(f"Cannot specify a non-numerical 'a' attribute {mod_local_id}. " +
+                                  "Specify in 'filename' attribute instead.")
+            _add_texture(mod_local_id + ".png")
+            if mod_local_id not in mapping_n_region:
+                continue
+            new_id = mapping_n_region[mod_local_id]
             asset.set('a', new_id)
 
     if len(needs_autogeneration):
@@ -111,21 +123,25 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         minRequiredDimension = 0
         # First get all the files and pack them into a new texture square
         for regionName in needs_autogeneration:
-            (w, h, rows, info) = png.Reader(textures_path + "/" + regionName + ".png").asRGBA()
+            (w, h, rows, info) = png.Reader(textures_path + "/" + regionName).asRGBA()
             packer.add_rect(w, h, regionName)
             minRequiredDimension = max(minRequiredDimension, w, h)
             sum += (w * h)
 
-        size = max(int(math.sqrt(sum) * 1.2), minRequiredDimension)
+        sizeEstimate = 1.2
+        size = max(int(math.sqrt(sum) * sizeEstimate), minRequiredDimension)
+
+        packer.add_bin(size, size)
+        packer.pack()
+        if len(needs_autogeneration) != len(packer.rect_list()):
+            raise IndexError(   f"Unable to pack all {len(needs_autogeneration)} regions with size estimate {sizeEstimate}" + 
+                                f", was able to pack {len(packer.rect_list())} rectangles. Please file a bug report.")
 
         newTex = lxml.etree.SubElement(texturesNode, "t")
         newTex.set("i", str(textureID))
         newTex.set("w", str(size))
         newTex.set("h", str(size))
         coreLibrary['_custom_textures_cim'][str(textureID)] = newTex.attrib
-
-        packer.add_bin(size, size)
-        packer.pack()
 
         packedRectsSorted = {}
         for rect in packer.rect_list():
@@ -155,6 +171,13 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         new_id = mapping_n_region[mod_local_id]
         ui.log.log("  Mapping texture 're' {} to {}...".format(mod_local_id, new_id))
         asset.set('n', new_id)
+
+    # write the new textures XML if changed.
+    if autoAnimations:
+        modLibrary['library/textures'][0].write(
+            os.path.join(mod, "library", "generated_textures.xml"),
+            pretty_print=True
+        )
 
     return modded_textures
 
@@ -259,7 +282,7 @@ def mods(corePath, modPaths):
             reexport_cims[page] = set()
 
         # write back the cim file as png for debugging
-        reexport_cims[page].add(os.path.dirname(png_file))
+        reexport_cims[page].add(os.path.normpath(mod + "/textures"))
 
         x = int(region.get("x"))
         y = int(region.get("y"))

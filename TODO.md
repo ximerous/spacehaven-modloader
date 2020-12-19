@@ -1,7 +1,6 @@
 # Codebase
 - PEP 8 compliance
 - Better file structure
-- Prevent autopacking from making multiple copies of the same CIM file
 - Strip leading slashes on autopacked region images
 - Strip trailing extensions from autopacked region images
 
