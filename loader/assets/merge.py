@@ -15,7 +15,7 @@ from .library import PATCHABLE_CIM_FILES, PATCHABLE_XML_FILES
 
 
 def _detect_textures(coreLibrary, modLibrary, mod):
-    textures_path = os.path.join(mod, 'textures').replace("\\","/")
+    textures_path = os.path.join(mod, 'textures')
     if not os.path.isdir(textures_path):
         return {}
 
