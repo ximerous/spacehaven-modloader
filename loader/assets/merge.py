@@ -27,13 +27,13 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         filename += ".png"
         region_id = str.join(".", filename.split('.')[:-1])
         isCoreRegion = region_id.isdecimal() and int(region_id) <= coreLibrary['_last_core_region_id']
+        # Early exit if this texture exists
         if (region_id in modded_textures) or (region_id in mapping_n_region):
-            # Early exit if this texture exists
             return
 
         path = os.path.join(textures_path, filename)
+        #core region file without an associated file, return early
         if isCoreRegion and not os.path.exists(path):
-            #core region file without an associated file, return early
             return
 
         if not isCoreRegion:
