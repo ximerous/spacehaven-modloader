@@ -3,6 +3,9 @@
 - On Windows, the game will be autolocated via Steam if possible.
 - `<modid>` tag in info.xml: Defines a prefix that can be used in various places during mod creation.
 - Automatic texture packing: instead of defining a `textures` file, texture regions can be defined as needed in `animations`. Add a `filename=""` attribute to the `<assetPos />` tag, and it will be packed automatically into `modid.cim`. This will fail if a mod ID is not specified. Textures must still be located in `moddir/textures` and paths are relative to this directory.
+- Automatic texture patching writes the resulting textures XML to `moddir/library/generated_textures.xml` for debugging
+- Attempt to normalize file paths in a bunch of places
+- More instances of log cleanup - less errors, more error messages
 
 ## v0.8.2
 Bugfix: textures were not being merged in due to missing file during the build process
