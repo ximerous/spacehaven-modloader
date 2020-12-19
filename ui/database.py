@@ -19,7 +19,7 @@ class ModDatabase:
     def __init__(self, path_list, gameInfo):
         self.path_list = path_list
         self.gameInfo = gameInfo
-        self.locateMods()
+        self.mods = []
         ModDatabase.__lastInstance = self
 
     def locateMods(self):
@@ -79,7 +79,7 @@ class ModDatabase:
         return cls.getInstance().mods
 
     @classmethod
-    def getMod(cls, modPath):
+    def getMod(cls, modPath) -> Mod:
         """Get a specific mod from its installation path."""
         for mod in cls.getInstance().mods:
             if mod.path == modPath:
@@ -97,12 +97,13 @@ class Mod:
     """Details about a specific mod (name, description)"""
 
     def __init__(self, info_file, gameInfo):
-        self.path = os.path.dirname(info_file)
+        self.path = os.path.normpath(os.path.dirname(info_file))
         ui.log.log("  Loading mod at {}...".format(self.path))
         
         # TODO add a flag to warn users about savegame compatibility ?
         self.name = os.path.basename(self.path)
         self.gameInfo = gameInfo
+        self._mappedIDs = []
         self.enabled = not os.path.isfile(os.path.join(self.path, DISABLED_MARKER))
         self.loadInfo(info_file)
 
@@ -180,6 +181,17 @@ class Mod:
             # FIXME make it a separate textfield, can't select from this one
             description += f"\nURL: {self.website}"
         return description
+
+    def getAutomaticID(self, internalID):
+        """Returns a new ID prefixed by the mod prefix."""
+        autoIDAllocatedSize = 1000
+        if internalID in self._mappedIDs:
+            raise ValueError(f"{self.title()} tried to double-allocate internal ID {internalID}")
+        self._mappedIDs.append(internalID)
+        id = self.prefix * autoIDAllocatedSize + internalID
+        if internalID > autoIDAllocatedSize:
+            raise RuntimeError(f"{self.title()} requested an ID outside of the auto-ID allocation limit ({internalID} limit {autoIDAllocatedSize}). File a bug report.")
+        return str(id)
 
     def verifyLoaderVersion(self, mod):
         self.minimumLoaderVersion = mod.find("minimumLoaderVersion").text
