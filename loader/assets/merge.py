@@ -62,9 +62,10 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         if filenameAssetPos is not None:
             autoAnimations = True
 
+    # no textures.xml file and no autoAnimations, we're done
     if 'library/textures' not in modLibrary and not autoAnimations:
-        # no textures.xml file, we're done
         return modded_textures
+    # Create a textures xml tree if there was no manually-defined file
     if 'library/textures' not in modLibrary and autoAnimations:
         texRoot = lxml.etree.Element("AllTexturesAndRegions")
         lxml.etree.SubElement(texRoot, "textures")
@@ -72,18 +73,21 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         modLibrary['library/textures'] = [lxml.etree.ElementTree(texRoot)]
 
     #FIXME verify that there's only one file
+    # TODO Maybe don't require only a single file?
     textures_mod = modLibrary['library/textures'][0]
 
+    # Allocate any manually defined texture regions into the CTC lib
     for texture_pack in textures_mod.xpath("//t[@i]"):
         cim_id = texture_pack.get('i')
         coreLibrary['_custom_textures_cim'][cim_id] = texture_pack.attrib
 
+    # Map manually defined regions in textures file to autoIDs
     for region in textures_mod.xpath("//re[@n]"):
         region_id = region.get('n')
         _add_texture(region_id)
 
+    # no custom mod textures, no need to remap ids
     if not mapping_n_region and not autoAnimations:
-        # no custom mod textures, no need to remap ids
         return modded_textures
 
     needs_autogeneration = []
@@ -101,7 +105,6 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             if mod_local_id not in mapping_n_region:
                 continue
             new_id = mapping_n_region[mod_local_id]
-            #ui.log.log("  Mapping animation 'assetPos' {} to {}...".format(mod_local_id, new_id))
             asset.set('a', new_id)
 
     if len(needs_autogeneration):
