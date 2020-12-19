@@ -35,9 +35,6 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         if isCoreRegion and not os.path.exists(path):
             #core region file without an associated file, return early
             return
-        # Removed file existence check - file should already exist given how this function is being called
-        # If the file no longer exists, let the program thrown an error later (plus the file might be
-        # deleted by later anyway)
 
         if not isCoreRegion:
             # adding a new texture, this gets tricky as they have to have consecutive numbers.
