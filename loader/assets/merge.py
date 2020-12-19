@@ -171,6 +171,13 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         ui.log.log("  Mapping texture 're' {} to {}...".format(mod_local_id, new_id))
         asset.set('n', new_id)
 
+    # write the new textures XML if changed.
+    if autoAnimations:
+        modLibrary['library/textures'][0].write(
+            os.path.join(mod, "library", "generated_textures.xml"),
+            pretty_print=True
+        )
+
     return modded_textures
 
 
