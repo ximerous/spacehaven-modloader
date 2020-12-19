@@ -38,7 +38,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         if not isCoreRegion:
             # adding a new texture, this gets tricky as they have to have consecutive numbers.
             core_region_id = str(coreLibrary['_next_region_id'])
-            mapping_n_region[region_id] = core_region_id
+            mapping_n_region[filename] = core_region_id
             coreLibrary['_next_region_id'] += 1
             ui.log.log(f"    Allocated new core region idx {core_region_id:>5} to file {filename}")
         else:
@@ -102,7 +102,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             asset.set('a', new_id)
 
         # iterate on manually defined nodes
-        for asset in animation_chunk.xpath("//assetPos[@a & not(@filename)]"):
+        for asset in animation_chunk.xpath("//assetPos[@a and not(@filename)]"):
             mod_local_id = asset.get('a')
             if not str.isdecimal(mod_local_id):
                 raise ValueError(f"Cannot specify a non-numerical 'a' attribute {mod_local_id}. " +
