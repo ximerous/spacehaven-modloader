@@ -24,7 +24,8 @@ def _detect_textures(coreLibrary, modLibrary, mod):
     seen_textures = set()
 
     def _add_texture(filename):
-        filename += ".png"
+        if ".png" not in filename:
+            filename += ".png"
         region_id = str.join(".", filename.split('.')[:-1])
         isCoreRegion = region_id.isdecimal() and int(region_id) <= coreLibrary['_last_core_region_id']
         # Early exit if this texture exists
