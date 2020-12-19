@@ -19,7 +19,7 @@ class ModDatabase:
     def __init__(self, path_list, gameInfo):
         self.path_list = path_list
         self.gameInfo = gameInfo
-        self.locateMods()
+        self.mods = []
         ModDatabase.__lastInstance = self
 
     def locateMods(self):
