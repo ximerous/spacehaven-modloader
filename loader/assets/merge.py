@@ -24,8 +24,6 @@ def _detect_textures(coreLibrary, modLibrary, mod):
     seen_textures = set()
 
     def _add_texture(filename):
-        if ".png" not in filename:
-            filename += ".png"
         region_id = str.join(".", filename.split('.')[:-1])
         isCoreRegion = region_id.isdecimal() and int(region_id) <= coreLibrary['_last_core_region_id']
         # Early exit if this texture exists
@@ -88,18 +86,28 @@ def _detect_textures(coreLibrary, modLibrary, mod):
     if not mapping_n_region and not autoAnimations:
         return modded_textures
 
-    needs_autogeneration = []
+    needs_autogeneration = set()
     for animation_chunk in modLibrary['library/animations']:
-        for asset in animation_chunk.xpath("//assetPos[@a | @filename]"):
-            mod_local_id = asset.get("filename")
-            if mod_local_id is None:
-                mod_local_id = asset.get('a')
-                if not str.isdecimal(mod_local_id):
-                    raise ValueError(f"Cannot specify a non-numerical 'a' attribute {mod_local_id}. " +
-                                     "Specify in 'filename' attribute instead.")
-            elif mod_local_id not in needs_autogeneration:
-                needs_autogeneration.append(mod_local_id)
+        # iterate on autogeneration nodes
+        for asset in animation_chunk.xpath("//assetPos[@filename]"):
+            # asset.get will never return null here
+            mod_local_id = asset.get("filename").lstrip("/")
+            if ".png" not in mod_local_id:
+                mod_local_id += ".png"
+            needs_autogeneration.add(mod_local_id)
             _add_texture(mod_local_id)
+            if mod_local_id not in mapping_n_region:
+                continue
+            new_id = mapping_n_region[mod_local_id]
+            asset.set('a', new_id)
+
+        # iterate on manually defined nodes
+        for asset in animation_chunk.xpath("//assetPos[@a & not(@filename)]"):
+            mod_local_id = asset.get('a')
+            if not str.isdecimal(mod_local_id):
+                raise ValueError(f"Cannot specify a non-numerical 'a' attribute {mod_local_id}. " +
+                                  "Specify in 'filename' attribute instead.")
+            _add_texture(mod_local_id + ".png")
             if mod_local_id not in mapping_n_region:
                 continue
             new_id = mapping_n_region[mod_local_id]
@@ -114,7 +122,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         minRequiredDimension = 0
         # First get all the files and pack them into a new texture square
         for regionName in needs_autogeneration:
-            (w, h, rows, info) = png.Reader(textures_path + "/" + regionName + ".png").asRGBA()
+            (w, h, rows, info) = png.Reader(textures_path + "/" + regionName).asRGBA()
             packer.add_rect(w, h, regionName)
             minRequiredDimension = max(minRequiredDimension, w, h)
             sum += (w * h)
