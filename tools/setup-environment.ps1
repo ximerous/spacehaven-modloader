@@ -1,6 +1,7 @@
 $python = get-command python
 $gitDir = git rev-parse --show-toplevel
 $venv = "env"
+$requiredVersion = [version]::new(3,7)
 
 function log {
 	param(
@@ -13,9 +14,12 @@ function log {
 	Write-Host -Fore Cyan $writeThis
 }
 
-$pythonVersion = (python --version).split(" ")[1].split(".")
+if ($python -eq $null) {
+	log "Unable to find python, aborting. Please install python $requiredVersion or add it to your path."
+}
+
+$pythonVersion = (& $python --version).split(" ")[1].split(".")
 $pythonVersion = [version]::new($pythonVersion[0], $pythonVersion[1])
-$requiredVersion = [version]::new(3,7)
 
 if ($pythonVersion -ne $requiredVersion){
 	log "This repository expects python $requiredVersion, installed python is $pythonVersion"
