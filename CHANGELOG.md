@@ -6,6 +6,8 @@
 - Automatic texture patching writes the resulting textures XML to `moddir/library/generated_textures.xml` for debugging
 - Attempt to normalize file paths in a bunch of places
 - More instances of log cleanup - less errors, more error messages
+- Decouple mod database from window class
+- Decouple mod info from window class
 
 ## v0.8.2
 Bugfix: textures were not being merged in due to missing file during the build process
