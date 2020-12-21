@@ -95,8 +95,9 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             mod_local_id = asset.get("filename").lstrip("/")
             if ".png" not in mod_local_id:
                 mod_local_id += ".png"
-            needs_autogeneration.add(mod_local_id)
-            _add_texture(mod_local_id)
+            if mod_local_id not in needs_autogeneration:
+                needs_autogeneration.add(mod_local_id)
+                _add_texture(mod_local_id)
             if mod_local_id not in mapping_n_region:
                 continue
             new_id = mapping_n_region[mod_local_id]
