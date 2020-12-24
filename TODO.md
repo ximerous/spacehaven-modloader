@@ -3,6 +3,7 @@
 - Better file structure
 - Strip leading slashes on autopacked region images
 - Strip trailing extensions from autopacked region images
+- Delete temporary folder when done
 
 # Repository
 - Create a powershell build script for Windows
