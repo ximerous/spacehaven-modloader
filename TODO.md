@@ -4,6 +4,9 @@
 - Strip leading slashes on autopacked region images
 - Strip trailing extensions from autopacked region images
 - Delete temporary folder when done
+- Work with config.json to avoid needing to repack the jar
+  - provided by pakr from libgdx
+- automatic version checking? Updating?
 
 # Repository
 - Create a powershell build script for Windows
