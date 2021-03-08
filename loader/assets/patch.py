@@ -69,10 +69,10 @@ def NodeAdd(patchArgs):
     currentCoreLibElems = patchArgs["coreLibElems"]
     value = patchArgs["value"]
     for elem in currentCoreLibElems:
-        lastelemIDX = len(elem.getchildren())
+        lastElemIDX = len(elem.getchildren())
         for node in value:
-            lastelemIDX += 1
-            elem.insert(lastelemIDX, copy.deepcopy(node))
+            lastElemIDX += 1
+            elem.insert(lastElemIDX, copy.deepcopy(node))
 
 
 def NodeInsert(patchArgs):
