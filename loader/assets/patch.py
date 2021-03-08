@@ -84,7 +84,9 @@ def NodeInsert(patchArgs):
     for elem in currentCoreLibElems:
         parent = elem.find('./..')
         elemIDX = parent.index(elem)
-        parent.insert(elemIDX + 1, copy.deepcopy(value[0]))
+        for node in value:
+            elemIDX += 1
+            parent.insert(elemIDX, copy.deepcopy(node))
 
 
 def NodeRemove(patchArgs):
