@@ -1,5 +1,5 @@
 # Change Log
-## v0.9.0
+## v0.9.1
 - BUGFIX: AttributeAdd patch operations were universally failing due to missing variable.
 
 ## v0.9.0
