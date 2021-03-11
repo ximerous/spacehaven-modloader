@@ -1,5 +1,8 @@
 # Change Log
 ## v0.9.0
+- BUGFIX: AttributeAdd patch operations were universally failing due to missing variable.
+
+## v0.9.0
 - On Windows, the game will be autolocated via Steam if possible.
 - `<modid>` tag in info.xml: Defines a prefix that can be used in various places during mod creation.
 - Automatic texture packing: instead of defining a `textures` file, texture regions can be defined as needed in `animations`. Add a `filename=""` attribute to the `<assetPos />` tag, and it will be packed automatically into `modid.cim`. This will fail if a mod ID is not specified. Textures must still be located in `moddir/textures` and paths are relative to this directory.
