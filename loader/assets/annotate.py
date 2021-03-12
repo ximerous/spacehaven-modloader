@@ -70,12 +70,11 @@ def annotate(corePath):
     for element in ElementRoot:
         mid = element.get("mid")
         if mid in ElementLink:
-            s=""
-            for link in ElementLink[mid]:
-                s = s + link
-                if link in ElementName:
-                    s = s + " " + ElementName[link]
-                s = s + ";"
+            links = (
+                (link + " " + ElementName[link]) if link in ElementName else link
+                for link in ElementLink[mid]
+            )
+            s = "; ".join(links)
             element.set("_linkedBy", s)
 
     # Annotate basic products
@@ -236,16 +235,6 @@ def annotate(corePath):
                       l.set("_annotation", gfilename[fid])
                       if lang=="EN":
                           fragment.set("_annotation", gfilename[fid])
-
-    ui.log.log("  annotate CharacterCondition...")
-    CharacterConditionRoot = haven.find("CharacterCondition")
-    CharacterConditionName = {}
-    for tech in TechRoot:
-        id = tech.get("id")
-        name = tech.find("name")
-        if name is not None:
-            tech.set("_annotation", nameOf(tech))
-            TechName[id] = tech.get("_annotation")
 
 
     annotatedHavenPath = os.path.join(corePath, "library", "haven_annotated.xml")
