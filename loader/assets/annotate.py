@@ -46,15 +46,37 @@ def annotate(corePath):
 
         return tids[tid]
     
+    ui.log.log("  annotate Element...")
     ElementRoot = haven.find("Element")
-    # Annotate Elements
+    ElementName = {}
+    ElementLink = {}
+    # Annotate Elements and create list of links.
     for element in ElementRoot:
         mid = element.get("mid")
-
         objectInfo = element.find("objectInfo")
         if objectInfo is not None:
             element.set("_annotation", nameOf(objectInfo))
-    
+            ElementName[mid] = element.get("_annotation")
+        # Keep track of links, inverted.
+        linked = element.find("linked")
+        for link in linked.findall("l"):
+            linkid = link.get("id")
+            if linkid is not None and linkid not in ElementLink:
+                ElementLink[linkid] = []
+            if mid not in ElementLink[linkid]:
+                ElementLink[linkid].append(mid)
+
+    # Element Second pass, give linked-by reference list.
+    for element in ElementRoot:
+        mid = element.get("mid")
+        if mid in ElementLink:
+            links = (
+                (link + " " + ElementName[link]) if link in ElementName else link
+                for link in ElementLink[mid]
+            )
+            s = "; ".join(links)
+            element.set("_linkedBy", s)
+
     # Annotate basic products
     # first pass also builds the names cache
     elementNames = {}
@@ -73,7 +95,7 @@ def annotate(corePath):
             item.set("_annotation", name)
         elementNames[item.get("mid")] = name
     
-    # small helped to annotate a node
+    # small helper to annotate a node
     def _annotate_elt(element, attr = None):
         if attr:
             name = elementNames[element.get(attr)]
@@ -127,6 +149,8 @@ def annotate(corePath):
         except:
             pass
     
+    # Annotations for other critial sections.
+    ui.log.log("  annotate DifficultySettings...")
     DifficultySettings = haven.find('DifficultySettings')
     for settings in DifficultySettings:
         name = nameOf(settings)
@@ -146,6 +170,73 @@ def annotate(corePath):
         except:
             pass
     
+
+
+    ui.log.log("  annotate Tech...")
+    TechRoot = haven.find("Tech")
+    TechName = {}
+    for tech in TechRoot:
+        id = tech.get("id")
+        name = tech.find("name")
+        if name is not None:
+            tech.set("_annotation", nameOf(tech))
+            TechName[id] = tech.get("_annotation")
+
+    ui.log.log("  annotate TechTree...")
+    TechTreeRoot = haven.find("TechTree")
+    for techtree in TechTreeRoot:
+        techtreeid = techtree.get("id")
+        for techitem in techtree.find("items"):
+            id = techitem.get("tid")
+            if TechName[id] is not None:
+                techitem.set("_annotation", TechName[id])
+        for techlink in techtree.find("links"):
+            fromId = techlink.get("fromId")
+            toId = techlink.get("toId")
+            if TechName[fromId] is not None:
+                techlink.set("_fromName", TechName[fromId])
+            if TechName[toId] is not None:
+                techlink.set("_toName", TechName[toId])
+
+
+    ui.log.log("  annotate MainCat...")
+    MainCatRoot = haven.find("MainCat")
+    MainCatName = {}
+    for cat in MainCatRoot:
+        id = cat.get("id")
+        name = cat.find("name")
+        if name is not None:
+            cat.set("_annotation", nameOf(cat))
+            MainCatName[id] = cat.get("_annotation")
+
+
+
+    ui.log.log("  annotate DataLogFragment...")
+    # First get gfile names.
+    gfiles = ElementTree.parse(os.path.join(corePath, "library", "gfiles"), parser=XMLParser(recover=True))
+    gfilename = {}
+    for f in gfiles.getroot():
+        id = f.get("id")
+        path = f.get("path")
+        if id is not None:
+            gfilename[id] = path
+    # now Annotate DataLogFragment with file paths and names.
+    DataLogFragmentRoot = haven.find("DataLogFragment")
+    for fragment in DataLogFragmentRoot:
+        id = fragment.get("id")
+        languages = fragment.find("languages")
+        if languages is not None:
+            for l in languages.findall('l'):
+                lang = l.get("lang")
+                f = l.find("file")
+                if f is not None:
+                    fid=f.get("fid")
+                    if fid is not None and gfilename[fid] is not None:
+                      l.set("_annotation", gfilename[fid])
+                      if lang=="EN":
+                          fragment.set("_annotation", gfilename[fid])
+
+
     annotatedHavenPath = os.path.join(corePath, "library", "haven_annotated.xml")
     haven.write(annotatedHavenPath)
     ui.log.log("  Wrote annotated spacehaven library to {}".format(annotatedHavenPath))

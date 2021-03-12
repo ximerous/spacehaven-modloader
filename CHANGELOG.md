@@ -1,6 +1,7 @@
 # Change Log
 ## vNext_Version
-- No changes yet
+- Annotate more fields in `haven` file
+- New annotation type: `_linkedBy` tag indicates references to the tagged object.
 
 ## v0.9.1
 - BUGFIX: AttributeAdd patch operations were universally failing due to missing variable.
