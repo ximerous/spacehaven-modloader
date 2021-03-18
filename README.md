@@ -67,13 +67,7 @@ Note that because mods are loaded by doing an id-wise merge with the base game l
 
 ### ID Numbers
 
-Most of the items in the game's library are identified by a numeric ID rather than a human-readable name.
-
-If you want to replace an *existing* game definition, like the included Greenhouse mod does, simply copy that definition into to your mod with the same ID number that the game uses. The mod loader will replace the game's definition with the one from your mod.
-
-If you want to create a *new* definition, things get a bit trickier because you need to make sure your ID numbers are unique across all mods that might get loaded. Luckily IDs can be any (positive) 32-bit integer which means there's lots of space.
-
-I recommend prefixing your definition IDs with your Discord user number (e.g. mine is #4511) and a sequential mod number (e.g. I used `00` for the `artificial-plant` example, `01` for `exterior-air-vent`, etc) to come up with something reasonably unique, e.g. `451102000` for the Monster Meat crop recipe in the `greenhouse` example (and then `451102001` for the next ID in that mod, `451102002` for the one after that, etc etc).
+[Moved to Wiki](wiki). Ref: Merge by ID
 
 
 ### Navigating the Library
@@ -127,13 +121,5 @@ To make life easier, the mod loader does these name lookups automatically in a f
 
 ### Textures and Animations
 
-Extracting and annotating game assets also decodes and explodes the game's textures into `library/textures.exploded`. The game's original packed textures are written to `library/textures.exploded/*.png` and the texture regions are written to `library/textures.exploded/*/*.png`, where the folder name is the texture ID and the filename is the region ID.
-
-Regions definitions can be found in `library/textures.xml` in `<re n="..." />` tags and are used in `library/animations.xml` by the `<assetPos a="..." />` tags.
-
-The loader can overwrite existing textures from the base game and add new ones. To overwrite a texture, simply place a file called `123.png` in a directory called `textures` (where 123 is the id of the texture you want to replace). 
-
-To add a new texture, you need to add a `<re n="..." t="..." />` entry in `library/textures.xml`. Textures are packed together in `.cim` files, which are defined in `<t i="..." />` entries. The `re` entry references the `t` entry through it's index `i`. Take care of choosing reasonably unique indexes to avoid conflicts. Once this is done, you can add the `123456.png` file to the `textures` directory. 
-
-When loading your mod, the modloader will output the png version of the packed texture file for debugging purposes. This will allow you to check proper placement for new textures, or correct merging for existing ones.
+[Moved to Wiki](wiki). Ref: Modding textures.
 
