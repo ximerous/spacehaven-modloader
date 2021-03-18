@@ -1,5 +1,6 @@
+# Required to annotate ModDatabase.getInstance() with own type
+from __future__ import annotations
 
-from __future__ import annotations  # Required to annotate ModDatabase.getInstance() with own type
 import distutils.version
 import os
 from xml.etree import ElementTree

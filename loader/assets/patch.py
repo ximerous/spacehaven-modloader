@@ -1,6 +1,7 @@
+import copy
+
 import lxml.etree
 import ui.log
-import copy
 
 
 def AttributeSet(patchArgs):

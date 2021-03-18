@@ -1,10 +1,9 @@
 
 import os
 import shutil
-import click
-
 from zipfile import ZipFile
 
+import click
 import ui.log
 
 PATCHABLE_XML_FILES = [

@@ -7,8 +7,8 @@ import loader.assets.library
 import lxml.etree
 import png
 import rectpack
-import ui.log
 import ui.database
+import ui.log
 
 from .explode import Texture
 from .library import PATCHABLE_CIM_FILES, PATCHABLE_XML_FILES

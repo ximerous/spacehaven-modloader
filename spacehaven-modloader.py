@@ -1,27 +1,24 @@
 #!/usr/bin/env python3
 
 import os
+import platform
 import subprocess
 import threading
 import traceback
-
+import winreg
 from collections import OrderedDict
-from steamfiles import acf
-from tkinter import filedialog
-from tkinter import messagebox
 from tkinter import *
+from tkinter import filedialog, messagebox
 
-import ui.header
-import ui.database
-import ui.launcher
-import ui.log
+from steamfiles import acf
 
 import loader.extract
 import loader.load
-
+import ui.database
+import ui.header
+import ui.launcher
+import ui.log
 import version
-import winreg
-import platform
 
 POSSIBLE_SPACEHAVEN_LOCATIONS = [
     # MacOS

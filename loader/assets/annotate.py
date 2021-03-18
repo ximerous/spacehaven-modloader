@@ -1,9 +1,10 @@
 
 import os
 from xml.etree import ElementTree
-from lxml.etree import XMLParser
 
 import ui.log
+from lxml.etree import XMLParser
+
 
 def annotate(corePath):
     """Generate an annotated Space Haven library"""

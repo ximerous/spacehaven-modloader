@@ -3,10 +3,11 @@ import os
 import shutil
 import tempfile
 
+import ui.log
+
 import loader.assets.library
 import loader.assets.merge
 
-import ui.log
 
 def quick_launch_filename(mods_cache_signature):
     return "quicklaunch_" + mods_cache_signature + ".jar"
