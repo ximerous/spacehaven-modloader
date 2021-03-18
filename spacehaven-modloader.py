@@ -5,7 +5,10 @@ import platform
 import subprocess
 import threading
 import traceback
-import winreg
+try:
+    import winreg
+except (ImportError, ModuleNotFoundError):
+    winreg is None
 from collections import OrderedDict
 from tkinter import *
 from tkinter import filedialog, messagebox
@@ -161,6 +164,8 @@ class Window(Frame):
         
         # Steam based locator (Windows)
         try:
+            if winreg is None:
+                raise NotImplementedError()
             registry_path = "SOFTWARE\\WOW6432Node\\Valve\\Steam" if (platform.architecture()[0] == "64bit") else "SOFTWARE\\Valve\\Steam"
             steam_path = winreg.QueryValueEx(winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, registry_path), "InstallPath")[0]
             library_folders = acf.load(open(steam_path + "\\steamapps\\libraryfolders.vdf"), wrapper=OrderedDict)
@@ -173,6 +178,8 @@ class Window(Frame):
                     return
         except FileNotFoundError:
             ui.log.log("Unable to locate Steam registry keys, aborting Steam autolocator")
+        except NotImplementedError:
+            ui.log.log("Unable to run steam autolocate without winreg package (Windows only)")
 
         for location in POSSIBLE_SPACEHAVEN_LOCATIONS:
             try: 
