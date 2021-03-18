@@ -7,7 +7,7 @@ It is **not associated with Bugbyte or Space Haven in any way** other than that 
 
 ## Getting Started
 
-Download the [latest release](https://github.com/PhiR42/spacehaven-modloader/releases/download/0.0.7/spacehaven-modloader-win-amd64.zip) and fire it up.
+Download the [latest release](https://github.com/Tahvohck/spacehaven-modloader/releases/latest) and fire it up.
 
 ![Screenshot](/tools/screenshot.png?raw=true)
 
@@ -15,7 +15,7 @@ Download the [latest release](https://github.com/PhiR42/spacehaven-modloader/rel
 
 2. Click the "Open Mods Folder" button to open your game's `mods` folder.
 
-3. Download some mods and copy them in. There are a few example mods available from [the releases page](https://github.com/anatarist/spacehaven-modloader/releases) or you can find them elsewhere on the internet. When you're done your game folder should look something like this:
+3. Download some mods and copy them in. There are a few example mods available from [anatarist's releases page](https://github.com/anatarist/spacehaven-modloader/releases) or you can find them elsewhere on the internet. When you're done your game folder should look something like this:
 
 ```
 spacehaven.jar
