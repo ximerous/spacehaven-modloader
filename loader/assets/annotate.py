@@ -5,10 +5,13 @@ from lxml.etree import XMLParser
 
 import ui.log
 
+
+
 def annotate(corePath):
     """Generate an annotated Space Haven library"""
 
-    # NOTE: textures and animations do not seem to get annotated.  Should this be replaced?  I would like to use these to make additional annotations in `haven`.
+
+    # NOTE: textures and animations do not seem to get annotated.  Should this be replaced?  WP would like to use these to make additional annotations in `haven`.
     texture_names = {}
     local_texture_names = ElementTree.parse("textures_annotations.xml", parser=XMLParser(recover=True))
     for region in local_texture_names.findall(".//re[@n]"):
@@ -22,7 +25,6 @@ def annotate(corePath):
         if not asset_id in texture_names:
             continue
         assetPos.set('_annotation', texture_names[asset_id])
-
     
     annotatedPath = os.path.join(corePath, "library", "animations_annotated.xml")
     animations.write(annotatedPath)
@@ -187,6 +189,7 @@ def annotate(corePath):
         except:
             pass
     
+    # NOTE: Maybe this can be refactored
     # Annotations for other critial sections.
     ui.log.log("  annotate DifficultySettings...")
     DifficultySettings = haven.find('DifficultySettings')
@@ -250,7 +253,7 @@ def annotate(corePath):
             MainCatName[id] = cat.get("_annotation")
 
 
-
+    # NOTE: maybe refactor to only use the tags for the annotation, as the path is always the same and a bit verbose.
     ui.log.log("  annotate DataLogFragment...")
     # First get gfile names.
     gfiles = ElementTree.parse(os.path.join(corePath, "library", "gfiles"), parser=XMLParser(recover=True))
