@@ -67,7 +67,7 @@ Note that because mods are loaded by doing an id-wise merge with the base game l
 
 ### ID Numbers
 
-[Moved to Wiki](wiki). Ref: Merge by ID
+[Moved to Wiki](../../wiki). Ref: Merge by ID
 
 
 ### Navigating the Library
@@ -121,5 +121,5 @@ To make life easier, the mod loader does these name lookups automatically in a f
 
 ### Textures and Animations
 
-[Moved to Wiki](wiki). Ref: Modding textures.
+[Moved to Wiki](../../wiki). Ref: Modding textures.
 
