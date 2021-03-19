@@ -71,6 +71,10 @@ def _detect_textures(coreLibrary, modLibrary, mod):
 
     #FIXME verify that there's only one file
     # TODO Maybe don't require only a single file?
+    textures_count = len(modLibrary['library/textures'])
+    if len(modLibrary['library/textures']) != 1:
+        ui.log.log(f"    Expected 1 library/textures but found {textures_count}")
+
     textures_mod = modLibrary['library/textures'][0]
 
     # Allocate any manually defined texture regions into the CTC lib
@@ -87,6 +91,9 @@ def _detect_textures(coreLibrary, modLibrary, mod):
     if not mapping_n_region and not autoAnimations:
         return modded_textures
 
+    ##########################################################################
+    # Custom Mod Textures processing starts here
+    ##########################################################################
     needs_autogeneration = set()
     for animation_chunk in modLibrary['library/animations']:
         # iterate on autogeneration nodes
@@ -121,9 +128,11 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         regionsNode = textures_mod.find("//regions")
         texturesNode = textures_mod.find("//textures")
         textureID = ui.database.ModDatabase.getMod(mod).prefix
+
         # Catch missing Modder ID.  Still try to process and move forward.
         if not textureID or textureID <= 0:
             ui.log.log("ERROR: info.xml is missing <modid>.  Mod Author should set this to their Discord ID for all mods they make.")
+
         packer = rectpack.newPacker(rotation=False)
         sumA:int = 0  # Total Area
         sumW:int = 0  # Total Width
@@ -316,11 +325,11 @@ def mods(corePath, modPaths):
                 extra_assets.append('library/' + cim_name)
             cims[page] = Texture(os.path.join(corePath, 'library', cim_name), **kwargs)
 
-            reexport_cims[page] = set()
+            #reexport_cims[page] = set()
 
         # BUG #5 : CRASH ON CIM CREATION
         # write back the cim file as png for debugging
-        reexport_cims[page].add(os.path.normpath(mod + "/textures"))
+        #reexport_cims[page].add(os.path.normpath(mod + "/textures"))
 
         x = int(region.get("x"))
         y = int(region.get("y"))
@@ -334,8 +343,7 @@ def mods(corePath, modPaths):
     for page in cims:
         ui.log.log("  Writing {}.cim...".format(page))
         cims[page].export_cim(os.path.join(corePath, 'library', '{}.cim'.format(page)))
-        for path in reexport_cims[page]:
-            cims[page].export_png(os.path.join(path, 'modded_cim_{}.png'.format(page)))
+
 
     return extra_assets
 
