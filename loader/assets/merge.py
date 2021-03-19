@@ -116,27 +116,63 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             asset.set('a', new_id)
 
     if len(needs_autogeneration):
+        image_count = len(needs_autogeneration)
+
         regionsNode = textures_mod.find("//regions")
         texturesNode = textures_mod.find("//textures")
         textureID = ui.database.ModDatabase.getMod(mod).prefix
+        # Catch missing Modder ID.  Still try to process and move forward.
+        if not textureID or textureID <= 0:
+            ui.log.log("ERROR: info.xml is missing <modid>.  Mod Author should set this to their Discord ID for all mods they make.")
         packer = rectpack.newPacker(rotation=False)
-        sum = 0
+        sumA:int = 0  # Total Area
+        sumW:int = 0  # Total Width
+        sumH:int = 0  # Total Height
+        maxW:int = 0  # Biggest Width
+        maxH:int = 0  # Biggest Height
         minRequiredDimension = 0
         # First get all the files and pack them into a new texture square
         for regionName in needs_autogeneration:
             (w, h, rows, info) = png.Reader(textures_path + "/" + regionName).asRGBA()
             packer.add_rect(w, h, regionName)
             minRequiredDimension = max(minRequiredDimension, w, h)
-            sum += (w * h)
+            sumA += (w * h)
+            sumW += w
+            sumH += h
+            maxW = max(maxW, w)
+            maxH = max(maxH, w)
 
+        # This size estimate factor can fail in certain cases when many images have the same dimensions.
+        # Is there a way for the library to find the smallest area possible automatically?
         sizeEstimate = 1.2
-        size = max(int(math.sqrt(sum) * sizeEstimate), minRequiredDimension)
+        size = max(int(math.sqrt(sumA) * sizeEstimate), minRequiredDimension)
 
         packer.add_bin(size, size)
         packer.pack()
+        '''Original Code :
         if len(needs_autogeneration) != len(packer.rect_list()):
             raise IndexError(   f"Unable to pack all {len(needs_autogeneration)} regions with size estimate {sizeEstimate}" + 
                                 f", was able to pack {len(packer.rect_list())} rectangles. Please file a bug report.")
+        '''
+
+        # Workarounds, multiple tries.
+        # This will try VERY hard to pack, even if much space is wasted.
+        if image_count != len(packer.rect_list()):
+            # Try stacking vertically first.
+            # This should always work, and waste will be based on range of Height difference.
+            packer.reset()
+            packer.add_bin(maxW, sumH)
+            packer.pack()
+            if image_count != len(packer.rect_list()):
+                # Most wasteful, desperate try, but will always fit everything.
+                packer.reset()
+                packer.add_bin(sumW, sumH)
+                packer.pack()
+                if image_count != len(packer.rect_list()):
+                    # This should be impossible.
+                    errstr = f"Unable to pack all {len(needs_autogeneration)} regions with size estimate {sumW}x{sumH}, was able to pack {len(packer.rect_list())} rectangles. Please file a bug report."
+                    ui.log.log("ERROR: " + errstr)
+                    raise IndexError( errstr )
 
         newTex = lxml.etree.SubElement(texturesNode, "t")
         newTex.set("i", str(textureID))
@@ -282,6 +318,7 @@ def mods(corePath, modPaths):
 
             reexport_cims[page] = set()
 
+        # BUG #5 : CRASH ON CIM CREATION
         # write back the cim file as png for debugging
         reexport_cims[page].add(os.path.normpath(mod + "/textures"))
 
