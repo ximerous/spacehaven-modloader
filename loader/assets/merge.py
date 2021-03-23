@@ -159,11 +159,6 @@ def _detect_textures(coreLibrary, modLibrary, mod):
 
         packer.add_bin(sizeW, sizeH)
         packer.pack()
-        '''Original Code :
-        if len(needs_autogeneration) != len(packer.rect_list()):
-            raise IndexError(   f"Unable to pack all {len(needs_autogeneration)} regions with size estimate {sizeEstimate}" + 
-                                f", was able to pack {len(packer.rect_list())} rectangles. Please file a bug report.")
-        '''
 
         # Workarounds, multiple tries.
         # This will try VERY hard to pack, even if much space is wasted.
@@ -194,7 +189,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         newTex.set("h", str(sizeH))
         coreLibrary['_custom_textures_cim'][str(textureID)] = newTex.attrib
 
-        # Export packed PNG to mod directory.
+        # prepare to export packed PNG to mod directory.
         kwargs = {}
         kwargs['create'] = True
         kwargs['width'] = sizeW
@@ -210,6 +205,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             custom_png.pack_png( os.path.join(textures_path,rid) , x,y,w,h )
 
         # write back the cim file as png for debugging
+        # this only includes textures from this mod, not the final generated cim.
         custom_png.export_png(export_path)
 
         # NOT YET SORTED
@@ -342,20 +338,8 @@ def mods(corePath, modPaths):
                 kwargs['width'] = coreLibrary['_custom_textures_cim'][page]['w']
                 kwargs['height'] = coreLibrary['_custom_textures_cim'][page]['h']
                 extra_assets.append('library/' + cim_name)
-
-                # write back the cim file as png for debugging
-                #custom_file_path = os.path.join( corePath, 'library', "custom_texture_{}.png".format(page) )
-                #reexport_cims[page]:Texture = Texture(custom_file_path,**kwargs )
-                ###reexport_cims[page].pack_png(custom_file_path)
                 
             cims[page] = Texture(os.path.join(corePath, 'library', cim_name), **kwargs)
-
-            #reexport_cims[page] = set()
-            #reexport_cims[page] = cims[page]
-
-        # BUG #5 : CRASH ON CIM CREATION
-        # write back the cim file as png for debugging
-        #reexport_cims[page].add(os.path.normpath(corePath + "/mod_textures"))
 
         x = int(region.get("x"))
         y = int(region.get("y"))
