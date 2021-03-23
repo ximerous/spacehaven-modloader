@@ -127,11 +127,12 @@ def _detect_textures(coreLibrary, modLibrary, mod):
 
         regionsNode = textures_mod.find("//regions")
         texturesNode = textures_mod.find("//textures")
-        textureID = ui.database.ModDatabase.getMod(mod).prefix
+        textureID:int = ui.database.ModDatabase.getMod(mod).prefix
 
         # Catch missing Modder ID.  Still try to process and move forward.
         if not textureID or textureID <= 0:
             ui.log.log("ERROR: info.xml is missing <modid>.  Mod Author should set this to their Discord ID for all mods they make.")
+            textureID = 9999
 
         packer = rectpack.newPacker(rotation=False)
         sumA:int = 0  # Total Area
@@ -151,12 +152,12 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             maxW = max(maxW, w)
             maxH = max(maxH, w)
 
-        # This size estimate factor can fail in certain cases when many images have the same dimensions.
+        # This size estimate factor can fail in certain cases when many images have the same dimensions, or when there is high wasted space.
         # Is there a way for the library to find the smallest area possible automatically?
         sizeEstimate = 1.2
-        size = max(int(math.sqrt(sumA) * sizeEstimate), minRequiredDimension)
+        sizeW = sizeH = max(int(math.sqrt(sumA) * sizeEstimate), minRequiredDimension)
 
-        packer.add_bin(size, size)
+        packer.add_bin(sizeW, sizeH)
         packer.pack()
         '''Original Code :
         if len(needs_autogeneration) != len(packer.rect_list()):
@@ -168,14 +169,18 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         # This will try VERY hard to pack, even if much space is wasted.
         if image_count != len(packer.rect_list()):
             # Try stacking vertically first.
-            # This should always work, and waste will be based on range of Height difference.
+            # This should always work, and waste will be based on range of Width difference.
             packer.reset()
-            packer.add_bin(maxW, sumH)
+            sizeW = maxW
+            sizeH = sumH
+            packer.add_bin(sizeW, sizeH)
             packer.pack()
             if image_count != len(packer.rect_list()):
                 # Most wasteful, desperate try, but will always fit everything.
                 packer.reset()
-                packer.add_bin(sumW, sumH)
+                sizeW = sumW
+                sizeH = sumH
+                packer.add_bin(sizeW, sizeH)
                 packer.pack()
                 if image_count != len(packer.rect_list()):
                     # This should be impossible.
@@ -185,20 +190,33 @@ def _detect_textures(coreLibrary, modLibrary, mod):
 
         newTex = lxml.etree.SubElement(texturesNode, "t")
         newTex.set("i", str(textureID))
-        newTex.set("w", str(size))
-        newTex.set("h", str(size))
+        newTex.set("w", str(sizeW))
+        newTex.set("h", str(sizeH))
         coreLibrary['_custom_textures_cim'][str(textureID)] = newTex.attrib
+
+        # Export packed PNG to mod directory.
+        kwargs = {}
+        kwargs['create'] = True
+        kwargs['width'] = sizeW
+        kwargs['height'] = sizeH
+        export_path = os.path.join(mod, f"custom_texture_{textureID}.png")
+        custom_png:Texture = Texture( export_path, **kwargs )
 
         packedRectsSorted = {}
         for rect in packer.rect_list():
             b, x, y, w, h, rid = rect
             remappedID = mapping_n_region[rid]
             packedRectsSorted[remappedID] = (str(x), str(y), str(w), str(h), str(rid))
+            custom_png.pack_png( os.path.join(textures_path,rid) , x,y,w,h )
+
+        # write back the cim file as png for debugging
+        custom_png.export_png(export_path)
+
         # NOT YET SORTED
         packedRectsSorted = {k: v for k,v in sorted(packedRectsSorted.items())}
         # NOW SORTED: We need this to make sure the IDs are added to the textures file in the correct order
 
-        for remappedID, data in packedRectsSorted.items():
+        for remappedID, data in packedRectsSorted.items(): 
             x, y, w, h, regionFileName = data
             remapData = modded_textures[remappedID]
             newNode = lxml.etree.SubElement(regionsNode, "re")
@@ -209,6 +227,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             newNode.set("w", w)
             newNode.set("h", h)
             newNode.set("file", regionFileName)
+        
 
     for asset in textures_mod.xpath("//re[@n]"):
         mod_local_id = asset.get('n')
@@ -323,13 +342,20 @@ def mods(corePath, modPaths):
                 kwargs['width'] = coreLibrary['_custom_textures_cim'][page]['w']
                 kwargs['height'] = coreLibrary['_custom_textures_cim'][page]['h']
                 extra_assets.append('library/' + cim_name)
+
+                # write back the cim file as png for debugging
+                #custom_file_path = os.path.join( corePath, 'library', "custom_texture_{}.png".format(page) )
+                #reexport_cims[page]:Texture = Texture(custom_file_path,**kwargs )
+                ###reexport_cims[page].pack_png(custom_file_path)
+                
             cims[page] = Texture(os.path.join(corePath, 'library', cim_name), **kwargs)
 
             #reexport_cims[page] = set()
+            #reexport_cims[page] = cims[page]
 
         # BUG #5 : CRASH ON CIM CREATION
         # write back the cim file as png for debugging
-        #reexport_cims[page].add(os.path.normpath(mod + "/textures"))
+        #reexport_cims[page].add(os.path.normpath(corePath + "/mod_textures"))
 
         x = int(region.get("x"))
         y = int(region.get("y"))
@@ -343,7 +369,6 @@ def mods(corePath, modPaths):
     for page in cims:
         ui.log.log("  Writing {}.cim...".format(page))
         cims[page].export_cim(os.path.join(corePath, 'library', '{}.cim'.format(page)))
-
 
     return extra_assets
 
