@@ -81,10 +81,11 @@ if __name__ == "__main__":
         for x in range(repeat):
             TextureManager.registerNewTexture("unit-tests", filename)
 
-    for rt in TextureManager.REGISTERED_MOD_TEXTURES:
-        print(rt)
     TextureManager.pack()
-    for rect in TextureManager.Packer.rect_list():
-        bin, x, y, w, h, rid = rect
-        print(f"[b{bin}, r{rid:>3}] {x:>3}x, {y:>3}y")
+
+    for bin in TextureManager.Packer:
+        r1str = f"x{bin[ 0].x}, y{bin[ 0].y} ({bin[ 0].rid})"
+        r2str = f"x{bin[-1].x}, y{bin[-1].y} ({bin[-1].rid})"
+        binstr = f"{len(bin):>3} rects, first {r1str}, last {r2str}"
+        print(binstr)
     print("CTM compiles.")
