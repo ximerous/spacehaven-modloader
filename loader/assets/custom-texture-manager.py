@@ -29,8 +29,7 @@ class TextureManager:
 
     @classmethod
     def registerNewTexture(cls, mod: str, texPath: str):
-        # TODO Figure out how we'll be getting the correct core region ID
-        tmp = RegisteredTexture(mod, texPath, 0)
+        tmp = RegisteredTexture(mod, texPath, cls.popNextRegionID())
         cls.REGISTERED_MOD_TEXTURES.append(tmp)
 
     @classmethod
