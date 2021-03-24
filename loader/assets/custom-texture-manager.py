@@ -14,6 +14,7 @@ class TextureManager:
     RegisteredTexturesCustomRegion = []
     RegisteredTexturesCoreRegion = []
     RegisteredModPaths = dict()
+    RemappedRegionIDs = dict()
     CustomTextureIDStart = 400
 
     Packer : rectpack.PackerGlobal = None
@@ -30,9 +31,21 @@ class TextureManager:
         return tmp
 
     @classmethod
-    def registerNewTexture(cls, mod: str, texPath: str):
-        tmp = RegisteredTexture(mod, texPath, cls.popNextRegionID())
-        cls.RegisteredTexturesCustomRegion.append(tmp)
+    def registerNewTexture(cls, mod: str, texPath: str, regionID: int = -1):
+        if cls.isCoreRegion(regionID):
+            tmp = RegisteredTexture(mod, texPath, regionID)
+            cls.RegisteredTexturesCoreRegion.append(tmp)
+        else:
+            if regionID != -1 and regionID in cls.RemappedRegionIDs:
+                raise KeyError(f"Cannot remap ID {regionID}: Already remapped!")
+            rid = cls.popNextRegionID()
+            tmp = RegisteredTexture(mod, texPath, rid)
+            cls.RegisteredTexturesCustomRegion.append(tmp)
+            cls.RemappedRegionIDs[regionID] = rid
+
+    @classmethod
+    def isCoreRegion(cls, rID: int):
+        return rID > -1 and rID <= cls._RegionIdLastCore
 
     @classmethod
     def getModTexturePath(cls, mod: str, texPath: str):
@@ -153,4 +166,12 @@ if __name__ == "__main__":
     numRects = len(TextureManager.Packer.rect_list())
     numRectsRaw = len(TextureManager.RegisteredTexturesCustomRegion)
     print(f"{numBins} bins, {numRects} rects ({numRectsRaw} raw)")
+
+    for filename in os.listdir(testFileDir):
+        try:
+            TextureManager.registerNewTexture("unit-tests", filename, 20)
+        except KeyError as e:
+            print(f"Caught KeyError as expected: {e.args[0]}")
+            break
+
     print("CTM compiles.")
