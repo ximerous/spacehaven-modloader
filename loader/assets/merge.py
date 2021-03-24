@@ -138,8 +138,6 @@ def _detect_textures(coreLibrary, modLibrary, mod):
         sumA:int = 0  # Total Area
         sumW:int = 0  # Total Width
         sumH:int = 0  # Total Height
-        maxW:int = 0  # Biggest Width
-        maxH:int = 0  # Biggest Height
         minRequiredDimension = 0
         # First get all the files and pack them into a new texture square
         for regionName in needs_autogeneration:
@@ -149,51 +147,32 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             sumA += (w * h)
             sumW += w
             sumH += h
-            maxW = max(maxW, w)
-            maxH = max(maxH, w)
 
-        # This size estimate factor can fail in certain cases when many images have the same dimensions, or when there is high wasted space.
-        # Is there a way for the library to find the smallest area possible automatically?
+        # The absolute largest size that can be needed to fit everything.
+        maxRequiredDimension = int(math.ceil(math.sqrt(sumH*sumW)))
+
+        # Increase size estimate until it is large enough.
+        size:int = 0
         sizeEstimate = 1.2
-        sizeW = sizeH = max(int(math.sqrt(sumA) * sizeEstimate), minRequiredDimension)
-
-        packer.add_bin(sizeW, sizeH)
-        packer.pack()
-
-        # Workarounds, multiple tries.
-        # This will try VERY hard to pack, even if much space is wasted.
-        if image_count != len(packer.rect_list()):
-            # Try stacking vertically first.
-            # This should always work, and waste will be based on range of Width difference.
+        basearea = max( int(math.sqrt(sumA)) , minRequiredDimension )
+        while size < maxRequiredDimension and image_count != len( packer.rect_list() or [] ) :
+            size = int(basearea * sizeEstimate)
             packer.reset()
-            sizeW = maxW
-            sizeH = sumH
-            packer.add_bin(sizeW, sizeH)
+            packer.add_bin(size, size)
             packer.pack()
-            if image_count != len(packer.rect_list()):
-                # Most wasteful, desperate try, but will always fit everything.
-                packer.reset()
-                sizeW = sumW
-                sizeH = sumH
-                packer.add_bin(sizeW, sizeH)
-                packer.pack()
-                if image_count != len(packer.rect_list()):
-                    # This should be impossible.
-                    errstr = f"Unable to pack all {len(needs_autogeneration)} regions with size estimate {sumW}x{sumH}, was able to pack {len(packer.rect_list())} rectangles. Please file a bug report."
-                    ui.log.log("ERROR: " + errstr)
-                    raise IndexError( errstr )
+            sizeEstimate += 0.1
 
         newTex = lxml.etree.SubElement(texturesNode, "t")
         newTex.set("i", str(textureID))
-        newTex.set("w", str(sizeW))
-        newTex.set("h", str(sizeH))
+        newTex.set("w", str(size))
+        newTex.set("h", str(size))
         coreLibrary['_custom_textures_cim'][str(textureID)] = newTex.attrib
 
         # prepare to export packed PNG to mod directory.
         kwargs = {}
         kwargs['create'] = True
-        kwargs['width'] = sizeW
-        kwargs['height'] = sizeH
+        kwargs['width'] = size
+        kwargs['height'] = size
         export_path = os.path.join(mod, f"custom_texture_{textureID}.png")
         custom_png:Texture = Texture( export_path, **kwargs )
 
@@ -223,7 +202,7 @@ def _detect_textures(coreLibrary, modLibrary, mod):
             newNode.set("w", w)
             newNode.set("h", h)
             newNode.set("file", regionFileName)
-        
+
 
     for asset in textures_mod.xpath("//re[@n]"):
         mod_local_id = asset.get('n')
