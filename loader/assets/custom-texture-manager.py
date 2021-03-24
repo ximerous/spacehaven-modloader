@@ -32,13 +32,11 @@ class TextureManager:
 
     @classmethod
     def pack(cls):
-        # Should always generate plenty of space for packing.
-        sizeEstimateFactor = 1.2
-        NeededRegionFiles = math.ceil( cls.NEEDED_SIZE_MINIMUM * sizeEstimateFactor / (cls._TexFileResolution ** 2) )
         packer = rectpack.newPacker(rotation=False)
         cls.Packer = packer
 
-        packer.add_bin(cls._TexFileResolution, cls._TexFileResolution, NeededRegionFiles)
+        # as many bins as needed
+        packer.add_bin(cls._TexFileResolution, cls._TexFileResolution, float("inf"))
 
         for rt in cls.REGISTERED_MOD_TEXTURES:
             rt: RegisteredTexture
