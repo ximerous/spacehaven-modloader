@@ -12,11 +12,11 @@ class TextureManager:
     _RegionIdNextOffset = 1
 
     RegisteredTexturesCustomRegion = []
+    RegisteredTexturesCoreRegion = []
     RegisteredModPaths = dict()
     CustomTextureIDStart = 400
 
-    Packer = None
-    Packer : rectpack.PackerGlobal
+    Packer : rectpack.PackerGlobal = None
 
     @classmethod
     def setup(cls, lastCoreRegionID: int):
