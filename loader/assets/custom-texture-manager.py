@@ -31,7 +31,6 @@ class TextureManager:
         # TODO Figure out how we'll be getting the correct core region ID
         tmp = RegisteredTexture(mod, texPath, 0)
         cls.REGISTERED_MOD_TEXTURES.append(tmp)
-        cls.NEEDED_SIZE_MINIMUM += tmp.FileSizeX * tmp.FileSizeY
 
     @classmethod
     def getModTexturePath(cls, mod: str, texPath: str):
