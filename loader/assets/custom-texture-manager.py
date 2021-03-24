@@ -11,6 +11,7 @@ class TextureManager:
     REGISTERED_MOD_PATHS = dict()
 
     Packer = None
+    Packer : rectpack.PackerGlobal
 
     @classmethod
     def registerNewTexture(cls, mod: str, texPath: str):
