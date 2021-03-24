@@ -83,7 +83,6 @@ class RegisteredTexture:
 
 if __name__ == "__main__":
     """Run some basic unit tests."""
-    # TODO Remove this hard lock to my own mods and make some test files.
     testFileDir = "unit-tests/textures"
     for filename in os.listdir(testFileDir):
         repeat = os.stat(os.path.join(testFileDir, filename)).st_size
