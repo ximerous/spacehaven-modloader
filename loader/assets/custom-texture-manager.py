@@ -1,8 +1,10 @@
 import math
+import os
+
 import lxml.etree
 import png
-import os
 import rectpack
+
 
 class TextureManager:
     _TexFileResolution = 2000
