@@ -11,8 +11,8 @@ class TextureManager:
     _RegionIdLastCore = 0
     _RegionIdNextOffset = 1
 
-    REGISTERED_MOD_TEXTURES = []
-    REGISTERED_MOD_PATHS = dict()
+    RegisteredTexturesCustomRegion = []
+    RegisteredModPaths = dict()
     CustomTextureIDStart = 400
 
     Packer = None
@@ -32,17 +32,17 @@ class TextureManager:
     @classmethod
     def registerNewTexture(cls, mod: str, texPath: str):
         tmp = RegisteredTexture(mod, texPath, cls.popNextRegionID())
-        cls.REGISTERED_MOD_TEXTURES.append(tmp)
+        cls.RegisteredTexturesCustomRegion.append(tmp)
 
     @classmethod
     def getModTexturePath(cls, mod: str, texPath: str):
-        if mod not in cls.REGISTERED_MOD_PATHS:
+        if mod not in cls.RegisteredModPaths:
             texFolderPath = os.path.join(mod, "textures")
             if os.path.exists(texFolderPath):
-                cls.REGISTERED_MOD_PATHS[mod] = texFolderPath
+                cls.RegisteredModPaths[mod] = texFolderPath
             else:
                 raise FileNotFoundError(f"Couldn't find {texFolderPath}")
-        return os.path.join(cls.REGISTERED_MOD_PATHS[mod], texPath)
+        return os.path.join(cls.RegisteredModPaths[mod], texPath)
 
     @classmethod
     def pack(cls):
@@ -52,9 +52,9 @@ class TextureManager:
         # as many bins as needed
         packer.add_bin(cls._TexFileResolution, cls._TexFileResolution, float("inf"))
 
-        for rt in cls.REGISTERED_MOD_TEXTURES:
+        for rt in cls.RegisteredTexturesCustomRegion:
             rt: RegisteredTexture
-            packer.add_rect(rt.FileSizeX, rt.FileSizeY, cls.REGISTERED_MOD_TEXTURES.index(rt))
+            packer.add_rect(rt.FileSizeX, rt.FileSizeY, cls.RegisteredTexturesCustomRegion.index(rt))
 
         packer.pack()
 
@@ -70,7 +70,7 @@ class TextureManager:
         packedRectsSorted = {}
         for rect in cls.Packer.rect_list():
             b, x, y, w, h, regModTexIDX = rect
-            regionID = cls.REGISTERED_MOD_TEXTURES[regModTexIDX].CoreRegionID
+            regionID = cls.RegisteredTexturesCustomRegion[regModTexIDX].CoreRegionID
             packedRectsSorted[regionID] = (b, str(x), str(y), str(w), str(h), regModTexIDX)
         # NOT YET SORTED
         packedRectsSorted = {k: v for k,v in sorted(packedRectsSorted.items())}
@@ -80,7 +80,7 @@ class TextureManager:
         for regionID, rect in packedRectsSorted.items():
             newNode = lxml.etree.SubElement(regionsNode, "re")
 
-            rt: RegisteredTexture; rt = cls.REGISTERED_MOD_TEXTURES[regModTexIDX]
+            rt: RegisteredTexture; rt = cls.RegisteredTexturesCustomRegion[regModTexIDX]
             regionFileName = cls.getModTexturePath(rt.ParentMod, rt.TexPath)
             bin, x, y, w, h, regModTexIDX = rect
             bins.add(bin)
@@ -151,6 +151,6 @@ if __name__ == "__main__":
         print(binstr)
     numBins = len(TextureManager.Packer)
     numRects = len(TextureManager.Packer.rect_list())
-    numRectsRaw = len(TextureManager.REGISTERED_MOD_TEXTURES)
+    numRectsRaw = len(TextureManager.RegisteredTexturesCustomRegion)
     print(f"{numBins} bins, {numRects} rects ({numRectsRaw} raw)")
     print("CTM compiles.")
