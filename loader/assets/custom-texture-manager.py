@@ -11,6 +11,7 @@ class TextureManager:
 
     REGISTERED_MOD_TEXTURES = []
     REGISTERED_MOD_PATHS = dict()
+    CustomTextureIDStart = 400
 
     Packer = None
     Packer : rectpack.PackerGlobal
@@ -55,6 +56,45 @@ class TextureManager:
             packer.add_rect(rt.FileSizeX, rt.FileSizeY, cls.REGISTERED_MOD_TEXTURES.index(rt))
 
         packer.pack()
+
+    @classmethod
+    def getXMLTexture(cls):
+        texRoot = lxml.etree.Element("AllTexturesAndRegions")
+        lxml.etree.SubElement(texRoot, "textures")
+        lxml.etree.SubElement(texRoot, "regions")
+        texTree = lxml.etree.ElementTree(texRoot)
+        regionsNode = texTree.find("//regions")
+        texturesNode = texTree.find("//textures")
+
+        packedRectsSorted = {}
+        for rect in cls.Packer.rect_list():
+            b, x, y, w, h, regModTexIDX = rect
+            regionID = cls.REGISTERED_MOD_TEXTURES[regModTexIDX].CoreRegionID
+            packedRectsSorted[regionID] = (b, str(x), str(y), str(w), str(h), regModTexIDX)
+        # NOT YET SORTED
+        packedRectsSorted = {k: v for k,v in sorted(packedRectsSorted.items())}
+        # NOW SORTED
+
+        for regionID, rect in packedRectsSorted.items():
+            newNode = lxml.etree.SubElement(regionsNode, "re")
+
+            rt: RegisteredTexture; rt = cls.REGISTERED_MOD_TEXTURES[regModTexIDX]
+            regionFileName = cls.getModTexturePath(rt.ParentMod, rt.TexPath)
+            bin, x, y, w, h, regModTexIDX = rect
+
+            newNode.set("n", str(regionID))
+            newNode.set("t", str(cls.getBinTextureID(bin)))
+            newNode.set("x", x)
+            newNode.set("y", y)
+            newNode.set("w", w)
+            newNode.set("h", h)
+            newNode.set("file", regionFileName)
+
+        return texTree
+
+    @classmethod
+    def getBinTextureID(cls, bin: int):
+        return cls.CustomTextureIDStart + bin
 
 
 class RegisteredTexture:
