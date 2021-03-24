@@ -72,12 +72,15 @@ class RegisteredTexture:
 if __name__ == "__main__":
     """Run some basic unit tests."""
     # TODO Remove this hard lock to my own mods and make some test files.
-    TextureManager.registerNewTexture("../mods/Wiring", "busPanelFloor.png")
-    TextureManager.registerNewTexture("../mods/Wiring", "busPanelWallFront.png")
-    TextureManager.registerNewTexture("../mods/Wiring", "busPanelWallBack.png")
-    TextureManager.registerNewTexture("../mods/Wiring", "wiringpanel.png")
-    TextureManager.registerNewTexture("../mods/Wiring", "wiringPanelWallBack.png")
-    TextureManager.registerNewTexture("../mods/Wiring", "wiringPanelWallFront.png")
+    testFileDir = "unit-tests/textures"
+    for filename in os.listdir(testFileDir):
+        repeat = os.stat(os.path.join(testFileDir, filename)).st_size
+        # magic numbers chosen semi-randomly to get a good spread of repeats
+        repeat = math.ceil((210 - repeat)/ 9) ** 2
+        print(f"{filename:>11} - {repeat:>2}")
+        for x in range(repeat):
+            TextureManager.registerNewTexture("unit-tests", filename)
+
     for rt in TextureManager.REGISTERED_MOD_TEXTURES:
         print(rt)
     TextureManager.pack()
