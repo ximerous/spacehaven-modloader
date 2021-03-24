@@ -6,12 +6,26 @@ import rectpack
 
 class TextureManager:
     _TexFileResolution = 2000
+    _RegionIdLastCore = 0
+    _RegionIdNextOffset = 1
+
     NEEDED_SIZE_MINIMUM = 0
     REGISTERED_MOD_TEXTURES = []
     REGISTERED_MOD_PATHS = dict()
 
     Packer = None
     Packer : rectpack.PackerGlobal
+
+    @classmethod
+    def setup(cls, lastCoreRegionID: int):
+        cls._RegionIdLastCore = lastCoreRegionID
+
+    @classmethod
+    def popNextRegionID(cls):
+        """Get next region ID and increment the counter"""
+        tmp = cls._RegionIdLastCore + cls._RegionIdNextOffset
+        cls._RegionIdNextOffset += 1
+        return tmp
 
     @classmethod
     def registerNewTexture(cls, mod: str, texPath: str):
