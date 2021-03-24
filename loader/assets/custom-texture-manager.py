@@ -139,7 +139,7 @@ if __name__ == "__main__":
             TextureManager.registerNewTexture("unit-tests", filename)
 
     TextureManager.pack()
-    with open("unit-tests/textures.xml", 'wb') as f:
+    with open("unit-tests/textures-output.xml", 'wb') as f:
         f.write(lxml.etree.tostring(TextureManager.getXMLTexture(), pretty_print=True))
 
     for bin in TextureManager.Packer:
