@@ -9,7 +9,6 @@ class TextureManager:
     _RegionIdLastCore = 0
     _RegionIdNextOffset = 1
 
-    NEEDED_SIZE_MINIMUM = 0
     REGISTERED_MOD_TEXTURES = []
     REGISTERED_MOD_PATHS = dict()
 
