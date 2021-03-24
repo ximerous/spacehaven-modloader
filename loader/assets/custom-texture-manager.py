@@ -87,4 +87,8 @@ if __name__ == "__main__":
         r2str = f"x{bin[-1].x}, y{bin[-1].y} ({bin[-1].rid})"
         binstr = f"{len(bin):>3} rects, first {r1str}, last {r2str}"
         print(binstr)
+    numBins = len(TextureManager.Packer)
+    numRects = len(TextureManager.Packer.rect_list())
+    numRectsRaw = len(TextureManager.REGISTERED_MOD_TEXTURES)
+    print(f"{numBins} bins, {numRects} rects ({numRectsRaw} raw)")
     print("CTM compiles.")
