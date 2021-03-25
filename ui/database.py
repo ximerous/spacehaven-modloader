@@ -138,7 +138,25 @@ class Mod:
             self.website = _optional("website")
             self.updates = _optional("updates")
             self.prefix = int(_optional("modid") or "0")
-            
+
+            # feature request #4, user configuration.
+            self.config_xml = mod.find("config")
+            if self.config_xml:
+                self.variables = {}
+                for var in self.config_xml.findall("var"):
+                    varname = var.get("name")
+                    if varname:
+                        self.variables[ varname ] = {
+                            "name" : varname,
+                            "type" : var.get("type"),
+                            "size" : var.get("size"),
+                            "min"  : var.get("min"),
+                            "max"  : var.get("max"),
+                            "default" : var.get("default")
+                        }
+                        self.variables[ varname ]["desc"] = var.text
+                        self.variables[ varname ]["value"] = self.variables[ varname ]["default"]
+
             self.verifyLoaderVersion(mod)
             self.verifyGameVersion(mod, self.gameInfo)
 
