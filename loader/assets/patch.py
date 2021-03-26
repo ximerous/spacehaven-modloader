@@ -151,9 +151,10 @@ def doPatches(coreLib, modLib, mod:dict):
             "coreLibElems": currentCoreLibElems,
         }
 
-        # TODO: Replace Config Variables with user chosen value.
-        for var in mod.variables.values():
-            patchArgs["value"].text = patchArgs["value"].text.replace( var["name"], var["value"] )
+        # Replace Config Variables with user chosen value.
+        if mod.variables:
+            for var in mod.variables.values():
+                patchArgs["value"].text = patchArgs["value"].text.replace( var["name"], var["value"] )
 
         PatchDispatch(pType)(patchArgs)
 

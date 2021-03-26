@@ -106,7 +106,9 @@ class Mod:
         self.gameInfo = gameInfo
         self._mappedIDs = []
         self.enabled = not os.path.isfile(os.path.join(self.path, DISABLED_MARKER))
+        self.variables:dict = {}
         self.loadInfo(info_file)
+        
 
     def loadInfo(self, infoFile):
         
@@ -142,7 +144,6 @@ class Mod:
             # feature request #4, user configuration.
             self.config_xml = mod.find("config")
             if self.config_xml:
-                self.variables = {}
                 for var in self.config_xml.findall("var"):
                     varname = var.get("name")
                     if varname:
