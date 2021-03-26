@@ -1,20 +1,46 @@
 import math
 import os
+from typing import List, Dict
 
 import lxml.etree
 import png
 import rectpack
 
 
+class RegisteredTexture:
+    """All the metadata needed to construct a region node."""
+    ParentMod: str
+    TexPath: str
+    CoreRegionID: int
+    FileSizeX: int
+    FileSizeY: int
+
+    def __init__(self, mod: str, texPath: str, regionID: int):
+        self.ParentMod = mod
+        self.TexPath = texPath
+        self.CoreRegionID = regionID
+
+        filepath = TextureManager.getModTexturePath(self.ParentMod, self.TexPath)
+        (w, h, rows, info) = png.Reader(filepath).asRGBA()
+
+        self.FileSizeX = w
+        self.FileSizeY = h
+
+    def __str__(self):
+        return f"[{self.CoreRegionID:0>5}] {self.ParentMod}: {self.TexPath} - ({self.FileSizeX}, {self.FileSizeY})"
+
+
+RegTexLibrary = List[RegisteredTexture]
+
 class TextureManager:
     _TexFileResolution = 2000
     _RegionIdLastCore = 0
     _RegionIdNextOffset = 1
 
-    RegisteredTexturesCustomRegion = []
-    RegisteredTexturesCoreRegion = []
-    RegisteredModPaths = dict()
-    RemappedRegionIDs = dict()
+    RegisteredTexturesCustomRegion : RegTexLibrary = []
+    RegisteredTexturesCoreRegion : RegTexLibrary = []
+    RegisteredModPaths : Dict[str, str] = dict()
+    RemappedRegionIDs : Dict[int, int] = dict()
     CustomTextureIDStart = 400
 
     Packer : rectpack.PackerGlobal = None
@@ -117,29 +143,6 @@ class TextureManager:
     @classmethod
     def getBinTextureID(cls, bin: int):
         return cls.CustomTextureIDStart + bin
-
-
-class RegisteredTexture:
-    """All the metadata needed to construct a region node."""
-    ParentMod: str
-    TexPath: str
-    CoreRegionID: int
-    FileSizeX: int
-    FileSizeY: int
-
-    def __init__(self, mod: str, texPath: str, regionID: int):
-        self.ParentMod = mod
-        self.TexPath = texPath
-        self.CoreRegionID = regionID
-
-        filepath = TextureManager.getModTexturePath(self.ParentMod, self.TexPath)
-        (w, h, rows, info) = png.Reader(filepath).asRGBA()
-
-        self.FileSizeX = w
-        self.FileSizeY = h
-
-    def __str__(self):
-        return f"[{self.CoreRegionID:0>5}] {self.ParentMod}: {self.TexPath} - ({self.FileSizeX}, {self.FileSizeY})"
 
 
 if __name__ == "__main__":
