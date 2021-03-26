@@ -49,7 +49,14 @@ class TextureManager:
     @classmethod
     def setup(cls, lastCoreRegionID: int, loggerMethod):
         cls._RegionIdLastCore = lastCoreRegionID
+        cls._RegionIdNextOffset = 1
         cls._logger = loggerMethod
+
+        # Reset registries
+        cls.RegisteredTexturesCustomRegion : RegTexLibrary = []
+        cls.RegisteredTexturesCoreRegion : RegTexLibrary = []
+        cls.RegisteredModPaths : Dict[str, str] = dict()
+        cls.RemappedRegionIDs : Dict[object, int] = dict()
         cls.log(f"Done setup: core region ends at {cls._RegionIdLastCore}")
 
     @classmethod
