@@ -377,7 +377,7 @@ class Window(Frame):
     can_quit = True
     def disable_UI(self, message):
         self.set_ui_state(DISABLED, message)
-        self.config(cursor = 'wait')
+        self.config(cursor = '')
         self.can_quit = False
     
     def enable_UI(self, message):
