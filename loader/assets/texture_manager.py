@@ -41,7 +41,7 @@ class TextureManager:
     RegisteredTexturesCustomRegion : RegTexLibrary = []
     RegisteredTexturesCoreRegion : RegTexLibrary = []
     RegisteredModPaths : Dict[str, str] = dict()
-    RemappedRegionIDs : Dict[int, int] = dict()
+    RemappedRegionIDs : Dict[object, int] = dict()
     CustomTextureIDStart = 400
 
     Packer : rectpack.PackerGlobal = None
@@ -103,7 +103,11 @@ class TextureManager:
         Check if a given regionID number is inside the game's "core" set of
         region IDs.
         """
-        return rID > -1 and rID <= cls._RegionIdLastCore
+        try:
+            rID = int(rID)
+            return rID > -1 and rID <= cls._RegionIdLastCore
+        except ValueError:
+            return False
 
     @classmethod
     def getModTexturePath(cls, mod: str, texPath: str):
