@@ -51,6 +51,12 @@ class TextureManager:
 
     @classmethod
     def registerNewTexture(cls, mod: str, texPath: str, regionID: int = -1):
+        """
+        Register a new texture to be managed. Region ID must NOT be -1 during normal
+        operation, this is for debugging only. Core region textures will be stored
+        as-is, custom textures will have their region ID remapped to the next available
+        sequential region ID.
+        """
         if cls.isCoreRegion(regionID):
             tmp = RegisteredTexture(mod, texPath, regionID)
             cls.RegisteredTexturesCoreRegion.append(tmp)
