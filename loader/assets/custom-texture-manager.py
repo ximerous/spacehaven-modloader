@@ -85,10 +85,15 @@ class TextureManager:
 
     @classmethod
     def isCoreRegion(cls, rID: int):
+        """
+        Check if a given regionID number is inside the game's "core" set of
+        region IDs.
+        """
         return rID > -1 and rID <= cls._RegionIdLastCore
 
     @classmethod
     def getModTexturePath(cls, mod: str, texPath: str):
+        """Get the correct locaton for a given texture sub-path and mod combination."""
         if mod not in cls.RegisteredModPaths:
             texFolderPath = os.path.join(mod, "textures")
             if os.path.exists(texFolderPath):
@@ -99,6 +104,11 @@ class TextureManager:
 
     @classmethod
     def getXMLTexture(cls):
+        """
+        Build the lxml ElementTree that defines the current set of custom textures
+        ONLY. Although core region overrides can be registered, they will NEVER be
+        included in the output from this function.
+        """
         texRoot = lxml.etree.Element("AllTexturesAndRegions")
         lxml.etree.SubElement(texRoot, "textures")
         lxml.etree.SubElement(texRoot, "regions")
@@ -142,6 +152,7 @@ class TextureManager:
 
     @classmethod
     def getBinTextureID(cls, bin: int):
+        """Get the texture ID for for a given bin index."""
         return cls.CustomTextureIDStart + bin
 
 
