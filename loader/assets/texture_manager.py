@@ -36,6 +36,7 @@ class TextureManager:
     _TexFileResolution = 2000
     _RegionIdLastCore = 0
     _RegionIdNextOffset = 1
+    _logger = None
 
     RegisteredTexturesCustomRegion : RegTexLibrary = []
     RegisteredTexturesCoreRegion : RegTexLibrary = []
@@ -46,8 +47,10 @@ class TextureManager:
     Packer : rectpack.PackerGlobal = None
 
     @classmethod
-    def setup(cls, lastCoreRegionID: int):
+    def setup(cls, lastCoreRegionID: int, loggerMethod):
         cls._RegionIdLastCore = lastCoreRegionID
+        cls._logger = loggerMethod
+        cls.log(f"Done setup: core region ends at {cls._RegionIdLastCore}")
 
     @classmethod
     def registerNewTexture(cls, mod: str, texPath: str, regionID: int = -1):
@@ -81,6 +84,11 @@ class TextureManager:
             packer.add_rect(rt.FileSizeX, rt.FileSizeY, cls.RegisteredTexturesCustomRegion.index(rt))
 
         packer.pack()
+
+    @classmethod
+    def log(cls, *values):
+        if cls._logger:
+            cls._logger(*values)
 
     @classmethod
     def popNextRegionID(cls):
@@ -170,6 +178,8 @@ class TextureManager:
 
 if __name__ == "__main__":
     """Run some basic unit tests."""
+    TextureManager.setup(10, print)
+
     testFileDir = "unit-tests/textures"
     for filename in os.listdir(testFileDir):
         repeat = os.stat(os.path.join(testFileDir, filename)).st_size
