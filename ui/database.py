@@ -149,14 +149,18 @@ class Mod:
                     if varname:
                         self.variables[ varname ] = {
                             "name" : varname,
+                            "desc" : var.text,
                             "type" : var.get("type"),
                             "size" : var.get("size"),
                             "min"  : var.get("min"),
                             "max"  : var.get("max"),
-                            "default" : var.get("default")
+                            "default" : var.get("default"),
+                            "value" : var.get("value")
                         }
-                        self.variables[ varname ]["desc"] = var.text
-                        self.variables[ varname ]["value"] = self.variables[ varname ]["default"]
+                        if not self.variables[varname]["value"]:
+                            self.variables[varname]["value"] = self.variables[varname]["default"]
+
+            # TODO: Load past user config values here.
 
             self.verifyLoaderVersion(mod)
             self.verifyGameVersion(mod, self.gameInfo)
