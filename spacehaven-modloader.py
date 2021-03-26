@@ -8,19 +8,13 @@ import traceback
 
 try:
     import winreg
+    from steamfiles import acf
 except (ImportError, ModuleNotFoundError):
-    print ("winreg was not loaded in")
-    #winreg is None
+    winreg = None
 
 from collections import OrderedDict
 from tkinter import *
 from tkinter import filedialog, messagebox
-
-try:
-    from steamfiles import acf
-except (ImportError, ModuleNotFoundError):
-    print ("steamfiles acf was not loaded in")
-
 import loader.extract
 import loader.load
 import ui.database
@@ -50,6 +44,7 @@ POSSIBLE_SPACEHAVEN_LOCATIONS = [
     "../../SpaceHaven/spacehaven",
     "~/Games/SpaceHaven/spacehaven",
     ".local/share/Steam/steamapps/common/SpaceHaven/spacehaven",
+    "../Space Haven/game/spacehaven.jar",
 ]
 DatabaseHandler = ui.database.ModDatabase
 
