@@ -50,13 +50,6 @@ class TextureManager:
         cls._RegionIdLastCore = lastCoreRegionID
 
     @classmethod
-    def popNextRegionID(cls):
-        """Get next region ID and increment the counter"""
-        tmp = cls._RegionIdLastCore + cls._RegionIdNextOffset
-        cls._RegionIdNextOffset += 1
-        return tmp
-
-    @classmethod
     def registerNewTexture(cls, mod: str, texPath: str, regionID: int = -1):
         if cls.isCoreRegion(regionID):
             tmp = RegisteredTexture(mod, texPath, regionID)
@@ -68,20 +61,6 @@ class TextureManager:
             tmp = RegisteredTexture(mod, texPath, rid)
             cls.RegisteredTexturesCustomRegion.append(tmp)
             cls.RemappedRegionIDs[regionID] = rid
-
-    @classmethod
-    def isCoreRegion(cls, rID: int):
-        return rID > -1 and rID <= cls._RegionIdLastCore
-
-    @classmethod
-    def getModTexturePath(cls, mod: str, texPath: str):
-        if mod not in cls.RegisteredModPaths:
-            texFolderPath = os.path.join(mod, "textures")
-            if os.path.exists(texFolderPath):
-                cls.RegisteredModPaths[mod] = texFolderPath
-            else:
-                raise FileNotFoundError(f"Couldn't find {texFolderPath}")
-        return os.path.join(cls.RegisteredModPaths[mod], texPath)
 
     @classmethod
     def pack(cls):
@@ -96,6 +75,27 @@ class TextureManager:
             packer.add_rect(rt.FileSizeX, rt.FileSizeY, cls.RegisteredTexturesCustomRegion.index(rt))
 
         packer.pack()
+
+    @classmethod
+    def popNextRegionID(cls):
+        """Get next region ID and increment the counter"""
+        tmp = cls._RegionIdLastCore + cls._RegionIdNextOffset
+        cls._RegionIdNextOffset += 1
+        return tmp
+
+    @classmethod
+    def isCoreRegion(cls, rID: int):
+        return rID > -1 and rID <= cls._RegionIdLastCore
+
+    @classmethod
+    def getModTexturePath(cls, mod: str, texPath: str):
+        if mod not in cls.RegisteredModPaths:
+            texFolderPath = os.path.join(mod, "textures")
+            if os.path.exists(texFolderPath):
+                cls.RegisteredModPaths[mod] = texFolderPath
+            else:
+                raise FileNotFoundError(f"Couldn't find {texFolderPath}")
+        return os.path.join(cls.RegisteredModPaths[mod], texPath)
 
     @classmethod
     def getXMLTexture(cls):
