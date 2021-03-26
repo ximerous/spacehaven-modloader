@@ -9,7 +9,7 @@ import traceback
 try:
     import winreg
 except (ImportError, ModuleNotFoundError):
-    print (winreg was not loaded in)
+    print ("winreg was not loaded in")
     #winreg is None
 
 from collections import OrderedDict
@@ -19,7 +19,7 @@ from tkinter import filedialog, messagebox
 try:
     from steamfiles import acf
 except (ImportError, ModuleNotFoundError):
-    print (steamfiles acf was not loaded in)
+    print ("steamfiles acf was not loaded in")
 
 import loader.extract
 import loader.load
