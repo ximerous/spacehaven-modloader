@@ -161,6 +161,12 @@ class TextureManager:
         """Get the texture ID for for a given bin index."""
         return cls.CustomTextureIDStart + bin
 
+    @classmethod
+    def getRegionIDMapping(cls, rid: int):
+        if cls.isCoreRegion(rid):
+            return rid
+        else:
+            return cls.RemappedRegionIDs[rid]
 
 if __name__ == "__main__":
     """Run some basic unit tests."""
@@ -193,5 +199,7 @@ if __name__ == "__main__":
         except KeyError as e:
             print(f"Caught KeyError as expected: {e.args[0]}")
             break
+
+    print(f"Remap check: 20 -> {TextureManager.getRegionIDMapping(20)}")
 
     print("CTM compiles.")
