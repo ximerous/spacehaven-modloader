@@ -44,7 +44,7 @@ POSSIBLE_SPACEHAVEN_LOCATIONS = [
     "../../SpaceHaven/spacehaven",
     "~/Games/SpaceHaven/spacehaven",
     ".local/share/Steam/steamapps/common/SpaceHaven/spacehaven",
-    "../Space Haven/game/spacehaven.jar",
+    "../Space Haven/game/spacehaven",
 ]
 DatabaseHandler = ui.database.ModDatabase
 
@@ -259,7 +259,13 @@ class Window(Frame):
             filetypes.append(('spacehaven.app', '*.app'))
         elif platform.system() == "Linux":
             filetypes.append(('all files', '*'))
-        
+            # here someone needs to check if the given path is a executalble fiel!
+            # i suggest >os.system("bash -c \"file spacehaven\"")<
+            # the output should be something like 'spacehaven: ELF 64-bit LSB executable,
+            # \ x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2,
+            # \ for GNU/Linux 2.6.32, BuildID[sha1]=b66a5b80c86e626aa41006e4719afcf199a483d6,
+            # \ with debug_info, not stripped' <--- obviously the some variables can change!
+
         self.locateSpacehaven(
             filedialog.askopenfilename(
                 parent=self.master,
