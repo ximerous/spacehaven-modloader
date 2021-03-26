@@ -5,15 +5,21 @@ import platform
 import subprocess
 import threading
 import traceback
+
 try:
     import winreg
 except (ImportError, ModuleNotFoundError):
-    winreg is None
+    print (winreg was not loaded in)
+    #winreg is None
+
 from collections import OrderedDict
 from tkinter import *
 from tkinter import filedialog, messagebox
 
-from steamfiles import acf
+try:
+    from steamfiles import acf
+except (ImportError, ModuleNotFoundError):
+    print (steamfiles acf was not loaded in)
 
 import loader.extract
 import loader.load
