@@ -124,7 +124,7 @@ class TextureManager:
         # NOT YET SORTED
         packedRectsSorted = {k: v for k,v in sorted(packedRectsSorted.items())}
         # NOW SORTED
-        bins = set()
+        binIndexes = set()
 
         for regionID, rect in packedRectsSorted.items():
             newNode = lxml.etree.SubElement(regionsNode, "re")
@@ -132,7 +132,7 @@ class TextureManager:
             rt: RegisteredTexture; rt = cls.RegisteredTexturesCustomRegion[regModTexIDX]
             regionFileName = cls.getModTexturePath(rt.ParentMod, rt.TexPath)
             bin, x, y, w, h, regModTexIDX = rect
-            bins.add(bin)
+            binIndexes.add(bin)
 
             newNode.set("n", str(regionID))
             newNode.set("t", str(cls.getBinTextureID(bin)))
@@ -142,7 +142,7 @@ class TextureManager:
             newNode.set("h", h)
             newNode.set("file", regionFileName)
 
-        for bin in bins:
+        for bin in binIndexes:
             newTex = lxml.etree.SubElement(texturesNode, "t")
             newTex.set("i", str(cls.getBinTextureID(bin)))
             newTex.set("w", str(cls._TexFileResolution))
