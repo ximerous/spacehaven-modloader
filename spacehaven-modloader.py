@@ -500,10 +500,10 @@ class Window(Frame):
             messagebox.showerror("Error during quick launch", traceback.format_exc(3))
     
     def patchAndLaunch(self):
-        activeModPaths = [mod.path for mod in DatabaseHandler.getActiveMods()]
+        #activeModPaths = [mod.path for mod in DatabaseHandler.getActiveMods()]
         
         try:
-            loader.load.load(self.jarPath, activeModPaths, self.current_mods_signature())
+            loader.load.load(self.jarPath, DatabaseHandler.getActiveMods(), self.current_mods_signature())
             ui.launcher.launchAndWait(self.gamePath)
             loader.load.unload(self.jarPath)
         except Exception as ex:

@@ -1,0 +1,9 @@
+<Patch>	
+
+	<Operation Class="AttributeMath">
+		<xpath>/data/Product/product/products/l[@element="34"][@howMuch]</xpath>	<!-- 34 is Electricity -->
+		<attribute>howMuch</attribute>
+		<value opType="multiply">{EnergyOutputFactor}</value>
+	</Operation>
+
+</Patch>

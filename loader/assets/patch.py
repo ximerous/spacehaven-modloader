@@ -131,7 +131,8 @@ def PatchDispatch(pType):
     """Return the correct PatchOperation function"""
     return patchDispatcher.get(pType,BadOp)
 
-def doPatches(coreLib, modLib, mod: str):
+def doPatches(coreLib, modLib, mod:dict):
+
     # Helper function
     def doPatchType(patch: lxml.etree._Element, location: str):
         """Execute a single patch. Provided to reduce indentation level"""
@@ -144,11 +145,16 @@ def doPatches(coreLib, modLib, mod: str):
             ui.log.log(f"    Unable to perform patch. XPath found no results {xpath}")
             return      # Don't perform patch if no matches
 
-        patchArgs = {
+        patchArgs:dict = {
             "value":        patch.find('value'),
             "attribute":    patch.find("attribute"),     # Defer exception throw to later.
             "coreLibElems": currentCoreLibElems,
         }
+
+        # TODO: Replace Config Variables with user chosen value.
+        for var in mod.variables.values():
+            patchArgs["value"].text = patchArgs["value"].text.replace( var["name"], var["value"] )
+
         PatchDispatch(pType)(patchArgs)
 
     # Execution

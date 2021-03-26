@@ -1,0 +1,30 @@
+<mod>
+	<name>Electric Slide</name>
+	<author>WP</author>
+
+	<gameVersions>
+		<v>0.11.2</v>
+	</gameVersions>
+
+	<minimumLoaderVersion>0.9.1</minimumLoaderVersion>
+
+	<version>2021.03.25</version>
+
+	<description><![CDATA[
+Adjust all generators to produce more or less energy.
+
+First example of using Mod {Variables}!
+]]>
+	</description>
+
+	<!-- Everything configurable is defined here.  Right now, only <var> is supported.
+		`type` can be any of 'int', 'float', 'str'  (not implemented)
+		`int` and `float` will silently enforce.    (not implemented)
+		`min` and `max` are optional and will be compared for any type and enforce.  (not implemented)
+		`size` is how many characters can be typed by user.  (not implemented)
+	-->
+	<config>
+		<var name="{EnergyOutputFactor}" type="float" default="10" min="0" >Power Output Multiplier ( 0.5 = 50%, 1.5 = 150% )</var>
+	</config>
+
+</mod>
