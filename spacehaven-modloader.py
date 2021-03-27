@@ -5,16 +5,16 @@ import platform
 import subprocess
 import threading
 import traceback
+
 try:
     import winreg
+    from steamfiles import acf
 except (ImportError, ModuleNotFoundError):
-    winreg is None
+    winreg = None
+
 from collections import OrderedDict
 from tkinter import *
 from tkinter import filedialog, messagebox
-
-from steamfiles import acf
-
 import loader.extract
 import loader.load
 import ui.database
@@ -44,6 +44,7 @@ POSSIBLE_SPACEHAVEN_LOCATIONS = [
     "../../SpaceHaven/spacehaven",
     "~/Games/SpaceHaven/spacehaven",
     ".local/share/Steam/steamapps/common/SpaceHaven/spacehaven",
+    "../Space Haven/game/spacehaven",
 ]
 DatabaseHandler = ui.database.ModDatabase
 
@@ -258,7 +259,13 @@ class Window(Frame):
             filetypes.append(('spacehaven.app', '*.app'))
         elif platform.system() == "Linux":
             filetypes.append(('all files', '*'))
-        
+            # here someone needs to check if the given path is a executable file!
+            # I suggest >os.system("bash -c \"file spacehaven\"")< or > with open('spacehaven', mode='rb', buffering=8, encoding=None) as f: f.read(8) compare to ELF magic<
+            # the output should be something like 'spacehaven: ELF 64-bit LSB executable,
+            # \ x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2,
+            # \ for GNU/Linux 2.6.32, BuildID[sha1]=b66a5b80c86e626aa41006e4719afcf199a483d6,
+            # \ with debug_info, not stripped' <--- obviously some variables can change!
+
         self.locateSpacehaven(
             filedialog.askopenfilename(
                 parent=self.master,
@@ -376,7 +383,7 @@ class Window(Frame):
     can_quit = True
     def disable_UI(self, message):
         self.set_ui_state(DISABLED, message)
-        self.config(cursor = 'wait')
+        self.config(cursor = '')
         self.can_quit = False
     
     def enable_UI(self, message):
