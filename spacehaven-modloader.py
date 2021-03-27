@@ -259,12 +259,12 @@ class Window(Frame):
             filetypes.append(('spacehaven.app', '*.app'))
         elif platform.system() == "Linux":
             filetypes.append(('all files', '*'))
-            # here someone needs to check if the given path is a executalble fiel!
-            # i suggest >os.system("bash -c \"file spacehaven\"")<
+            # here someone needs to check if the given path is a executable file!
+            # I suggest >os.system("bash -c \"file spacehaven\"")< or > with open('spacehaven', mode='rb', buffering=8, encoding=None) as f: f.read(8) compare to ELF magic<
             # the output should be something like 'spacehaven: ELF 64-bit LSB executable,
             # \ x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2,
             # \ for GNU/Linux 2.6.32, BuildID[sha1]=b66a5b80c86e626aa41006e4719afcf199a483d6,
-            # \ with debug_info, not stripped' <--- obviously the some variables can change!
+            # \ with debug_info, not stripped' <--- obviously some variables can change!
 
         self.locateSpacehaven(
             filedialog.askopenfilename(
