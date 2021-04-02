@@ -8,7 +8,7 @@ import traceback
 import winreg
 from collections import OrderedDict
 from tkinter import *
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, ttk, font
 
 from steamfiles import acf
 
@@ -65,18 +65,28 @@ class Window(Frame):
 #        self.modLabel = Label(self, text="Installed mods", anchor=NW)
 #        self.modLabel.pack(fill=X, padx=4, pady=4)
 
-        self.modBrowser = Frame(self)
-        
-        # left side mods list
-        self.modListFrame = Frame(self.modBrowser)
-        self.modList = Listbox(self.modListFrame, height=0, selectmode=SINGLE, activestyle = NONE)
-        self.modList.bind('<<ListboxSelect>>', self.showCurrentMod)
-        self.modList.pack(fill=BOTH, expand=1, padx=4, pady=4)
+        # Main split screen, top and bottom.
+        # Top is for mod browser, bottom is buttons, etc.
 
-        self.modListFrame.pack(side=LEFT, fill=Y, padx=4, pady=4)
+        ###########################################################################
+        #### modBrowser - Top level frame to contain the mod list and details  ####
+        self.modBrowser = Frame(self)
+
+
+     
+        # left side mods list
+        self.modListFrame = Frame(self.modBrowser,padx=0, pady=0)
+        modList_scroll = Scrollbar( self.modListFrame ) 
+        modList_scroll.pack(side = RIGHT, fill = Y) 
+        self.modList = Listbox(self.modListFrame, height=1, selectmode=SINGLE, activestyle=NONE,  yscrollcommand = modList_scroll.set )
+        self.modList.bind('<<ListboxSelect>>', self.showCurrentMod)
+        self.modList.pack(side = LEFT, fill=Y, expand=1, padx=0, pady=0 )  #expand=1, padx=4, pady=4)
+        modList_scroll.config(command=self.modList.yview)
+
+        self.modListFrame.pack(side=LEFT, fill=Y, expand=True)
         
         # right side mod info
-        self.modDetailsFrame = Frame(self.modBrowser)
+        self.modDetailsFrame = Frame(self.modBrowser,padx=4,pady=4)
         frame = Frame(self.modDetailsFrame)
         self.modEnableDisable = Button(frame, text="Enable", command=self.toggle_current_mod)
         self.modEnableDisable.pack(side = RIGHT, padx=4, pady=4)
@@ -85,24 +95,33 @@ class Window(Frame):
         self.modDetailsName.pack(fill = X, padx=4, pady=4)
         frame.pack(fill = X, padx=4, pady=4)
         
-        self.modDetailsDescription = Text(self.modDetailsFrame, wrap=WORD, font="TkDefaultFont", height=0)
-        self.modDetailsDescription.pack(fill=BOTH, expand=1, padx=4, pady=4)
+        modDetails_scroll = Scrollbar( self.modDetailsFrame ) 
+        modDetails_scroll.pack(side = RIGHT, fill = Y) 
+
+        self.modDetailsDescription = Text(self.modDetailsFrame, wrap=WORD, font="TkDefaultFont", height=10)
+        self.modDetailsDescription.pack(side=LEFT, fill=BOTH, expand=1, padx=4, pady=4)
+        modDetails_scroll.config(command=self.modDetailsDescription.yview)
 
         self.modDetailsFrame.pack(fill=BOTH, expand=1, padx=4, pady=4)
 
         self.modBrowser.pack(fill=BOTH, expand=1, padx=0, pady=0)
-        
+
         # separator
-        Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
-        
+        #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
+        ttk.Separator(self,orient='horizontal').pack(fill=X, padx=4, pady=8)
+
+        ########################
+        #### Action Buttons ####        
+        # buttons at the bottom
+        buttonFrame = Frame(self)#.pack(fill = X, padx = 4, pady = 8)
+
         # launcher
         self.launchButton_default_text = "LAUNCH!"
-        self.launchButton = Button(self, text=self.launchButton_default_text, command=self.launch_wrapper, height = 5)
-        self.launchButton.pack(fill=X, padx=4, pady=4)
-        
+        self.launchButton = Button(buttonFrame, text=self.launchButton_default_text, command=self.launch_wrapper, height = 2, font=font.Font(size = 14, weight = "bold") )
+        self.launchButton.pack(fill=X, padx=4, pady=4 )
 
         #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
-        self.spacehavenPicker = Frame(self)#.pack(fill=X, padx=4, pady=4)
+        self.spacehavenPicker = Frame(buttonFrame)#.pack(fill=X, padx=4, pady=4)
         self.spacehavenBrowse = Button(self.spacehavenPicker, text="Find game...", command=self.browseForSpacehaven)
         self.spacehavenBrowse.pack(side = LEFT, padx=8, pady=4)
 
@@ -117,31 +136,32 @@ class Window(Frame):
         Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
 
 
-        # buttons at the bottom
-        #buttonFrame = Frame(self).pack(fill = X, padx = 4, pady = 8)
-        self.quitButton = Button(self, text="Quit", command=self.quit)
+        self.quitButton = Button(buttonFrame, text="Quit", command=self.quit)
         self.quitButton.pack(side=RIGHT, expand = False, padx=8, pady=4)
         #self.quitButton.grid(column = 2, padx=4, pady=4)
         
-        self.annotateButton = Button(self, text="Annotate XML", command = lambda: self.start_background_task(self.annotate, "Annotating"))
+        self.annotateButton = Button(buttonFrame, text="Annotate XML", command = lambda: self.start_background_task(self.annotate, "Annotating"))
         self.annotateButton.pack(side=RIGHT, expand = False, padx=8, pady=4)
         
-        self.extractButton = Button(self, text="Extract game assets", command = lambda: self.start_background_task(self.extract_assets, "Extracting"))
+        self.extractButton = Button(buttonFrame, text="Extract game assets", command = lambda: self.start_background_task(self.extract_assets, "Extracting"))
         self.extractButton.pack(side=RIGHT, expand = False, padx=8, pady=4)
         #self.extractButton.grid(column = 0, padx=4, pady=4)
         
-        self.modListOpenFolder = Button(self, text="Open Mods Folder", command=self.openModFolder)
+        self.modListOpenFolder = Button(buttonFrame, text="Open Mods Folder", command=self.openModFolder)
         self.modListOpenFolder.pack(side = RIGHT, expand = False, padx=8, pady=4)
         #self.modListOpenFolder.grid(column = 1, padx=4, pady=4)
 
-        self.modListRefresh = Button(self, text="Refresh Mods", command=self.refreshModList)
+        self.modListRefresh = Button(buttonFrame, text="Refresh Mods", command=self.refreshModList)
         self.modListRefresh.pack(side = RIGHT, expand = False, padx=8, pady=4)
         #self.modListOpenFolder.grid(column = 1, padx=4, pady=4)
         
-        self.quickLaunchClear = Button(self, text="Clear Quicklaunch file", command=self.clear_quick_launch)
+        self.quickLaunchClear = Button(buttonFrame, text="Clear Quicklaunch file", command=self.clear_quick_launch)
         self.quickLaunchClear.pack(side = RIGHT, expand = False, padx=8, pady=4)
         #self.modListOpenFolder.grid(column = 1, padx=4, pady=4)
-        
+
+        buttonFrame.pack(fill = X, padx = 4, pady = 8)
+
+
         self.autolocateSpacehaven()
 
     def autolocateSpacehaven(self):
@@ -537,6 +557,8 @@ if __name__ == "__main__":
     # HACK: Button labels don't appear until the window is resized with py2app
     def fixNoButtonLabelsBug():
         root.geometry("890x640")
+
+    root.resizable(True, True)
 
     app = Window(root)
     root.update()
