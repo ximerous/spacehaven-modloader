@@ -58,35 +58,28 @@ class Window(Frame):
         self.header.pack(fill=X, padx=0, pady=0)
 
         self.pack(fill=BOTH, expand=1, padx=4, pady=4)
+
         
         # separator
         #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
 
+        ##########################################################################################
+        #### modBrowser - Top level container for the mod list, details, and config.          ####
+        ##########################################################################################
 
-#        self.modLabel = Label(self, text="Installed mods", anchor=NW)
-#        self.modLabel.pack(fill=X, padx=4, pady=4)
-
-        # Main split screen, top and bottom.
-        # Top is for mod browser, bottom is buttons, etc.
-
-        ##################################################################################
-        #### modBrowser - Top level container for the mod list, details, and config.  ####
-        
+        # sashrelief values: RAISED, SUNKEN, FLAT, RIDGE, GROOVE, SOLID
         modBrowser = self.modBrowser = PanedWindow(self
             , orient=HORIZONTAL
             , relief=GROOVE
             , borderwidth=4
-            , sashrelief=RAISED #RIDGE
+            , sashcursor='sb_h_double_arrow'
+            , sashrelief=SOLID
             , sashwidth=8
             , sashpad=8)
         modBrowser.pack(fill=BOTH, expand=1)
 
-        #modList_scroll = Scrollbar(modListFrame) 
         modList = self.modList = ScrolledListbox(modBrowser, selectmode=SINGLE , activestyle=NONE )
-        #modList_scroll.config(command=modList.yview)
         modList.bind('<<ListboxSelect>>', self.showCurrentMod)
-        #modList.pack(side = LEFT, fill=BOTH, expand=1, padx=4, pady=4)
-        #modList_scroll.pack(side = RIGHT, fill = Y) 
         modBrowser.add(modList)
 
         # right side mod info
@@ -111,15 +104,17 @@ class Window(Frame):
         #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
         #ttk.Separator(self,orient='horizontal').pack(fill=X, padx=4, pady=8)
 
-        ########################
-        #### Action Buttons ####        
+        ##########################################################################################
+        #### Footer with Buttons                                                              ####
+        ##########################################################################################
+
         # buttons at the bottom
         buttonFrame = Frame(self)#.pack(fill = X, padx = 4, pady = 8)
 
         # launcher
         self.launchButton_default_text = "LAUNCH!"
         self.launchButton = Button(buttonFrame, text=self.launchButton_default_text, command=self.launch_wrapper, height = 2, font=font.Font(size = 14, weight = "bold") )
-        self.launchButton.pack(fill=X, padx=4, pady=4 )
+        #self.launchButton.pack(fill=X, padx=4, pady=4 )
 
         #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
         self.spacehavenPicker = Frame(buttonFrame)
@@ -131,35 +126,30 @@ class Window(Frame):
         #self.spacehavenGameLabel.pack(side = LEFT, padx=4, pady=4)
         # game path
         self.spacehavenText = Entry(self.spacehavenPicker)
+
         # damn cant align properly with the "find game" button...
         self.spacehavenText.pack(fill = X, padx=4, pady=4, anchor = S)
 
         self.spacehavenPicker.pack(fill=X, padx=0, pady=0)
         Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
 
-
         self.quitButton = Button(buttonFrame, text="Quit", command=self.quit)
         self.quitButton.pack(side=RIGHT, expand = False, padx=8, pady=4)
-        #self.quitButton.grid(column = 2, padx=4, pady=4)
         
         self.annotateButton = Button(buttonFrame, text="Annotate XML", command = lambda: self.start_background_task(self.annotate, "Annotating"))
         self.annotateButton.pack(side=RIGHT, expand = False, padx=8, pady=4)
         
         self.extractButton = Button(buttonFrame, text="Extract game assets", command = lambda: self.start_background_task(self.extract_assets, "Extracting"))
         self.extractButton.pack(side=RIGHT, expand = False, padx=8, pady=4)
-        #self.extractButton.grid(column = 0, padx=4, pady=4)
         
         self.modListOpenFolder = Button(buttonFrame, text="Open Mods Folder", command=self.openModFolder)
         self.modListOpenFolder.pack(side = RIGHT, expand = False, padx=8, pady=4)
-        #self.modListOpenFolder.grid(column = 1, padx=4, pady=4)
 
         self.modListRefresh = Button(buttonFrame, text="Refresh Mods", command=self.refreshModList)
         self.modListRefresh.pack(side = RIGHT, expand = False, padx=8, pady=4)
-        #self.modListOpenFolder.grid(column = 1, padx=4, pady=4)
         
         self.quickLaunchClear = Button(buttonFrame, text="Clear Quicklaunch file", command=self.clear_quick_launch)
         self.quickLaunchClear.pack(side = RIGHT, expand = False, padx=8, pady=4)
-        #self.modListOpenFolder.grid(column = 1, padx=4, pady=4)
 
         buttonFrame.pack(fill = X, padx = 4, pady = 8)
 
