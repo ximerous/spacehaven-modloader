@@ -8,8 +8,7 @@ import traceback
 import winreg
 from collections import OrderedDict
 from tkinter import *
-from tkinter import filedialog, messagebox, ttk, font
-
+from tkinter import filedialog, messagebox, ttk, font, scrolledtext
 from steamfiles import acf
 
 import loader.extract
@@ -44,6 +43,7 @@ POSSIBLE_SPACEHAVEN_LOCATIONS = [
 ]
 DatabaseHandler = ui.database.ModDatabase
 
+
 class Window(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
@@ -68,47 +68,50 @@ class Window(Frame):
         # Main split screen, top and bottom.
         # Top is for mod browser, bottom is buttons, etc.
 
-        ###########################################################################
-        #### modBrowser - Top level frame to contain the mod list and details  ####
-        self.modBrowser = Frame(self)
+        ##################################################################################
+        #### modBrowser - Top level container for the mod list, details, and config.  ####
+        
+        modBrowser = self.modBrowser = PanedWindow(self
+            , orient=HORIZONTAL
+            , relief=GROOVE
+            , borderwidth=4
+            , sashrelief=RAISED #RIDGE
+            , sashwidth=8
+            , sashpad=8)
+        modBrowser.pack(fill=BOTH, expand=1)
 
-
-     
         # left side mods list
-        self.modListFrame = Frame(self.modBrowser,padx=0, pady=0)
-        modList_scroll = Scrollbar( self.modListFrame ) 
+        modListFrame =  Frame(modBrowser)
+        #modListFrame.pack(side=LEFT)
+        modList_scroll = Scrollbar(modListFrame) 
+        modList = self.modList = Listbox(modListFrame, selectmode=SINGLE, yscrollcommand = modList_scroll.set )  #activestyle=NONE,
+        modList_scroll.config(command=modList.yview)
+        modList.bind('<<ListboxSelect>>', self.showCurrentMod)
+        modList.pack(side = LEFT, fill=BOTH, expand=1, padx=4, pady=4)
         modList_scroll.pack(side = RIGHT, fill = Y) 
-        self.modList = Listbox(self.modListFrame, height=1, selectmode=SINGLE, activestyle=NONE,  yscrollcommand = modList_scroll.set )
-        self.modList.bind('<<ListboxSelect>>', self.showCurrentMod)
-        self.modList.pack(side = LEFT, fill=Y, expand=1, padx=0, pady=0 )  #expand=1, padx=4, pady=4)
-        modList_scroll.config(command=self.modList.yview)
+        modBrowser.add(modListFrame)
 
-        self.modListFrame.pack(side=LEFT, fill=Y, expand=True)
-        
         # right side mod info
-        self.modDetailsFrame = Frame(self.modBrowser,padx=4,pady=4)
-        frame = Frame(self.modDetailsFrame)
-        self.modEnableDisable = Button(frame, text="Enable", command=self.toggle_current_mod)
-        self.modEnableDisable.pack(side = RIGHT, padx=4, pady=4)
-        
-        self.modDetailsName = Label(frame, font="TkDefaultFont 14 bold", anchor=W)
-        self.modDetailsName.pack(fill = X, padx=4, pady=4)
-        frame.pack(fill = X, padx=4, pady=4)
-        
-        modDetails_scroll = Scrollbar( self.modDetailsFrame ) 
-        modDetails_scroll.pack(side = RIGHT, fill = Y) 
-
-        self.modDetailsDescription = Text(self.modDetailsFrame, wrap=WORD, font="TkDefaultFont", height=10)
-        self.modDetailsDescription.pack(side=LEFT, fill=BOTH, expand=1, padx=4, pady=4)
-        modDetails_scroll.config(command=self.modDetailsDescription.yview)
-
+        # TODO: this needs to be a vertical PanedWindow keeping the description above and mod config below.
+        modDetailsFrame = self.modDetailsFrame = Frame(modBrowser) #,padx=4,pady=4)
         self.modDetailsFrame.pack(fill=BOTH, expand=1, padx=4, pady=4)
 
-        self.modBrowser.pack(fill=BOTH, expand=1, padx=0, pady=0)
+        modDetailTopBar = Frame(modDetailsFrame)
+        modDetailTopBar.pack(side=TOP,fill=X,padx=4,pady=4)
+        self.modDetailsName = Label(modDetailTopBar, font="TkDefaultFont 14 bold", anchor=NW)
+        self.modDetailsName.pack(side=LEFT, padx=4, pady=4)
+
+        self.modEnableDisable = Button(modDetailTopBar, text="Enable", anchor=NE, command=self.toggle_current_mod)
+        self.modEnableDisable.pack(side = RIGHT, padx=4, pady=4)
+
+        self.modDetailsDescription = scrolledtext.ScrolledText(self.modDetailsFrame, wrap=WORD)
+        self.modDetailsDescription.pack(fill=BOTH, expand=1)
+
+        modBrowser.add(modDetailsFrame)
 
         # separator
         #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
-        ttk.Separator(self,orient='horizontal').pack(fill=X, padx=4, pady=8)
+        #ttk.Separator(self,orient='horizontal').pack(fill=X, padx=4, pady=8)
 
         ########################
         #### Action Buttons ####        
@@ -121,7 +124,8 @@ class Window(Frame):
         self.launchButton.pack(fill=X, padx=4, pady=4 )
 
         #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
-        self.spacehavenPicker = Frame(buttonFrame)#.pack(fill=X, padx=4, pady=4)
+        self.spacehavenPicker = Frame(buttonFrame)
+        self.spacehavenPicker.pack(fill=X, padx=4, pady=4)
         self.spacehavenBrowse = Button(self.spacehavenPicker, text="Find game...", command=self.browseForSpacehaven)
         self.spacehavenBrowse.pack(side = LEFT, padx=8, pady=4)
 
