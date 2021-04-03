@@ -51,44 +51,55 @@ class Window(Frame):
         self.master = master
 
         self.master.title("Space Haven Mod Loader v{}".format(version.version))
-        self.master.bind('<FocusIn>', self.focus)
+        # self.master.bind('<FocusIn>', self.focus)
 
         self.headerImage = PhotoImage(data=ui.header.image, width=1680, height=30)
         self.header = Label(self.master, bg='black', image=self.headerImage)
         self.header.pack(fill=X, padx=0, pady=0)
 
         self.pack(fill=BOTH, expand=1, padx=4, pady=4)
-
         
+        # Used later when binding events.
+        # This prevents some obscure bugs.
+        closure_self:Window = self
+
         # separator
         #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
 
         ##########################################################################################
         #### modBrowser - Top level container for the mod list, details, and config.          ####
         ##########################################################################################
-
-        # sashrelief values: RAISED, SUNKEN, FLAT, RIDGE, GROOVE, SOLID
+        
         modBrowser = self.modBrowser = PanedWindow(self
             , orient=HORIZONTAL
             , relief=GROOVE
             , borderwidth=4
             , sashcursor='sb_h_double_arrow'
-            , sashrelief=SOLID
+            , sashrelief=SOLID  #choices: RAISED, SUNKEN, FLAT, RIDGE, GROOVE, SOLID
             , sashwidth=8
-            , sashpad=8)
+            , sashpad=0 )
         modBrowser.pack(fill=BOTH, expand=1)
 
-        modList = self.modList = ScrolledListbox(modBrowser, selectmode=SINGLE , activestyle=NONE )
-        modList.bind('<<ListboxSelect>>', self.showCurrentMod)
+        modList = self.modList = ScrolledListbox(modBrowser, selectmode=SINGLE) # , activestyle=NONE )
+        def evt_ModList_ListboxSelect( evt ):
+            w = evt.widget
+            sel = w.curselection()
+            # Handle problem of this event fireing when Listbox loses focus.
+            if sel is None or len(sel)==0:
+                return
+            index = int(w.curselection()[0])
+            value = w.get(index)
+            closure_self.showCurrentMod(evt)
+
+        modList.bind('<<ListboxSelect>>', evt_ModList_ListboxSelect)
         modBrowser.add(modList)
 
         # right side mod info
         # TODO: this needs to be a vertical PanedWindow keeping the description above and mod config below.
         modDetailsFrame = self.modDetailsFrame = Frame(modBrowser) #,padx=4,pady=4)
-        self.modDetailsFrame.pack(fill=BOTH, expand=1, padx=4, pady=4)
+        #self.modDetailsFrame.pack(fill=BOTH, expand=1, padx=4, pady=4)
 
         modDetailTopBar = Frame(modDetailsFrame)
-        modDetailTopBar.pack(side=TOP,fill=X,padx=4,pady=4)
         self.modDetailsName = Label(modDetailTopBar, font="TkDefaultFont 14 bold", anchor=NW)
         self.modDetailsName.pack(side=LEFT, padx=4, pady=4)
 
@@ -97,6 +108,8 @@ class Window(Frame):
 
         self.modDetailsDescription = scrolledtext.ScrolledText(self.modDetailsFrame, wrap=WORD)
         self.modDetailsDescription.pack(side=BOTTOM,fill=BOTH, expand=1)
+
+        modDetailTopBar.pack(side=TOP,fill=X,padx=4,pady=4)
 
         modBrowser.add(modDetailsFrame)
 
@@ -145,8 +158,8 @@ class Window(Frame):
         self.modListOpenFolder = Button(buttonFrame, text="Open Mods Folder", command=self.openModFolder)
         self.modListOpenFolder.pack(side = RIGHT, expand = False, padx=8, pady=4)
 
-        self.modListRefresh = Button(buttonFrame, text="Refresh Mods", command=self.refreshModList)
-        self.modListRefresh.pack(side = RIGHT, expand = False, padx=8, pady=4)
+        #self.modListRefresh = Button(buttonFrame, text="Refresh Mods", command=self.refreshModList)
+        #self.modListRefresh.pack(side = RIGHT, expand = False, padx=8, pady=4)
         
         self.quickLaunchClear = Button(buttonFrame, text="Clear Quicklaunch file", command=self.clear_quick_launch)
         self.quickLaunchClear.pack(side = RIGHT, expand = False, padx=8, pady=4)
@@ -272,10 +285,10 @@ class Window(Frame):
             )
         )
     
-    def focus(self, _arg=None):
-        # disabled, refreshes too much and resets the selection
-        #self.refreshModList()
-        pass
+    #def focus(self, _arg=None):
+    #    # disabled, refreshes too much and resets the selection
+    #    # self.refreshModList()
+    #    pass
 
     def refreshModList(self):
         try:
@@ -319,8 +332,8 @@ class Window(Frame):
             selected = 0
         else:
             selected = self.modList.curselection()[0]
-        
-        return DatabaseHandler.getRegisteredMods()[self.modList.curselection()[0]]
+
+        return DatabaseHandler.getRegisteredMods()[selected]
             
     def showCurrentMod(self, _arg=None):
         self.showMod(self.selected_mod())

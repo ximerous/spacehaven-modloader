@@ -15,15 +15,14 @@ from tkinter.constants import RIGHT, LEFT, Y, BOTH
 
 __all__ = ['ScrolledListbox']
 
-
 class ScrolledListbox(Listbox):
-    def __init__(self, master=None, **kw):
+    def __init__(self, master=None, **kwargs):
         self.frame = Frame(master)
         self.vbar = Scrollbar(self.frame)
         self.vbar.pack(side=RIGHT, fill=Y)
 
-        kw.update({'yscrollcommand': self.vbar.set})
-        Listbox.__init__(self, self.frame, **kw)
+        kwargs.update({'yscrollcommand': self.vbar.set})
+        self.list = Listbox.__init__(self, self.frame, **kwargs)
         self.pack(side=LEFT, fill=BOTH, expand=True)
         self.vbar['command'] = self.yview
 
