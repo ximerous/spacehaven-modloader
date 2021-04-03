@@ -18,6 +18,7 @@ import ui.header
 import ui.launcher
 import ui.log
 import version
+from ui.scrolledlistbox import ScrolledListbox
 
 POSSIBLE_SPACEHAVEN_LOCATIONS = [
     # MacOS
@@ -80,16 +81,13 @@ class Window(Frame):
             , sashpad=8)
         modBrowser.pack(fill=BOTH, expand=1)
 
-        # left side mods list
-        modListFrame =  Frame(modBrowser)
-        #modListFrame.pack(side=LEFT)
-        modList_scroll = Scrollbar(modListFrame) 
-        modList = self.modList = Listbox(modListFrame, selectmode=SINGLE, yscrollcommand = modList_scroll.set )  #activestyle=NONE,
-        modList_scroll.config(command=modList.yview)
+        #modList_scroll = Scrollbar(modListFrame) 
+        modList = self.modList = ScrolledListbox(modBrowser, selectmode=SINGLE , activestyle=NONE )
+        #modList_scroll.config(command=modList.yview)
         modList.bind('<<ListboxSelect>>', self.showCurrentMod)
-        modList.pack(side = LEFT, fill=BOTH, expand=1, padx=4, pady=4)
-        modList_scroll.pack(side = RIGHT, fill = Y) 
-        modBrowser.add(modListFrame)
+        #modList.pack(side = LEFT, fill=BOTH, expand=1, padx=4, pady=4)
+        #modList_scroll.pack(side = RIGHT, fill = Y) 
+        modBrowser.add(modList)
 
         # right side mod info
         # TODO: this needs to be a vertical PanedWindow keeping the description above and mod config below.
@@ -105,7 +103,7 @@ class Window(Frame):
         self.modEnableDisable.pack(side = RIGHT, padx=4, pady=4)
 
         self.modDetailsDescription = scrolledtext.ScrolledText(self.modDetailsFrame, wrap=WORD)
-        self.modDetailsDescription.pack(fill=BOTH, expand=1)
+        self.modDetailsDescription.pack(side=BOTTOM,fill=BOTH, expand=1)
 
         modBrowser.add(modDetailsFrame)
 
