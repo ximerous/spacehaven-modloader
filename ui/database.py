@@ -93,6 +93,62 @@ class ModDatabase:
             raise Exception("Mod Database not ready.")
         return cls.__lastInstance
 
+
+class ModConfigVar:
+    """ An individual user configurable variable."""
+
+    def __init__(XML):
+        return self.__init__(
+                XML.get("name"),
+                XML.text,
+                XML.get("type"),
+                XML.get("size"),
+                XML.get("min"),
+                XML.get("max"),
+                XML.get("default"),
+                XML.get("value")
+        )
+
+    def __init__(self,name,desc,data_type,size,min,max,default,value):
+        self.name:str=name
+        self.desc:str=desc
+        self.type:str=data_type
+
+        def _cleanValue(type_name:str, val:any):
+            r_type:str = None
+            v:any = None
+            try:
+                if type_name is None or val is None:
+                    return None,None
+                r_type = strip(lower(type_name))
+                v=val
+                if r_type is None or r_type == "" or r_type.startswith("str"):
+                    r_type="str"
+                    v = val
+                elif r_type.startswith("int"):
+                    r_type="int"
+                    v = math.ceil(float(val))
+                elif r_type.startswith("float"):
+                    r_type="float"
+                    v = float(val)
+                elif r_type.startswith("bool"):
+                    r_type="bool"
+                    if strip(lower(val)) in [1,-1,'1','t','y','true','yes','on'] or bool(val):
+                        v=True
+                    else:
+                        v=False
+            except:
+                pass
+
+            return v, r_type
+
+        self.min:float=_cleanValue(self.type,min)
+        self.max:float=_cleanValue(self.type,max)
+        self.size:int=_cleanValue("int",size)
+        self.default=_cleanValue(self.type,default)
+        self.value=_cleanValue(self.type,value)
+
+
 DISABLED_MARKER = "disabled.txt"
 class Mod:
     """Details about a specific mod (name, description)"""

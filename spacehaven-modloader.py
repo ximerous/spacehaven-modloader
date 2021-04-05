@@ -53,12 +53,15 @@ class Window(Frame):
         self.master.title("Space Haven Mod Loader v{}".format(version.version))
         # self.master.bind('<FocusIn>', self.focus)
 
+
         self.headerImage = PhotoImage(data=ui.header.image, width=1680, height=30)
         self.header = Label(self.master, bg='black', image=self.headerImage)
         self.header.pack(fill=X, padx=0, pady=0)
 
         self.pack(fill=BOTH, expand=1, padx=4, pady=4)
-        
+
+        self.sizegrip = ttk.Sizegrip(master).pack(side=RIGHT)
+
         # Used later when binding events.
         # This prevents some obscure bugs.
         closure_self:Window = self
@@ -67,9 +70,9 @@ class Window(Frame):
         #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
 
         ##########################################################################################
-        #### modBrowser - Top level container for the mod list, details, and config.          ####
+        #### modBrowser - Center container for the mod list, details, and config.             ####
         ##########################################################################################
-        
+
         modBrowser = self.modBrowser = PanedWindow(self
             , orient=HORIZONTAL
             , relief=GROOVE
@@ -77,9 +80,10 @@ class Window(Frame):
             , sashcursor='sb_h_double_arrow'
             , sashrelief=SOLID  #choices: RAISED, SUNKEN, FLAT, RIDGE, GROOVE, SOLID
             , sashwidth=8
-            , sashpad=0 )
+            , sashpad=8 )
         modBrowser.pack(fill=BOTH, expand=1)
 
+        # MOD SELECTION LISTBOX (left pane)
         modList = self.modList = ScrolledListbox(modBrowser, selectmode=SINGLE) # , activestyle=NONE )
         def evt_ModList_ListboxSelect( evt ):
             w = evt.widget
@@ -94,10 +98,21 @@ class Window(Frame):
         modList.bind('<<ListboxSelect>>', evt_ModList_ListboxSelect)
         modBrowser.add(modList)
 
-        # right side mod info
-        # TODO: this needs to be a vertical PanedWindow keeping the description above and mod config below.
-        modDetailsFrame = self.modDetailsFrame = Frame(modBrowser) #,padx=4,pady=4)
-        #self.modDetailsFrame.pack(fill=BOTH, expand=1, padx=4, pady=4)
+        # MOD DETAILS CONTAINER (right pane)
+        # Ar vertical paned window inside a horizontal paned window.
+        modDetailsWindow = self.modDetailsWindow =  PanedWindow(self
+            , orient=VERTICAL
+            , relief=GROOVE
+            , borderwidth=4
+            , sashcursor='sb_v_double_arrow'
+            , sashrelief=SOLID  #choices: RAISED, SUNKEN, FLAT, RIDGE, GROOVE, SOLID
+            , sashwidth=8
+            , sashpad=4 )
+        modBrowser.add(modDetailsWindow)
+
+        # MOD DETAILS - Title and Description (top subpane)
+        modDetailsFrame = Frame(modDetailsWindow)
+        modDetailsWindow.add(modDetailsFrame)
 
         modDetailTopBar = Frame(modDetailsFrame)
         self.modDetailsName = Label(modDetailTopBar, font="TkDefaultFont 14 bold", anchor=NW)
@@ -106,12 +121,15 @@ class Window(Frame):
         self.modEnableDisable = Button(modDetailTopBar, text="Enable", anchor=NE, command=self.toggle_current_mod)
         self.modEnableDisable.pack(side = RIGHT, padx=4, pady=4)
 
-        self.modDetailsDescription = scrolledtext.ScrolledText(self.modDetailsFrame, wrap=WORD)
+        self.modDetailsDescription = scrolledtext.ScrolledText(modDetailsFrame, wrap=WORD)
         self.modDetailsDescription.pack(side=BOTTOM,fill=BOTH, expand=1)
 
-        modDetailTopBar.pack(side=TOP,fill=X,padx=4,pady=4)
+        #modDetailTopBar.pack(side=TOP,fill=X,padx=4,pady=4)
+        modDetailsWindow.add(modDetailsFrame)
 
-        modBrowser.add(modDetailsFrame)
+        # Create Bottom frame placeholder for later.
+        self.modConfigFrame:Frame = Frame(modDetailsWindow)
+
 
         # separator
         #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
@@ -127,7 +145,7 @@ class Window(Frame):
         # launcher
         self.launchButton_default_text = "LAUNCH!"
         self.launchButton = Button(buttonFrame, text=self.launchButton_default_text, command=self.launch_wrapper, height = 2, font=font.Font(size = 14, weight = "bold") )
-        #self.launchButton.pack(fill=X, padx=4, pady=4 )
+        self.launchButton.pack(fill=X, padx=4, pady=4 )
 
         #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
         self.spacehavenPicker = Frame(buttonFrame)
@@ -158,8 +176,8 @@ class Window(Frame):
         self.modListOpenFolder = Button(buttonFrame, text="Open Mods Folder", command=self.openModFolder)
         self.modListOpenFolder.pack(side = RIGHT, expand = False, padx=8, pady=4)
 
-        #self.modListRefresh = Button(buttonFrame, text="Refresh Mods", command=self.refreshModList)
-        #self.modListRefresh.pack(side = RIGHT, expand = False, padx=8, pady=4)
+        self.modListRefresh = Button(buttonFrame, text="Refresh Mods", command=self.refreshModList)
+        self.modListRefresh.pack(side = RIGHT, expand = False, padx=8, pady=4)
         
         self.quickLaunchClear = Button(buttonFrame, text="Clear Quicklaunch file", command=self.clear_quick_launch)
         self.quickLaunchClear.pack(side = RIGHT, expand = False, padx=8, pady=4)
@@ -357,7 +375,29 @@ class Window(Frame):
         self.modDetailsDescription.delete(1.0, END)
         self.modDetailsDescription.insert(END, description)
         self.modDetailsDescription.config(state="disabled")
+
+    def Create_ModConfigVariableEntry(self, varFrame:Frame, mod, v):
+        print(mod)
+        print(v)
+        return
+
+    def update_mod_config_ui(self,mod):
+        try:
+            self.modConfigFrame.destroy()
+        except:
+            pass
         
+        try:
+            if len(mod.variables)>0:
+                self.modConfigFrame:Frame = Frame(self.modDetailsWindow)
+                self.modDetailsWindow.add(self.modConfigFrame)
+        except:
+            return
+
+        for v in mod.variables:
+            self.Create_ModConfigVariableEntry( self.modConfigFrame, mod, v )
+
+
     def showMod(self, mod):
         if not mod:
             return self.showModError("No mods found", "Please install some mods into your mods folder.")
@@ -372,6 +412,7 @@ class Window(Frame):
         self.modDetailsName.config(text = title)
         self.modEnableDisable.config(text = command_label)
         self.update_description(mod.getDescription())
+        self.update_mod_config_ui(mod)
     
     def showModError(self, title, error):
         self.modDetailsName.config(text = title)
