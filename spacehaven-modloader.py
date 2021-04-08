@@ -376,12 +376,14 @@ class Window(Frame):
         self.modDetailsDescription.insert(END, description)
         self.modDetailsDescription.config(state="disabled")
 
-    def Create_ModConfigVariableEntry(self, varFrame:Frame, mod, v):
-        print(mod)
-        print(v)
+    def create_ModConfigVariableEntry(self, configFrame:Frame, mod:ui.database.Mod, var:ui.database.ModConfigVar):
+        valFrame = Frame(configFrame)
+        Label(valFrame,text=var.desc).pack(side=LEFT)
+        Entry(valFrame,textvariable=var.tk_value).pack(side=RIGHT)
+        valFrame.pack(fill=X)
         return
 
-    def update_mod_config_ui(self,mod):
+    def update_mod_config_ui(self,mod:ui.database.Mod):
         try:
             self.modConfigFrame.destroy()
         except:
@@ -389,16 +391,19 @@ class Window(Frame):
         
         try:
             if len(mod.variables)>0:
-                self.modConfigFrame:Frame = Frame(self.modDetailsWindow)
-                self.modDetailsWindow.add(self.modConfigFrame)
+                self.modConfigFrame = Frame(self.modDetailsWindow)
+            else:
+                return
         except:
             return
 
         for v in mod.variables:
-            self.Create_ModConfigVariableEntry( self.modConfigFrame, mod, v )
+            self.create_ModConfigVariableEntry( self.modConfigFrame, mod, v)
+
+        self.modDetailsWindow.add(self.modConfigFrame)
 
 
-    def showMod(self, mod):
+    def showMod(self, mod:ui.database.Mod):
         if not mod:
             return self.showModError("No mods found", "Please install some mods into your mods folder.")
         

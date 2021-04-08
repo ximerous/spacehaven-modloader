@@ -10,6 +10,7 @@ import version
 import ui.gameinfo
 import ui.log
 
+import tkinter as tk
 
 class ModDatabase:
     """Information about a collection of mods"""
@@ -95,59 +96,65 @@ class ModDatabase:
 
 
 class ModConfigVar:
-    """ An individual user configurable variable."""
+    """ An individual user configurable variable.  Presently a simple string search-replace. Designed to support more advanced features."""
 
-    def __init__(XML):
-        return self.__init__(
-                XML.get("name"),
-                XML.text,
-                XML.get("type"),
-                XML.get("size"),
-                XML.get("min"),
-                XML.get("max"),
-                XML.get("default"),
-                XML.get("value")
+    def __init__(self, XML:ElementTree.Element):
+        self.loadXml(
+                XML.get("name"),        # Internal Name, used in search-replace of the XML.
+                XML.text,               # Description shown in UI to user.
+                XML.get("type"),        # Optional Data type, as int, float, str, or bool. TODO:enforce.
+                XML.get("size"),        # Optional Size. Number of characters permitted in string.  TODO:enforce.
+                XML.get("min"),         # Optional minimum value. TODO:enforce.
+                XML.get("max"),         # Optional maximum value. TODO:enforce.
+                XML.get("default"),     # Optional default value. 
+                XML.get("value")        # User set value, and optional initial value. Can be different than default.
         )
 
-    def __init__(self,name,desc,data_type,size,min,max,default,value):
+    def loadXml(self, name:str, desc:str, data_type:str, size, min, max, default, value):
         self.name:str=name
         self.desc:str=desc
         self.type:str=data_type
 
         def _cleanValue(type_name:str, val:any):
-            r_type:str = None
-            v:any = None
+            if not type_name:
+                self.type="str"
+            type_name = type_name.strip().lower()
+            v:any = val
             try:
-                if type_name is None or val is None:
-                    return None,None
-                r_type = strip(lower(type_name))
-                v=val
-                if r_type is None or r_type == "" or r_type.startswith("str"):
-                    r_type="str"
+                if type_name is None or type_name == "" or type_name.startswith("str"):
+                    self.type="str"
                     v = val
-                elif r_type.startswith("int"):
-                    r_type="int"
-                    v = math.ceil(float(val))
-                elif r_type.startswith("float"):
-                    r_type="float"
+                elif type_name.startswith("int"):
+                    self.type="int"
+                    v = int(val)
+                elif type_name.startswith("float"):
+                    self.type="float"
                     v = float(val)
-                elif r_type.startswith("bool"):
-                    r_type="bool"
-                    if strip(lower(val)) in [1,-1,'1','t','y','true','yes','on'] or bool(val):
+                elif type_name.startswith("bool"):
+                    self.type="bool"
+                    if strip(lower(val)) in [1,-1,'1','t','y','true','yes','on']:
                         v=True
                     else:
                         v=False
             except:
                 pass
 
-            return v, r_type
+            return v
 
         self.min:float=_cleanValue(self.type,min)
         self.max:float=_cleanValue(self.type,max)
         self.size:int=_cleanValue("int",size)
-        self.default=_cleanValue(self.type,default)
-        self.value=_cleanValue(self.type,value)
-
+        self.default:str=_cleanValue(self.type,default)
+        self.value:str=_cleanValue(self.type,value)
+        if self.value is None:
+            self.value = value = self.default
+        
+        # For use on the UI
+        self.tk_value = tk.StringVar()
+        if self.value is None:
+            self.tk_value.set("")
+        else:
+            self.tk_value.set(self.value)
 
 DISABLED_MARKER = "disabled.txt"
 class Mod:
@@ -200,21 +207,14 @@ class Mod:
             # feature request #4, user configuration.
             self.config_xml = mod.find("config")
             if self.config_xml:
-                for var in self.config_xml.findall("var"):
-                    varname = var.get("name")
-                    if varname:
-                        self.variables[ varname ] = {
-                            "name" : varname,
-                            "desc" : var.text,
-                            "type" : var.get("type"),
-                            "size" : var.get("size"),
-                            "min"  : var.get("min"),
-                            "max"  : var.get("max"),
-                            "default" : var.get("default"),
-                            "value" : var.get("value")
-                        }
-                        if not self.variables[varname]["value"]:
-                            self.variables[varname]["value"] = self.variables[varname]["default"]
+                all_var = self.config_xml.findall("var")
+                if all_var and len(all_var)>0:
+                    self.variables=[]
+                    for var in all_var:
+                        confVar = ModConfigVar(var)
+                        if confVar:
+                            self.variables.append(confVar)
+                        confVar=None
 
             # TODO: Load past user config values here.
 
