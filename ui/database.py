@@ -115,13 +115,14 @@ class ModConfigVar:
         self.desc:str=desc
         self.type:str=data_type
 
-        def _cleanValue(type_name:str, val:any):
-            if not type_name:
+        def _cleanValue(val:any):
+            if not self.type:
                 self.type="str"
             type_name = type_name.strip().lower()
             v:any = val
             try:
-                if type_name is None or type_name == "" or type_name.startswith("str"):
+                # Be very generous on string type.
+                if type_name is None or type_name == "" or type_name.startswith("str") or type_name.startswith("text") or type_name.startswith("txt"):
                     self.type="str"
                     v = val
                 elif type_name.startswith("int"):
@@ -132,6 +133,7 @@ class ModConfigVar:
                     v = float(val)
                 elif type_name.startswith("bool"):
                     self.type="bool"
+                    # Be generous on boolean values.
                     if strip(lower(val)) in [1,-1,'1','t','y','true','yes','on']:
                         v=True
                     else:
@@ -150,11 +152,15 @@ class ModConfigVar:
             self.value = value = self.default
         
         # For use on the UI
+        def _value_update(*args):
+            s = str(args)
+            self.value = _cleanValue(self.type, self.tk_value.get() )
         self.tk_value = tk.StringVar()
         if self.value is None:
             self.tk_value.set("")
         else:
             self.tk_value.set(self.value)
+        self.tk_value.trace('w',_value_update)
 
 DISABLED_MARKER = "disabled.txt"
 class Mod:

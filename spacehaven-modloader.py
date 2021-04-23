@@ -120,14 +120,15 @@ class Window(Frame):
 
         self.modEnableDisable = Button(modDetailTopBar, text="Enable", anchor=NE, command=self.toggle_current_mod)
         self.modEnableDisable.pack(side = RIGHT, padx=4, pady=4)
+        modDetailTopBar.pack(side=TOP,fill=X,padx=4,pady=4)
 
         self.modDetailsDescription = scrolledtext.ScrolledText(modDetailsFrame, wrap=WORD)
-        self.modDetailsDescription.pack(side=BOTTOM,fill=BOTH, expand=1)
+        self.modDetailsDescription.pack(side=TOP,fill=BOTH, expand=TRUE)
 
-        #modDetailTopBar.pack(side=TOP,fill=X,padx=4,pady=4)
-        modDetailsWindow.add(modDetailsFrame)
+        modDetailsWindow.add(modDetailsFrame,minsize=100)
 
         # Create Bottom frame placeholder for later.
+        # This is populated when a mod is selected in the Listbox.
         self.modConfigFrame:Frame = Frame(modDetailsWindow)
 
 
@@ -377,9 +378,14 @@ class Window(Frame):
         self.modDetailsDescription.config(state="disabled")
 
     def create_ModConfigVariableEntry(self, configFrame:Frame, mod:ui.database.Mod, var:ui.database.ModConfigVar):
+        # TODO: change this to use grid instead of pack for better presentation.
         valFrame = Frame(configFrame)
+        # label for variable description
         Label(valFrame,text=var.desc).pack(side=LEFT)
+        # Entry for value (currently only text)
         Entry(valFrame,textvariable=var.tk_value).pack(side=RIGHT)
+        # label for debug information
+        #Label(valFrame,text="").pack(side=RIGHT)
         valFrame.pack(fill=X)
         return
 
@@ -400,7 +406,9 @@ class Window(Frame):
         for v in mod.variables:
             self.create_ModConfigVariableEntry( self.modConfigFrame, mod, v)
 
-        self.modDetailsWindow.add(self.modConfigFrame)
+        self.modConfigFrame.update()
+        self.modDetailsWindow.add(self.modConfigFrame, minsize=self.modConfigFrame.winfo_reqheight())
+        self.modDetailsWindow.update()
 
 
     def showMod(self, mod:ui.database.Mod):
@@ -602,12 +610,12 @@ def handleException(type, value, trace):
 
 if __name__ == "__main__":
     root = Tk()
-    root.geometry("890x639")
+    root.geometry("890x669")
     root.report_callback_exception = handleException
 
     # HACK: Button labels don't appear until the window is resized with py2app
     def fixNoButtonLabelsBug():
-        root.geometry("890x640")
+        root.geometry("890x670")
 
     root.resizable(True, True)
 
