@@ -110,57 +110,49 @@ class ModConfigVar:
                 XML.get("value")        # User set value, and optional initial value. Can be different than default.
         )
 
+    # Clean entry for different value types.
+    def _cleanValue(self, val:any):
+        if not self.type:
+            self.type="str"
+        type_name = self.type.strip().lower()
+        v:any = val
+        try:
+            # Be very generous on string type.
+            if type_name is None or type_name == "" or type_name.startswith("str") or type_name.startswith("text") or type_name.startswith("txt"):
+                self.type="str"
+                v = val
+            elif type_name.startswith("int"):
+                self.type="int"
+                v = int(val)
+            elif type_name.startswith("float"):
+                self.type="float"
+                v = float(val)
+            elif type_name.startswith("bool"):
+                self.type="bool"
+                # Be generous on boolean values.
+                if strip(lower(val)) in [1,-1,'1','t','y','true','yes','on']:
+                    v=True
+                else:
+                    v=False
+        except:
+            return None
+
+        return v
+
+
     def loadXml(self, name:str, desc:str, data_type:str, size, min, max, default, value):
         self.name:str=name
         self.desc:str=desc
         self.type:str=data_type
 
-        def _cleanValue(val:any):
-            if not self.type:
-                self.type="str"
-            type_name = type_name.strip().lower()
-            v:any = val
-            try:
-                # Be very generous on string type.
-                if type_name is None or type_name == "" or type_name.startswith("str") or type_name.startswith("text") or type_name.startswith("txt"):
-                    self.type="str"
-                    v = val
-                elif type_name.startswith("int"):
-                    self.type="int"
-                    v = int(val)
-                elif type_name.startswith("float"):
-                    self.type="float"
-                    v = float(val)
-                elif type_name.startswith("bool"):
-                    self.type="bool"
-                    # Be generous on boolean values.
-                    if strip(lower(val)) in [1,-1,'1','t','y','true','yes','on']:
-                        v=True
-                    else:
-                        v=False
-            except:
-                pass
-
-            return v
-
-        self.min:float=_cleanValue(self.type,min)
-        self.max:float=_cleanValue(self.type,max)
-        self.size:int=_cleanValue("int",size)
-        self.default:str=_cleanValue(self.type,default)
-        self.value:str=_cleanValue(self.type,value)
+        self.min:float=float(min) if min else None
+        self.max:float=float(max) if max else None
+        self.size:int=int(size) if size else None
+        self.default:str=self._cleanValue(default)
+        self.value:str=self._cleanValue(value)
         if self.value is None:
             self.value = value = self.default
         
-        # For use on the UI
-        def _value_update(*args):
-            s = str(args)
-            self.value = _cleanValue(self.type, self.tk_value.get() )
-        self.tk_value = tk.StringVar()
-        if self.value is None:
-            self.tk_value.set("")
-        else:
-            self.tk_value.set(self.value)
-        self.tk_value.trace('w',_value_update)
 
 DISABLED_MARKER = "disabled.txt"
 class Mod:

@@ -378,14 +378,27 @@ class Window(Frame):
         self.modDetailsDescription.config(state="disabled")
 
     def create_ModConfigVariableEntry(self, configFrame:Frame, mod:ui.database.Mod, var:ui.database.ModConfigVar):
-        # TODO: change this to use grid instead of pack for better presentation.
+        # TODO: Maybe change this to use grid instead of pack for better presentation?
         valFrame = Frame(configFrame)
         # label for variable description
         Label(valFrame,text=var.desc).pack(side=LEFT)
+
         # Entry for value (currently only text)
-        Entry(valFrame,textvariable=var.tk_value).pack(side=RIGHT)
+        tk_value = StringVar(valFrame, value=var.value)
+        def _value_update(name, index, mode, mod, var, tk_value):
+            var.value = tk_value.get()
+            #var.value = var._cleanValue(tk_value.get())
+        #def _entry_leave(mod, var, tk_value):
+        #    tk_value.set( var.value is not None or '')
+
+        tk_value.trace('w', lambda name,index,mode : _value_update(name,index,mode,mod,var,tk_value) )
+        entryValue = Entry(valFrame,textvariable=tk_value)
+        entryValue.pack(side=RIGHT)
+        #entryValue.bind("<Leave>", lambda *args : _entry_leave(mod,var,tk_value) )
+
         # label for debug information
         #Label(valFrame,text="").pack(side=RIGHT)
+
         valFrame.pack(fill=X)
         return
 
