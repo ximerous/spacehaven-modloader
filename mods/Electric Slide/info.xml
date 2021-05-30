@@ -13,7 +13,7 @@
 	<description><![CDATA[
 Adjust all power buildings.
 Multiply generator,solar,battery,and node values by the specified amount.
-Generator output and Solar ouput are separate.
+Generator output and Solar output are separate.
 All other variables apply the multiplier to all power related buildings.
 
 Only enter numeric values.
