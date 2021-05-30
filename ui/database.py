@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import distutils.version
+from operator import truediv
 import os
 from xml.etree import ElementTree
 
@@ -111,6 +112,7 @@ class ModConfigVar:
         )
 
     # Clean entry for different value types.
+    # TODO: fully implement and enforce.
     def _cleanValue(self, val:any):
         if not self.type:
             self.type="str"
@@ -130,7 +132,7 @@ class ModConfigVar:
             elif type_name.startswith("bool"):
                 self.type="bool"
                 # Be generous on boolean values.
-                if strip(lower(val)) in [1,-1,'1','t','y','true','yes','on']:
+                if str(val).strip().lower() in [1,-1,'1','-1','t','y','true','yes','on']:
                     v=True
                 else:
                     v=False
@@ -168,6 +170,7 @@ class Mod:
         self._mappedIDs = []
         self.enabled = not os.path.isfile(os.path.join(self.path, DISABLED_MARKER))
         self.variables:dict = {}
+        self.info_file = info_file
         self.loadInfo(info_file)
         
 
@@ -192,6 +195,7 @@ class Mod:
             info = ElementTree.parse(infoFile)
             mod = info.getroot()
 
+            self.info_xml = info
             self.name = _sanitize(mod.find("name"))
             self.description = _sanitize(mod.find("description"))
             
@@ -214,8 +218,6 @@ class Mod:
                             self.variables.append(confVar)
                         confVar=None
 
-            # TODO: Load past user config values here.
-
             self.verifyLoaderVersion(mod)
             self.verifyGameVersion(mod, self.gameInfo)
 
@@ -226,7 +228,20 @@ class Mod:
             ui.log.log("    Failed to parse info file")
 
         ui.log.log("    Finished loading {}".format(self.name))
-    
+
+    def saveConfig(self):         
+        if self.config_xml:
+            all_var = self.config_xml.findall("var")
+            if all_var and len(all_var)>0:
+                for var in self.variables:
+                    v = self.config_xml.findall("./var[@name='" + var.name + "']")
+                    if v :
+                        v[0].set("value",str(var.value))
+
+            # config_xml is a section of info_xml
+            self.info_xml.write(self.info_file)
+
+
     def enable(self):
         try:
             os.unlink(os.path.join(self.path, DISABLED_MARKER))

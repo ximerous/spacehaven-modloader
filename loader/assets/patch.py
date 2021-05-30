@@ -155,6 +155,7 @@ def doPatches(coreLib, modLib, mod:dict):
         if mod.variables:
             for var in mod.variables:
                 patchArgs["value"].text = patchArgs["value"].text.replace( str(var.name), str(var.value) )
+            
 
         PatchDispatch(pType)(patchArgs)
 

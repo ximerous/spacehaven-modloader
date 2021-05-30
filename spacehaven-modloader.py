@@ -387,14 +387,10 @@ class Window(Frame):
         tk_value = StringVar(valFrame, value=var.value)
         def _value_update(name, index, mode, mod, var, tk_value):
             var.value = tk_value.get()
-            #var.value = var._cleanValue(tk_value.get())
-        #def _entry_leave(mod, var, tk_value):
-        #    tk_value.set( var.value is not None or '')
 
         tk_value.trace('w', lambda name,index,mode : _value_update(name,index,mode,mod,var,tk_value) )
         entryValue = Entry(valFrame,textvariable=tk_value)
         entryValue.pack(side=RIGHT)
-        #entryValue.bind("<Leave>", lambda *args : _entry_leave(mod,var,tk_value) )
 
         # label for debug information
         #Label(valFrame,text="").pack(side=RIGHT)
@@ -415,6 +411,8 @@ class Window(Frame):
                 return
         except:
             return
+
+        # TODO: Reset to default button.
 
         for v in mod.variables:
             self.create_ModConfigVariableEntry( self.modConfigFrame, mod, v)
@@ -593,9 +591,18 @@ class Window(Frame):
     
     def patchAndLaunch(self):
         #activeModPaths = [mod.path for mod in DatabaseHandler.getActiveMods()]
+
+        activeMods = DatabaseHandler.getActiveMods()
+
+        # If any active mods have variables, save them.
+        for mod in activeMods:
+            if mod.variables:
+                #mod.info_xml.write(mod.info_file)
+                mod.saveConfig()
+
         
         try:
-            loader.load.load(self.jarPath, DatabaseHandler.getActiveMods(), self.current_mods_signature())
+            loader.load.load(self.jarPath, activeMods, self.current_mods_signature())
             ui.launcher.launchAndWait(self.gamePath)
             loader.load.unload(self.jarPath)
         except Exception as ex:
