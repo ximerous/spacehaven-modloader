@@ -392,11 +392,25 @@ class Window(Frame):
         entryValue = Entry(valFrame,textvariable=tk_value)
         entryValue.pack(side=RIGHT)
 
+        # Link the UI variable back to the config variable for later.
+        var.ui_stringvar = tk_value
+
         # label for debug information
         #Label(valFrame,text="").pack(side=RIGHT)
 
         valFrame.pack(fill=X)
         return
+
+    def reset_ModConfigVariables(self):
+        mod = self.selected_mod()
+        if not mod or not mod.variables:
+            return
+        for var in mod.variables:
+            var.value = var.default
+            var.ui_stringvar.set(var.default)
+        self.modConfigFrame.update()
+        # TODO: how to set entry boxes to defaults?
+
 
     def update_mod_config_ui(self,mod:ui.database.Mod):
         try:
@@ -412,7 +426,11 @@ class Window(Frame):
         except:
             return
 
-        # TODO: Reset to default button.
+        # Reset button at top.
+        resetFrame = Frame(self.modConfigFrame)
+        resetButton = Button(resetFrame, text="Reset to Defaults", anchor=NE, command=self.reset_ModConfigVariables)
+        resetButton.pack(side = RIGHT, padx=4, pady=4)
+        resetFrame.pack(fill=X)
 
         for v in mod.variables:
             self.create_ModConfigVariableEntry( self.modConfigFrame, mod, v)
