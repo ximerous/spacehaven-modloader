@@ -409,8 +409,6 @@ class Window(Frame):
             var.value = var.default
             var.ui_stringvar.set(var.default)
         self.modConfigFrame.update()
-        # TODO: how to set entry boxes to defaults?
-
 
     def update_mod_config_ui(self,mod:ui.database.Mod):
         try:
