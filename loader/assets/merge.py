@@ -349,6 +349,7 @@ def doMerges(coreLib, modLib, mod: str):
         "/data/Product": "eid",
         "/data/Randomizer": "id",
         "/data/RandomShip": "id",
+        "/data/Robot":"cid",                   #
         "/data/RoofExpPackage": "id",          #
         "/data/Room": "rid",
         "/data/Sector": "id",
