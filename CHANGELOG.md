@@ -1,7 +1,55 @@
 # Change Log
+
 ## vNext_Version
-- Annotate more fields in `haven` file
-- New annotation type: `_linkedBy` tag indicates references to the tagged object.
+- Example mods for the new mod sections.
+
+## v0.10.0
+### GitHub Issues Resolved
+- #4 Add mod configuration options
+- #5 Possible issue during CIM generation
+- #7 Patch operation Add doesn't adhere to the PatchOperationAdd standard
+- #19 Mod loader issue
+### UI Changes
+- List Box now has a scroll bar.
+- Description frame now has a scroll bar.
+- List Box and Description now can be resized.
+- Small window sizes are handled better.
+- Default window size increased.
+### New Modifiable Sections
+- Explosion
+- FloorExpPackage
+- GameScenario
+- Robot
+- RoofExpPackage
+- Tech
+- TechTree
+### Mod Config Variables
+- Modders can create variables that are user configurable.
+- Variable values are saved at time of launch.
+- Variables can be reset to defaults.
+- Example mods included: "Electric Slide", "Engine Tuner", and "Robot Work".
+- Known Issues - Variables do NOT have UI validation.
+- Known Issues - All variables are a simple search-replace.
+### Improved Annotations
+- "Element" entries now have a "_linkedBy" that lists what Elements link to them.
+- "Element" entries that produce or consume a resource now annotate that resource with its name.
+- "Product" entries now have annotations for their needs and output.
+- "DataLogFragment" now have an annotation with the file path.
+- "GameScenario" now have name annotation.
+- "SubCat" now have annotations.
+- "PersonalitySettings/attributes/l" now annotated.
+- "DifficultySettings" now have annotation for all resources and items.
+- "Faction" entries now annotated.
+- "Craft" now have name annotation.
+- "DataLog" now have name annotation.
+- "BackStory" now have name annotation.
+- "TradingValues" entries now annotated with resource name.
+- "CharacterTrait" now have name annotation.
+- "CharacterCondition" now have name annotation.
+- "MainCat" now have annotations.
+- "TechTree" entries now have items annotation.
+- "Robot" cost and repair elements are annotated with element name.
+- And some others.
 
 ## v0.9.1
 - BUGFIX: AttributeAdd patch operations were universally failing due to missing variable.

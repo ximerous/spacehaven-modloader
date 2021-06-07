@@ -1,12 +1,12 @@
 <mod>
 	<name>Electric Slide</name>
-	<author>WP</author>
+	<author>WP#8462</author>
 
 	<gameVersions>
-		<v>0.11.2</v>
+		<v>0.12.0</v>
 	</gameVersions>
 
-	<minimumLoaderVersion>0.9.2</minimumLoaderVersion>
+	<minimumLoaderVersion>0.10.0</minimumLoaderVersion>
 
 	<version>21.04.23</version>
 

@@ -7,12 +7,14 @@
 		<v>0.12.0</v>
 	</gameVersions>
 
-	<minimumLoaderVersion>0.9.2</minimumLoaderVersion>
+	<minimumLoaderVersion>0.10.0</minimumLoaderVersion>
 
 	<version>21.04.23</version>
 
 	<description>
 Adjust stats for all engines using multipliers.
+
+A simple example of mod variables using multipliers.
 
 "Mass Capacity" is self explanatory.
 
