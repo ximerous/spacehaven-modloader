@@ -1,7 +1,8 @@
 # Change Log
 
 ## vNext_Version
-- Example mods for the new mod sections.
+- Fix legacy mod examples.
+- More complete mod examples.
 
 ## v0.10.0
 ### GitHub Issues Resolved
@@ -50,6 +51,8 @@
 - "TechTree" entries now have items annotation.
 - "Robot" cost and repair elements are annotated with element name.
 - And some others.
+### Other
+- Use of Python pip module "steamfiles" was removed.
 
 ## v0.9.1
 - BUGFIX: AttributeAdd patch operations were universally failing due to missing variable.
