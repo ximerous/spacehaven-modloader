@@ -9,8 +9,9 @@ import winreg
 from collections import OrderedDict
 from tkinter import *
 from tkinter import filedialog, messagebox, ttk, font, scrolledtext
-from steamfiles import acf
+#from steamfiles import acf
 
+import re
 import loader.extract
 import loader.load
 import ui.database
@@ -192,7 +193,7 @@ class Window(Frame):
         self.gamePath = None
         self.jarPath = None
         self.modPath = None
-        
+        '''
         # Open previous location if known
         try:
             with open("previous_spacehaven_path.txt", 'r') as f:
@@ -202,11 +203,14 @@ class Window(Frame):
                     return
         except FileNotFoundError:
             ui.log.log("Unable to get last space haven location. Autolocating again.")
-        
+        '''
         # Steam based locator (Windows)
         try:
-            registry_path = "SOFTWARE\\WOW6432Node\\Valve\\Steam" if (platform.architecture()[0] == "64bit") else "SOFTWARE\\Valve\\Steam"
-            steam_path = winreg.QueryValueEx(winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, registry_path), "InstallPath")[0]
+            registry_path:str = "SOFTWARE\\WOW6432Node\\Valve\\Steam" if (platform.architecture()[0] == "64bit") else "SOFTWARE\\Valve\\Steam"
+            steam_path:str = winreg.QueryValueEx(winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, registry_path), "InstallPath")[0]
+            spacehaven_exe:str = r"\steamapps\common\SpaceHaven\spacehaven.exe"
+
+            ''' DEPRECATED
             library_folders = acf.load(open(steam_path + "\\steamapps\\libraryfolders.vdf"), wrapper=OrderedDict)
             locations = [steam_path + "\\steamapps\\common\\SpaceHaven\\spacehaven.exe"]
             for key, value in library_folders["LibraryFolders"].items():
@@ -215,8 +219,24 @@ class Window(Frame):
                 if os.path.exists(location):
                     self.locateSpacehaven(location)
                     return
+            '''
+
+            def vdf_path_parse(libfile):
+                filestring:str = open(steam_path + r"\steamapps\libraryfolders.vdf").read()
+                paths = re.findall(r'\s*\"path\"\s*\"([^\"]*)', filestring)                      
+                return paths
+
+            library_folders = vdf_path_parse(open(steam_path + r"\steamapps\libraryfolders.vdf"))
+            locations = [steam_path + spacehaven_exe]
+            for value in library_folders:
+                locations.append( value.replace( "\\\\" , "\\" ) + spacehaven_exe)
+            for location in locations:
+                if os.path.exists(location):
+                    self.locateSpacehaven(location)
+                    return
+
         except FileNotFoundError:
-            ui.log.log("Unable to locate Steam registry keys, aborting Steam autolocator")
+            ui.log.log("Unable to locate Steam registry keys or library paths, aborting Steam autolocator")
 
         for location in POSSIBLE_SPACEHAVEN_LOCATIONS:
             try: 
