@@ -193,7 +193,7 @@ class Window(Frame):
         self.gamePath = None
         self.jarPath = None
         self.modPath = None
-        '''
+
         # Open previous location if known
         try:
             with open("previous_spacehaven_path.txt", 'r') as f:
@@ -203,7 +203,7 @@ class Window(Frame):
                     return
         except FileNotFoundError:
             ui.log.log("Unable to get last space haven location. Autolocating again.")
-        '''
+
         # Steam based locator (Windows)
         try:
             registry_path:str = "SOFTWARE\\WOW6432Node\\Valve\\Steam" if (platform.architecture()[0] == "64bit") else "SOFTWARE\\Valve\\Steam"
