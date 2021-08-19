@@ -4,6 +4,7 @@ import sys
 
 import version
 
+
 class Logger:
     """Logger that writes to both a local logfile and one in the game mods/ folder"""
     def __init__(self):

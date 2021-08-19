@@ -1,11 +1,12 @@
 
 import os
 
-import loader.assets.library
-import loader.assets.explode
-import loader.assets.annotate
-
 import ui.log
+
+import loader.assets.annotate
+import loader.assets.explode
+import loader.assets.library
+
 
 def extract(jarPath, corePath):
     """Extract and annotate game assets"""

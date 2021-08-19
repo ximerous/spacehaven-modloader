@@ -1,6 +1,7 @@
+import copy
+
 import lxml.etree
 import ui.log
-import copy
 
 
 def AttributeSet(patchArgs):
@@ -70,8 +71,10 @@ def NodeAdd(patchArgs):
     currentCoreLibElems = patchArgs["coreLibElems"]
     value = patchArgs["value"]
     for elem in currentCoreLibElems:
-        lastelemIDX = len(elem.getchildren())
-        elem.insert(lastelemIDX + 1, copy.deepcopy(value[0]))
+        lastElemIDX = len(elem.getchildren())
+        for node in value:
+            lastElemIDX += 1
+            elem.insert(lastElemIDX, copy.deepcopy(node))
 
 
 def NodeInsert(patchArgs):
@@ -83,7 +86,9 @@ def NodeInsert(patchArgs):
     for elem in currentCoreLibElems:
         parent = elem.find('./..')
         elemIDX = parent.index(elem)
-        parent.insert(elemIDX + 1, copy.deepcopy(value[0]))
+        for node in value:
+            elemIDX += 1
+            parent.insert(elemIDX, copy.deepcopy(node))
 
 
 def NodeRemove(patchArgs):
@@ -126,7 +131,8 @@ def PatchDispatch(pType):
     """Return the correct PatchOperation function"""
     return patchDispatcher.get(pType,BadOp)
 
-def doPatches(coreLib, modLib, mod: str):
+def doPatches(coreLib, modLib, mod:dict):
+
     # Helper function
     def doPatchType(patch: lxml.etree._Element, location: str):
         """Execute a single patch. Provided to reduce indentation level"""
@@ -139,11 +145,18 @@ def doPatches(coreLib, modLib, mod: str):
             ui.log.log(f"    Unable to perform patch. XPath found no results {xpath}")
             return      # Don't perform patch if no matches
 
-        patchArgs = {
+        patchArgs:dict = {
             "value":        patch.find('value'),
             "attribute":    patch.find("attribute"),     # Defer exception throw to later.
             "coreLibElems": currentCoreLibElems,
         }
+
+        # Replace Config Variables with user chosen value.
+        if mod.variables:
+            for var in mod.variables:
+                patchArgs["value"].text = patchArgs["value"].text.replace( str(var.name), str(var.value) )
+            
+
         PatchDispatch(pType)(patchArgs)
 
     # Execution

@@ -1,7 +1,8 @@
 
+from zipfile import ZipFile
+
 import ui.log
 
-from zipfile import ZipFile
 
 class GameInfo:
     def __init__(self, jarPath):

@@ -1,15 +1,13 @@
 
-import zlib
-import click
-import io
-import struct
-import os
 import hashlib
+import io
+import os
+import struct
+import zlib
 
-import png
-
+import click
 import lxml.etree
-
+import png
 import ui.log
 
 PIXEL_SIZE = 4

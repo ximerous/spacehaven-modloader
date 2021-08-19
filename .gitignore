@@ -15,3 +15,4 @@ extra_mods_path.txt
 env/
 .vscode/.ropeproject/
 .vscode/settings.json
+unit-tests/*.xml

@@ -1,9 +1,10 @@
 
 import os
-import sys
 import subprocess
+import sys
 
 import ui.log
+
 
 def launchAndWait(path):
     """Launch the game and wait for it to exit"""
