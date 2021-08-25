@@ -45,6 +45,27 @@ POSSIBLE_SPACEHAVEN_LOCATIONS = [
 ]
 DatabaseHandler = ui.database.ModDatabase
 
+#Frame with built in scrollbar. Used for MonConfigFrame
+class ScrollableFrame(ttk.Frame):
+    def __init__(self, container, *args, **kwargs):
+        super().__init__(container, *args, **kwargs)
+        canvas = Canvas(self)
+        scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
+        self.scrollable_frame = ttk.Frame(canvas)
+
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(
+                scrollregion=canvas.bbox("all")
+            )
+        )
+
+        canvas.create_window((0, 30), window=self.scrollable_frame, anchor="nw") 
+
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
 
 class Window(Frame):
     def __init__(self, master=None):
@@ -86,6 +107,7 @@ class Window(Frame):
 
         # MOD SELECTION LISTBOX (left pane)
         modList = self.modList = ScrolledListbox(modBrowser, selectmode=SINGLE) # , activestyle=NONE )
+        modList.configure(exportselection=False)
         def evt_ModList_ListboxSelect( evt ):
             w = evt.widget
             sel = w.curselection()
@@ -130,8 +152,7 @@ class Window(Frame):
 
         # Create Bottom frame placeholder for later.
         # This is populated when a mod is selected in the Listbox.
-        self.modConfigFrame:Frame = Frame(modDetailsWindow)
-
+        self.modConfigFrame = ScrollableFrame(modDetailsWindow) #Y30 used as default - see line 64
 
         # separator
         #Frame(self, height=1, bg="grey").pack(fill=X, padx=4, pady=8)
@@ -185,7 +206,6 @@ class Window(Frame):
         self.quickLaunchClear.pack(side = RIGHT, expand = False, padx=8, pady=4)
 
         buttonFrame.pack(fill = X, padx = 4, pady = 8)
-
 
         self.autolocateSpacehaven()
 
@@ -403,14 +423,21 @@ class Window(Frame):
         # label for variable description
         Label(valFrame,text=var.desc).pack(side=LEFT)
 
-        # Entry for value (currently only text)
+        # Entry for value 
         tk_value = StringVar(valFrame, value=var.value)
         def _value_update(name, index, mode, mod, var, tk_value):
             var.value = tk_value.get()
+        # Checkbox option
+        if (var.type == "toggle"):
+            c1 = Checkbutton(valFrame,variable=tk_value,onvalue=var.max,offvalue=var.min)
+            c1.pack()
+        # Else uses entry text
+        else:
+            entryValue = Entry(valFrame,textvariable=tk_value)
+            entryValue.pack(side=RIGHT)
 
         tk_value.trace('w', lambda name,index,mode : _value_update(name,index,mode,mod,var,tk_value) )
-        entryValue = Entry(valFrame,textvariable=tk_value)
-        entryValue.pack(side=RIGHT)
+
 
         # Link the UI variable back to the config variable for later.
         var.ui_stringvar = tk_value
@@ -426,8 +453,8 @@ class Window(Frame):
         if not mod or not mod.variables:
             return
         for var in mod.variables:
-            var.value = var.default
             var.ui_stringvar.set(var.default)
+            var.value = var.default
         self.modConfigFrame.update()
 
     def update_mod_config_ui(self,mod:ui.database.Mod):
@@ -438,25 +465,24 @@ class Window(Frame):
         
         try:
             if len(mod.variables)>0:
-                self.modConfigFrame = Frame(self.modDetailsWindow)
+                self.modConfigFrame = ScrollableFrame(self.modDetailsWindow)
             else:
                 return
         except:
             return
 
         # Reset button at top.
-        resetFrame = Frame(self.modConfigFrame)
+        resetFrame = Frame(self.modConfigFrame.scrollable_frame)
         resetButton = Button(resetFrame, text="Reset to Defaults", anchor=NE, command=self.reset_ModConfigVariables)
         resetButton.pack(side = RIGHT, padx=4, pady=4)
         resetFrame.pack(fill=X)
 
         for v in mod.variables:
-            self.create_ModConfigVariableEntry( self.modConfigFrame, mod, v)
+            self.create_ModConfigVariableEntry( self.modConfigFrame.scrollable_frame, mod, v)
 
         self.modConfigFrame.update()
         self.modDetailsWindow.add(self.modConfigFrame, minsize=self.modConfigFrame.winfo_reqheight())
         self.modDetailsWindow.update()
-
 
     def showMod(self, mod:ui.database.Mod):
         if not mod:
